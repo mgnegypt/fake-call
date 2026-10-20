@@ -17,6 +17,8 @@ import android.content.pm.PackageManager
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -204,7 +206,7 @@ fun SettingsScreen(onShowUpdate: () -> Unit, onOpenLogs: () -> Unit) {
                 modifier = Modifier.weight(1f)
             )
             Icon(
-                androidx.compose.material.icons.Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                Icons.AutoMirrored.Filled.KeyboardArrowRight,
                 contentDescription = null
             )
         }
