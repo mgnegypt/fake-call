@@ -145,8 +145,9 @@
 
     <!-- Errors / misc -->
     <string name="error_no_dialer_account">The call account could not be used, so the call was not placed.</string>
-    <string name="diag_title">Last call attempt</string>
-    <string name="diag_none">No call attempt recorded yet. Trigger a call and this card will show exactly what the system reported.</string>
+    <string name="diag_none">No call attempt recorded yet. Trigger a call and this screen will show exactly what the system reported.</string>
+    <string name="logs_title">Logs</string>
+    <string name="logs_export">Export logs as a file</string>
     <string name="telecom_unavailable_title">System call account not available</string>
     <string name="telecom_unavailable_text">The fake call could not ring in the system dialer because the Fake Call account is not enabled. Tap to open call account settings and enable it.</string>
 

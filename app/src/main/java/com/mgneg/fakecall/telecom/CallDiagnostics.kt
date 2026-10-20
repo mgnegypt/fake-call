@@ -6,8 +6,8 @@ import android.telecom.PhoneAccountHandle
 import android.telecom.TelecomManager
 
 /**
- * A snapshot of one trigger attempt, recorded so the Settings diagnostics
- * card can show the device's own ground truth instead of guesses: what
+ * A snapshot of one trigger attempt, recorded so the Logs screen
+ * can show the device's own ground truth instead of guesses: what
  * mode was requested, what our enabled-probe saw, whether Telecom was
  * actually asked to place the call, what it answered (including the
  * exception when it refused), and how the registrar itself described the
@@ -33,10 +33,14 @@ data class CallAttemptDiagnostics(
     /** Registrar snapshot lines (our account lookup + call-capable accounts). */
     val snapshot: List<String> = emptyList()
 ) {
-    /** One-line-per-field plain-text rendering for the Settings card. */
+    /**
+     * One-line-per-field plain-text rendering (human-readable time first).
+     * This is the single source of the field content: the Logs screen
+     * displays these lines and [toLogText] exports them.
+     */
     fun toDisplayLines(): List<String> {
         val lines = mutableListOf<String>()
-        lines += "time=$timestamp"
+        lines += "time=${formatTime(timestamp)}"
         lines += "mode=$mode"
         lines += "accountEnabled=$accountEnabled"
         lines += "placeAttempted=$placeAttempted"
@@ -48,6 +52,22 @@ data class CallAttemptDiagnostics(
         lines += snapshot
         return lines
     }
+
+    /**
+     * Full plain-text export of this record: an app header line and the
+     * export time, then every display line. When no attempt was recorded
+     * yet ([timestamp] == 0), the body is [noAttemptNote] instead, so the
+     * exported file still explains itself.
+     */
+    fun toLogText(appName: String, noAttemptNote: String): String {
+        val body = if (timestamp == 0L) noAttemptNote
+            else toDisplayLines().joinToString("\n")
+        return "$appName logs\nexported=${formatTime(System.currentTimeMillis())}\n\n$body\n"
+    }
+
+    private fun formatTime(epochMillis: Long): String =
+        java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.US)
+            .format(java.util.Date(epochMillis))
 }
 
 /**

@@ -1,10 +1,12 @@
 package com.mgneg.fakecall.ui.screens
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
@@ -16,6 +18,7 @@ import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -47,7 +50,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 @Composable
-fun SettingsScreen(onShowUpdate: () -> Unit) {
+fun SettingsScreen(onShowUpdate: () -> Unit, onOpenLogs: () -> Unit) {
     val context = LocalContext.current
     val app = context.applicationContext as FakeCallApp
     val scope = rememberCoroutineScope()
@@ -56,8 +59,6 @@ fun SettingsScreen(onShowUpdate: () -> Unit) {
     val dynamicColor by app.settings.dynamicColor.collectAsState(initial = false)
     val callMode by app.settings.callMode.collectAsState(initial = "telecom")
     val updateNotifications by app.settings.updateNotifications.collectAsState(initial = false)
-    val lastAttempt by app.settings.lastCallAttempt
-        .collectAsState(initial = com.mgneg.fakecall.telecom.CallAttemptDiagnostics())
 
     var accountLabel by remember { mutableStateOf("") }
     var defaultName by remember { mutableStateOf("") }
@@ -130,8 +131,6 @@ fun SettingsScreen(onShowUpdate: () -> Unit) {
         }
         Text(stringResource(R.string.call_mode_desc), style = MaterialTheme.typography.bodySmall)
 
-        DiagnosticsSection(lastAttempt)
-
         SectionTitle(R.string.settings_account_label)
         OutlinedTextField(
             value = accountLabel, onValueChange = { accountLabel = it },
@@ -189,39 +188,25 @@ fun SettingsScreen(onShowUpdate: () -> Unit) {
 
         SectionTitle(R.string.settings_automation)
         Text(stringResource(R.string.settings_automation_desc), style = MaterialTheme.typography.bodyMedium)
-    }
-}
 
-/**
- * Ground truth of the most recent trigger attempt, recorded by
- * [com.mgneg.fakecall.telecom.CallController.startIncoming]: the mode,
- * what our enabled-probe saw, whether Telecom was asked, what it
- * answered (exception included), and how the registrar itself described
- * the accounts. This replaces guesswork when a device misbehaves.
- */
-@Composable
-private fun DiagnosticsSection(attempt: com.mgneg.fakecall.telecom.CallAttemptDiagnostics) {
-    SectionTitle(R.string.diag_title)
-    if (attempt.timestamp == 0L) {
-        Text(stringResource(R.string.diag_none), style = MaterialTheme.typography.bodySmall)
-    } else {
-        val timeText = remember(attempt.timestamp) {
-            java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.US)
-                .format(java.util.Date(attempt.timestamp))
-        }
-        Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+        // Logs lives at the very end: the recorded diagnostics of the
+        // last call attempt, on its own screen with a file export.
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(min = 56.dp)
+                .clickable(onClick = onOpenLogs),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             Text(
-                "time=$timeText",
-                style = MaterialTheme.typography.bodySmall,
-                fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace
+                stringResource(R.string.logs_title),
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.weight(1f)
             )
-            attempt.toDisplayLines().drop(1).forEach { line ->
-                Text(
-                    line,
-                    style = MaterialTheme.typography.bodySmall,
-                    fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace
-                )
-            }
+            Icon(
+                androidx.compose.material.icons.Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                contentDescription = null
+            )
         }
     }
 }

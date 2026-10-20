@@ -47,6 +47,7 @@ import com.mgneg.fakecall.telecom.IncomingCallActivity
 import com.mgneg.fakecall.ui.screens.AboutScreen
 import com.mgneg.fakecall.ui.screens.HistoryScreen
 import com.mgneg.fakecall.ui.screens.HomeScreen
+import com.mgneg.fakecall.ui.screens.LogsScreen
 import com.mgneg.fakecall.ui.screens.SettingsScreen
 import com.mgneg.fakecall.ui.screens.UpdateSheet
 import com.mgneg.fakecall.ui.screens.WhatsNewSheet
@@ -58,6 +59,9 @@ object Routes {
     const val HISTORY = "history"
     const val SETTINGS = "settings"
     const val ABOUT = "about"
+
+    /** Sub-destination of Settings (the diagnostics logs screen). */
+    const val LOGS = "logs"
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -145,7 +149,10 @@ fun FakeCallRoot(app: FakeCallApp) {
             NavigationBar {
                 items.forEach { (dest, label, icon) ->
                     NavigationBarItem(
-                        selected = route == dest,
+                        // Logs is a sub-screen of Settings: keep the
+                        // Settings tab highlighted while it is showing.
+                        selected = route == dest ||
+                            (dest == Routes.SETTINGS && route == Routes.LOGS),
                         onClick = {
                             navController.navigate(dest) {
                                 popUpTo(Routes.HOME) { saveState = true }
@@ -179,7 +186,13 @@ fun FakeCallRoot(app: FakeCallApp) {
                     )
                 }
                 composable(Routes.HISTORY) { HistoryScreen() }
-                composable(Routes.SETTINGS) { SettingsScreen(onShowUpdate = { showUpdate = true }) }
+                composable(Routes.SETTINGS) {
+                    SettingsScreen(
+                        onShowUpdate = { showUpdate = true },
+                        onOpenLogs = { navController.navigate(Routes.LOGS) }
+                    )
+                }
+                composable(Routes.LOGS) { LogsScreen() }
                 composable(Routes.ABOUT) { AboutScreen(onShowUpdate = { showUpdate = true }) }
             }
         }
