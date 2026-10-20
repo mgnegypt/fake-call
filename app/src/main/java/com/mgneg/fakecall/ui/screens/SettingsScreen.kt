@@ -42,7 +42,7 @@ fun SettingsScreen(onShowUpdate: () -> Unit) {
     val scope = rememberCoroutineScope()
 
     val language by app.settings.language.collectAsState(initial = "system")
-    val dynamicColor by app.settings.dynamicColor.collectAsState(initial = true)
+    val dynamicColor by app.settings.dynamicColor.collectAsState(initial = false)
     val callMode by app.settings.callMode.collectAsState(initial = "telecom")
     val updateNotifications by app.settings.updateNotifications.collectAsState(initial = false)
 

@@ -41,7 +41,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         setContent {
-            val dynamicColor by app.settings.dynamicColor.collectAsState(initial = true)
+            val dynamicColor by app.settings.dynamicColor.collectAsState(initial = false)
             var showIntro by remember { mutableStateOf<Boolean?>(null) }
             androidx.compose.runtime.LaunchedEffect(Unit) {
                 showIntro = !app.settings.introShown.first()

@@ -1,5 +1,17 @@
 # Changelog
 
+## [Unreleased]
+
+## English
+### Improved
+- Dual visual identity: Volt UI in dark mode (bold, high-contrast, lime-accented) and Aura UI in light mode (calm, organic, sage-green), with matching splash screens, launcher artwork, shapes, and system bars
+- Dynamic color (Monet) is now an opt-in in Settings; the brand palettes are the default
+
+## العربية
+### تم التحسين
+- هوية بصرية مزدوجة: واجهة Volt في الوضع الداكن (جريئة وعالية التباين بلمسات ليمونية) وواجهة Aura في الوضع الفاتح (هادئة وطبيعية بأخضر المريمية)، مع شاشات بداية وأيقونة وأشكال وأشرطة نظام متناسقة
+- الألوان الديناميكية (Monet) أصبحت اختيارية من الإعدادات؛ لوحات العلامة هي الافتراضية
+
 ## [1.0] - 2026-10-20
 
 ## English

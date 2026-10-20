@@ -36,7 +36,7 @@ class SettingsStore(private val context: Context) {
     }
 
     val language: Flow<String> = context.dataStore.data.map { it[Keys.LANGUAGE] ?: "system" }
-    val dynamicColor: Flow<Boolean> = context.dataStore.data.map { it[Keys.DYNAMIC_COLOR] ?: true }
+    val dynamicColor: Flow<Boolean> = context.dataStore.data.map { it[Keys.DYNAMIC_COLOR] ?: false }
     val callMode: Flow<String> = context.dataStore.data.map { it[Keys.CALL_MODE] ?: "telecom" }
     val accountLabel: Flow<String> = context.dataStore.data.map { it[Keys.ACCOUNT_LABEL] ?: "Fake Call" }
     val defaultName: Flow<String> = context.dataStore.data.map { it[Keys.DEFAULT_NAME] ?: "" }

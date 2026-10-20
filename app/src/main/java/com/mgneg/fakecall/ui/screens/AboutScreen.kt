@@ -69,7 +69,7 @@ fun AboutScreen(onShowUpdate: () -> Unit) {
                 modifier = Modifier
                     .size(72.dp)
                     .clip(androidx.compose.foundation.shape.RoundedCornerShape(16.dp))
-                    .background(androidx.compose.ui.graphics.Color(0xFF0B3D5C)),
+                    .background(com.mgneg.fakecall.ui.theme.BrandTile),
                 contentAlignment = androidx.compose.ui.Alignment.Center
             ) {
                 Image(

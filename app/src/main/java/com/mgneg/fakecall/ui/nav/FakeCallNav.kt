@@ -114,7 +114,7 @@ fun FakeCallRoot(app: FakeCallApp) {
                         modifier = Modifier
                             .size(48.dp)
                             .clip(androidx.compose.foundation.shape.RoundedCornerShape(12.dp))
-                            .background(androidx.compose.ui.graphics.Color(0xFF0B3D5C)),
+                            .background(com.mgneg.fakecall.ui.theme.BrandTile),
                         contentAlignment = androidx.compose.ui.Alignment.Center
                     ) {
                         Image(
