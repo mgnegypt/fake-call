@@ -9,7 +9,16 @@ import android.telecom.PhoneAccount
 import android.telecom.PhoneAccountHandle
 import android.telecom.TelecomManager
 
-/** Registration and use of the self-managed Telecom PhoneAccount. */
+/**
+ * Registration and use of the Telecom PhoneAccount.
+ *
+ * The account is registered as a CALL_PROVIDER (not self-managed). That is
+ * the mechanism that makes the SYSTEM phone app render the incoming-call
+ * UI, play the ringtone, and write the call log entry: non-self-managed
+ * calls are handled by the default dialer's InCallService. A self-managed
+ * account, by contrast, is responsible for its own UI and many OEM dialers
+ * never show one for it — the call effectively rings invisibly.
+ */
 object TelecomAccounts {
 
     const val ACCOUNT_ID = "fake_call_account"
@@ -26,7 +35,7 @@ object TelecomAccounts {
     fun register(context: Context, label: String) {
         val tm = context.getSystemService(TelecomManager::class.java) ?: return
         val account = PhoneAccount.builder(handle(context), label)
-            .setCapabilities(PhoneAccount.CAPABILITY_SELF_MANAGED)
+            .setCapabilities(PhoneAccount.CAPABILITY_CALL_PROVIDER)
             .setSupportedUriSchemes(listOf(PhoneAccount.SCHEME_TEL))
             .setShortDescription(label)
             .build()

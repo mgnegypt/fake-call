@@ -8,9 +8,9 @@ and with the app closed?
 
 ## Options considered (from the official Android documentation)
 
-### 1. Telecom framework (self-managed ConnectionService)
+### 1. Telecom framework (ConnectionService)
 
-- Register a self-managed `PhoneAccount` with `TelecomManager`, implement a
+- Register a `PhoneAccount` with `TelecomManager`, implement a
   `ConnectionService`, and raise the call with `addNewIncomingCall`.
 - The system in-call UI (the device's default dialer / Telecom UI) renders the
   ringing and in-call experience and the call is written to the system call
@@ -35,27 +35,35 @@ and with the app closed?
 
 ## Decision
 
-**Telecom first, automatic fallback — with our own UI on both paths.**
+**Telecom first (call-provider account), automatic fallback.**
 
-Field finding (2026-10-20): several OEM dialers never render an in-call UI
-for self-managed accounts, so "let the system UI ring" silently produced no
-visible call on real devices. The documented contract for self-managed
-accounts is that the app presents the UI; Telecom signals this through
-`Connection.onShowIncomingCallUi`.
+Field finding (2026-10-20): our first build registered the PhoneAccount as
+`CAPABILITY_SELF_MANAGED`, and on the owner's device no call UI ever
+appeared — self-managed accounts are responsible for their own UI, and many
+OEM dialers render nothing for them. The reference behavior (verified from
+the mechanism, implemented independently here) is to register the account
+as **`CAPABILITY_CALL_PROVIDER`**: non-self-managed calls are rendered by
+the default phone app's InCallService — the system shows its real incoming
+call screen, plays the ringtone, and writes the call-log entry.
 
-`CallController.startIncoming()` now:
+`CallController.startIncoming()`:
 
 1. If the PhoneAccount is enabled → raise the call through Telecom
-   (`addNewIncomingCall`). When Telecom asks for UI
-   (`Connection.onShowIncomingCallUi`), our incoming-call activity opens; its buttons
-   are bridged to the live `Connection` (`answer()` / `reject()` /
-   `disconnect()`), so the call is a real Telecom call — in the system call
-   log and audio-routed — with our screen as its face. If the device's
-   dialer also shows its own UI, both control the same connection.
+   (`addNewIncomingCall`); the **system phone app presents the call**. Our
+   `FakeConnection` callbacks (`onAnswer` / `onReject` / `onDisconnect`)
+   fire from the user's actions in that system UI, drive the history row,
+   and play the answer audio on the voice-communication route. Our own call
+   activity stays out of the way on this path; `Connection.onShowIncomingCallUi`
+   is kept only as an OEM safety net (Telecom normally never calls it for
+   call-provider accounts), bridged to the live connection if it ever fires.
 2. Otherwise (account not enabled, exception, or the user picked "App screen"
-   in Settings) → post the full-screen-intent notification and show the same
+   in Settings) → post the full-screen-intent notification and show our own
    incoming-call screen, mirroring the same states (ringing → in-call →
    ended) and logging history identically.
+
+Note: switching an existing install's account capability can reset its
+enabled state on some builds — the Home readiness card detects this and
+asks the user to enable the account once more.
 
 Both paths write the same Room history record and honour the same caller name,
 number, avatar, and answer audio. The Settings screen shows the account state

@@ -6,7 +6,7 @@ import android.telecom.DisconnectCause
 import com.mgneg.fakecall.FakeCallApp
 import com.mgneg.fakecall.data.db.CallStatus
 
-/** A self-managed Telecom connection: rings, then plays audio when answered. */
+/** A Telecom connection on the call-provider account: rings in the system phone app, then plays audio when answered. */
 class FakeConnection(
     context: Context,
     private val callerName: String,
@@ -21,7 +21,8 @@ class FakeConnection(
     private var finished = false
 
     init {
-        connectionProperties = PROPERTY_SELF_MANAGED
+        // No PROPERTY_SELF_MANAGED: the account is a call provider, so the
+        // system InCallService owns the UI for this connection.
         connectionCapabilities = CAPABILITY_MUTE or CAPABILITY_SUPPORTS_VT_LOCAL_BIDIRECTIONAL
         setCallerDisplayName(callerName, android.telecom.TelecomManager.PRESENTATION_ALLOWED)
         setRinging()
@@ -39,9 +40,10 @@ class FakeConnection(
     }
 
     /**
-     * Telecom asks the app to present its incoming-call UI (self-managed
-     * contract). Several OEM dialers show no UI of their own for
-     * self-managed accounts, so this hook is what makes the call visible.
+     * Safety net only: with a CALL_PROVIDER account the system InCallService
+     * renders the call and Telecom normally never calls this. If an OEM
+     * build still asks the app for UI, we present ours — its buttons are
+     * bridged to this very connection.
      */
     override fun onShowIncomingCallUi() {
         appContext.startActivity(
