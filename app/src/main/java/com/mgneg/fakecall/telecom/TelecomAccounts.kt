@@ -44,7 +44,22 @@ object TelecomAccounts {
 
     fun isEnabled(context: Context): Boolean {
         val tm = context.getSystemService(TelecomManager::class.java) ?: return false
-        return runCatching { tm.getPhoneAccount(handle(context))?.isEnabled == true }
+        val ours = handle(context)
+        // Primary signal: the call-capable list. Accounts returned by
+        // getCallCapablePhoneAccounts are by definition registered AND
+        // user-enabled. The direct getPhoneAccount().isEnabled probe is
+        // NOT trusted as the primary signal: on the owner's Nubia/REDMAGIC
+        // stack it reported false while the account toggle was ON in
+        // system settings and system-UI calls rang fine (field-verified
+        // 2026-10-20) — the same probe that used to gate placement and
+        // silently blocked every system-UI call.
+        val capable = runCatching { tm.callCapablePhoneAccounts }.getOrNull()
+        if (capable != null) {
+            return capable.any {
+                it.componentName == ours.componentName && it.id == ours.id
+            }
+        }
+        return runCatching { tm.getPhoneAccount(ours)?.isEnabled == true }
             .getOrDefault(false)
     }
 
