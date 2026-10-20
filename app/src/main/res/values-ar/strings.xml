@@ -132,6 +132,14 @@
 
     <string name="error_no_dialer_account">تعذّر استخدام حساب المكالمة؛ تم عرض شاشة المكالمة داخل التطبيق بدلًا من ذلك.</string>
 
+        <string name="hero_title">جدولة مكالمة</string>
+    <string name="hero_subtitle">اضبط الوقت والمتصل والمزيد</string>
+    <string name="callnow_subtitle">ابدأ مكالمة واردة فورًا</string>
+    <string name="home_start_call">بدء المكالمة</string>
+    <string name="ringtone_label">نغمة الرنين</string>
+    <string name="ringtone_default">الافتراضية</string>
+    <string name="vibration_label">الاهتزاز</string>
+
     <plurals name="delay_seconds">
         <item quantity="zero">%d ثانية</item>
         <item quantity="one">ثانية واحدة</item>

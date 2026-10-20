@@ -47,6 +47,48 @@ class CallController(private val context: Context) {
     private val audioPlayer = CallAudioPlayer(context)
     private var ringtonePlayer: RingtonePlayer? = null
 
+    /** The live Telecom connection while a system-path call exists. */
+    @Volatile
+    private var telecomConnection: FakeConnection? = null
+
+    fun bindTelecomConnection(connection: FakeConnection) {
+        telecomConnection = connection
+    }
+
+    fun unbindTelecomConnection(connection: FakeConnection) {
+        if (telecomConnection === connection) telecomConnection = null
+    }
+
+    /** Answer, whichever presentation path the live call is using. */
+    fun answerCurrent() {
+        val s = _state.value as? CallState.Ringing ?: return
+        if (s.path == CallPath.TELECOM) {
+            telecomConnection?.answer()
+        } else {
+            answerFromAppScreen()
+        }
+    }
+
+    /** Decline, whichever presentation path the live call is using. */
+    fun declineCurrent() {
+        val s = _state.value as? CallState.Ringing ?: return
+        if (s.path == CallPath.TELECOM) {
+            telecomConnection?.reject()
+        } else {
+            declineFromAppScreen()
+        }
+    }
+
+    /** End an in-progress call on either path. */
+    fun endCurrent() {
+        val s = _state.value as? CallState.InCall ?: return
+        if (s.path == CallPath.TELECOM) {
+            telecomConnection?.disconnect()
+        } else {
+            endFromAppScreen()
+        }
+    }
+
     fun startIncoming(callerName: String, callerNumber: String, audioUri: String?, historyId: Long) {
         app.appScope.launch {
             val mode = app.settings.callMode.first()
@@ -56,7 +98,9 @@ class CallController(private val context: Context) {
                 _state.value = CallState.Ringing(callerName, callerNumber, audioUri, historyId, CallPath.TELECOM)
             } else {
                 _state.value = CallState.Ringing(callerName, callerNumber, audioUri, historyId, CallPath.APP_SCREEN)
-                ringtonePlayer = RingtonePlayer(context).also { it.start() }
+                val ringtoneUri = app.settings.ringtoneUri.first()
+                val vibrate = app.settings.vibrateOnRing.first()
+                ringtonePlayer = RingtonePlayer(context, ringtoneUri, vibrate).also { it.start() }
                 IncomingCallNotifier.show(context, callerName, callerNumber)
             }
         }

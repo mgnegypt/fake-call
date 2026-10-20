@@ -144,6 +144,14 @@
     <!-- Errors / misc -->
     <string name="error_no_dialer_account">The call account could not be used; the app call screen was shown instead.</string>
 
+        <string name="hero_title">Schedule Call</string>
+    <string name="hero_subtitle">Set the time, caller, and more</string>
+    <string name="callnow_subtitle">Start an incoming call instantly</string>
+    <string name="home_start_call">Start Fake Call</string>
+    <string name="ringtone_label">Ringtone</string>
+    <string name="ringtone_default">Default</string>
+    <string name="vibration_label">Vibration</string>
+
     <plurals name="delay_seconds">
         <item quantity="one">%d second</item>
         <item quantity="other">%d seconds</item>

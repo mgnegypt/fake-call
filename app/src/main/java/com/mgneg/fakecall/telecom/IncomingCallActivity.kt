@@ -23,13 +23,13 @@ class IncomingCallActivity : ComponentActivity() {
                 val state by app.callController.state.collectAsState()
                 CallScreen(
                     state = state,
-                    onAnswer = { app.callController.answerFromAppScreen() },
+                    onAnswer = { app.callController.answerCurrent() },
                     onDecline = {
-                        app.callController.declineFromAppScreen()
+                        app.callController.declineCurrent()
                         finish()
                     },
                     onEnd = {
-                        app.callController.endFromAppScreen()
+                        app.callController.endCurrent()
                         finish()
                     },
                     onToggleMute = { app.callController.setMuted(it) },

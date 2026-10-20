@@ -33,6 +33,8 @@ class SettingsStore(private val context: Context) {
         val LATEST_DATE = stringPreferencesKey("update_latest_date")
         val LAST_SEEN_VERSION = stringPreferencesKey("last_seen_version")
         val INTRO_SHOWN = booleanPreferencesKey("intro_shown")
+        val RINGTONE_URI = stringPreferencesKey("ringtone_uri")
+        val VIBRATE_ON_RING = booleanPreferencesKey("vibrate_on_ring")
     }
 
     val language: Flow<String> = context.dataStore.data.map { it[Keys.LANGUAGE] ?: "system" }
@@ -46,6 +48,8 @@ class SettingsStore(private val context: Context) {
     val lastSeenVersion: Flow<String> =
         context.dataStore.data.map { it[Keys.LAST_SEEN_VERSION] ?: "" }
     val introShown: Flow<Boolean> = context.dataStore.data.map { it[Keys.INTRO_SHOWN] ?: false }
+    val ringtoneUri: Flow<String?> = context.dataStore.data.map { it[Keys.RINGTONE_URI] }
+    val vibrateOnRing: Flow<Boolean> = context.dataStore.data.map { it[Keys.VIBRATE_ON_RING] ?: true }
 
     data class UpdateCache(
         val lastCheck: Long = 0,
@@ -80,6 +84,10 @@ class SettingsStore(private val context: Context) {
     suspend fun setUpdateNotifications(v: Boolean) = edit { it[Keys.UPDATE_NOTIFICATIONS] = v }
     suspend fun setLastSeenVersion(v: String) = edit { it[Keys.LAST_SEEN_VERSION] = v }
     suspend fun setIntroShown(v: Boolean) = edit { it[Keys.INTRO_SHOWN] = v }
+    suspend fun setRingtoneUri(v: String?) = edit { p ->
+        if (v == null) p.remove(Keys.RINGTONE_URI) else p[Keys.RINGTONE_URI] = v
+    }
+    suspend fun setVibrateOnRing(v: Boolean) = edit { it[Keys.VIBRATE_ON_RING] = v }
 
     suspend fun saveUpdateCache(c: UpdateCache) = edit { p ->
         p[Keys.LAST_CHECK] = c.lastCheck

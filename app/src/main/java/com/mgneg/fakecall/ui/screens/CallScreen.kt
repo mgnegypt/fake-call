@@ -6,6 +6,8 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.ui.draw.blur
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -63,8 +65,48 @@ fun CallScreen(
 ) {
     when (state) {
         is CallState.Idle -> LaunchedEffect(Unit) { onFinished() }
-        is CallState.Ringing -> RingingContent(state, onAnswer, onDecline)
-        is CallState.InCall -> InCallContent(state, onEnd, onToggleMute, onToggleSpeaker)
+        is CallState.Ringing -> AuroraBackground {
+            RingingContent(state, onAnswer, onDecline)
+        }
+        is CallState.InCall -> AuroraBackground {
+            InCallContent(state, onEnd, onToggleMute, onToggleSpeaker)
+        }
+    }
+}
+
+/**
+ * Soft aurora backdrop in the active identity's colors — deep green-black
+ * glow for Volt, pale botanical glow for Aura (both derive from the scheme).
+ */
+@Composable
+private fun AuroraBackground(content: @Composable () -> Unit) {
+    val scheme = MaterialTheme.colorScheme
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(
+                Brush.verticalGradient(
+                    listOf(scheme.background, scheme.primaryContainer.copy(alpha = 0.35f), scheme.background)
+                )
+            )
+    ) {
+        Box(
+            modifier = Modifier
+                .align(androidx.compose.ui.Alignment.TopEnd)
+                .size(320.dp)
+                .clip(CircleShape)
+                .background(scheme.primary.copy(alpha = 0.38f))
+                .blur(70.dp)
+        )
+        Box(
+            modifier = Modifier
+                .align(androidx.compose.ui.Alignment.BottomStart)
+                .size(280.dp)
+                .clip(CircleShape)
+                .background(scheme.tertiary.copy(alpha = 0.30f))
+                .blur(70.dp)
+        )
+        content()
     }
 }
 

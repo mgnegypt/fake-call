@@ -50,6 +50,7 @@ class FakeConnection(
     private fun finish(status: String) {
         if (finished) return
         finished = true
+        controller.unbindTelecomConnection(this)
         audioPlayer.stop()
         val duration = if (answeredAt > 0)
             ((System.currentTimeMillis() - answeredAt) / 1000).toInt() else 0
