@@ -9,6 +9,14 @@ object CallStatus {
     const val ANSWERED = "ANSWERED"
     const val DECLINED = "DECLINED"
     const val COMPLETED = "COMPLETED"
+
+    /**
+     * The call could not be presented at all (e.g. Telecom mode selected
+     * but the system call account is disabled). The status column is a
+     * plain TEXT value with no schema constraint, so this is a safe,
+     * migration-free addition.
+     */
+    const val FAILED = "FAILED"
 }
 
 @Entity(tableName = "call_history")

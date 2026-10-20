@@ -50,7 +50,18 @@ object TelecomAccounts {
 
     fun accountSettingsIntent(): Intent = Intent(TelecomManager.ACTION_CHANGE_PHONE_ACCOUNTS)
 
-    /** Raise an incoming call through Telecom. Returns false if it could not be placed. */
+    /**
+     * Raise an incoming call through Telecom. Returns false if it could not
+     * be placed.
+     *
+     * Extras contract (must mirror [FakeConnectionService]): the address
+     * sits at the TOP level under [TelecomManager.EXTRA_INCOMING_CALL_ADDRESS],
+     * while every app-specific value travels NESTED inside a child bundle
+     * under [TelecomManager.EXTRA_INCOMING_CALL_EXTRAS]. Telecom delivers
+     * the outer bundle as `ConnectionRequest.extras` and the service reads
+     * the nested child — values placed at the top level are silently lost
+     * on that side (name, audio and history id all arrived empty).
+     */
     fun placeIncomingCall(
         context: Context,
         callerName: String,
@@ -58,19 +69,30 @@ object TelecomAccounts {
         audioUri: String?,
         historyId: Long
     ): Boolean {
-        val tm = context.getSystemService(TelecomManager::class.java) ?: return false
+        val tm = context.getSystemService(TelecomManager::class.java)
+        if (tm == null) {
+            android.util.Log.w(TAG, "placeIncomingCall: TelecomManager unavailable")
+            return false
+        }
+        val appExtras = Bundle().apply {
+            putLong(EXTRA_HISTORY_ID, historyId)
+            putString(EXTRA_CALLER_NAME, callerName)
+            audioUri?.let { putString(EXTRA_AUDIO_URI, it) }
+        }
         val extras = Bundle().apply {
             putParcelable(
                 TelecomManager.EXTRA_INCOMING_CALL_ADDRESS,
                 Uri.fromParts(PhoneAccount.SCHEME_TEL, callerNumber, null)
             )
-            putLong(EXTRA_HISTORY_ID, historyId)
-            putString(EXTRA_CALLER_NAME, callerName)
-            audioUri?.let { putString(EXTRA_AUDIO_URI, it) }
+            putBundle(TelecomManager.EXTRA_INCOMING_CALL_EXTRAS, appExtras)
         }
         return runCatching {
             tm.addNewIncomingCall(handle(context), extras)
             true
+        }.onFailure {
+            android.util.Log.w(TAG, "placeIncomingCall: addNewIncomingCall failed", it)
         }.getOrDefault(false)
     }
+
+    private const val TAG = "FakeCallTelecom"
 }

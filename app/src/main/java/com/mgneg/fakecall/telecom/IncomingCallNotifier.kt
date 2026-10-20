@@ -42,6 +42,40 @@ object IncomingCallNotifier {
         context.getSystemService(NotificationManager::class.java).cancel(NOTIFICATION_ID)
     }
 
+    private const val UNAVAILABLE_NOTIFICATION_ID = 4102
+
+    /**
+     * Honest failure notice for strict Telecom mode: the user picked the
+     * system dialer, the call could not be placed there, and nothing rang.
+     * Tapping the notification (or its action) opens the system
+     * call-account settings where the account can be enabled. This is NOT
+     * a call notification — no full-screen intent, no answer/decline.
+     */
+    fun showTelecomUnavailable(context: Context) {
+        val settingsIntent = PendingIntent.getActivity(
+            context, 3,
+            TelecomAccounts.accountSettingsIntent()
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        val notification = NotificationCompat.Builder(context, FakeCallApp.CHANNEL_CALLS)
+            .setSmallIcon(R.drawable.ic_tile_phone)
+            .setContentTitle(context.getString(R.string.telecom_unavailable_title))
+            .setContentText(context.getString(R.string.telecom_unavailable_text))
+            .setStyle(
+                NotificationCompat.BigTextStyle()
+                    .bigText(context.getString(R.string.telecom_unavailable_text))
+            )
+            .setCategory(NotificationCompat.CATEGORY_ERROR)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setContentIntent(settingsIntent)
+            .setAutoCancel(true)
+            .addAction(0, context.getString(R.string.action_enable), settingsIntent)
+            .build()
+        context.getSystemService(NotificationManager::class.java)
+            .notify(UNAVAILABLE_NOTIFICATION_ID, notification)
+    }
+
     private fun actionIntent(context: Context, action: String, requestCode: Int): PendingIntent =
         PendingIntent.getBroadcast(
             context, requestCode,

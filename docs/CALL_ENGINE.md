@@ -35,7 +35,7 @@ and with the app closed?
 
 ## Decision
 
-**Telecom first (call-provider account), automatic fallback.**
+**Two strict modes, chosen by the user in Settings. No silent substitution.**
 
 Field finding (2026-10-20): our first build registered the PhoneAccount as
 `CAPABILITY_SELF_MANAGED`, and on the owner's device no call UI ever
@@ -46,29 +46,76 @@ as **`CAPABILITY_CALL_PROVIDER`**: non-self-managed calls are rendered by
 the default phone app's InCallService — the system shows its real incoming
 call screen, plays the ringtone, and writes the call-log entry.
 
-`CallController.startIncoming()`:
+Second field finding (2026-10-20, owner's REDMAGIC screenshots): even with
+the call-provider account in place, calls still rang in OUR aurora screen
+while the reference app rang in the plain system dialer. Two defects
+combined to cause this: the write side of the Telecom extras did not match
+the read side (see "Extras contract" below), and `startIncoming` silently
+fell back to the app screen whenever any Telecom gate link failed — so a
+disabled account (its enabled state can be reset when an existing
+install's account capability changes) permanently masked the system UI,
+and the user had no way to tell why. The fallback has been removed from
+Telecom mode.
 
-1. If the PhoneAccount is enabled → raise the call through Telecom
-   (`addNewIncomingCall`); the **system phone app presents the call**. Our
-   `FakeConnection` callbacks (`onAnswer` / `onReject` / `onDisconnect`)
-   fire from the user's actions in that system UI, drive the history row,
-   and play the answer audio on the voice-communication route. Our own call
-   activity plays NO part on this path — there is no `onShowIncomingCallUi`
-   override and no app-side answering of Telecom calls.
-2. Otherwise (account not enabled, exception, or the user picked "App screen"
-   in Settings) → post the full-screen-intent notification and show our own
-   incoming-call screen, mirroring the same states (ringing → in-call →
-   ended) and logging history identically.
+`CallController.startIncoming()` — the single funnel for every trigger
+(immediate, scheduled alarm, boot reschedule, automation broadcast,
+preset, QS tile; all arrive via `CallRepository.fireNow`). The routing
+decision itself is the pure, unit-tested `CallRouting.decide(mode,
+accountEnabled, placed)`:
+
+1. **Mode "telecom" (system dialer) — Telecom ONLY.**
+   - Account enabled and `addNewIncomingCall` accepted → the **system
+     phone app presents the call**. Our `FakeConnection` callbacks
+     (`onAnswer` / `onReject` / `onDisconnect`) fire from the user's
+     actions in that system UI, drive the history row, and play the
+     answer audio on the voice-communication route. Our own call activity
+     plays NO part on this path — there is no `onShowIncomingCallUi`
+     override and no app-side answering of Telecom calls.
+   - Account disabled OR placement rejected → **nothing rings**. State
+     returns to Idle, the history row is finished as `FAILED`, and the
+     user gets an honest notification ("System call account not
+     available") whose tap/action deep-links to the system call-account
+     settings (`TelecomManager.ACTION_CHANGE_PHONE_ACCOUNTS`). The app
+     screen is NEVER substituted in this mode: a substituted UI is what
+     hid the disabled account in the first place.
+2. **Mode "app" (app call screen)** → post the full-screen-intent
+   notification and show our own incoming-call screen, mirroring the same
+   states (ringing → in-call → ended) and logging history identically.
+   The Telecom account state is irrelevant in this mode.
+
+Every trigger logs one line under tag `FakeCallTelecom` with the mode,
+the account-enabled result, whether placement was attempted, its result,
+and the chosen route — so an on-device logcat capture shows exactly which
+link failed instead of guessing.
 
 Note: switching an existing install's account capability can reset its
 enabled state on some builds — the Home readiness card detects this and
 asks the user to enable the account once more.
 
-Both paths write the same Room history record and honour the same caller name,
-number, avatar, and answer audio. The Settings screen shows the account state
-and links to the system screen where the user can enable it, and the Home
-screen warns (with a shortcut) when neither path is fully permitted
-(exact-alarm / full-screen-intent / notification permission missing).
+Both successful paths write the same Room history record and honour the
+same caller name, number, and answer audio. The Settings screen shows the
+account state and links to the system screen where the user can enable
+it, and the Home screen warns (with a shortcut) when a prerequisite is
+missing (disabled account / exact-alarm / full-screen-intent /
+notification permission).
+
+## Extras contract (addNewIncomingCall ↔ ConnectionService)
+
+The bundle handed to `addNewIncomingCall` has a fixed two-level shape,
+and writer and reader must agree on it exactly:
+
+- **Top level:** `TelecomManager.EXTRA_INCOMING_CALL_ADDRESS` = the
+  `tel:` URI for the caller number.
+- **Nested** under `TelecomManager.EXTRA_INCOMING_CALL_EXTRAS`: a child
+  bundle carrying the app-specific values — history id, caller name, and
+  the optional answer-audio URI.
+
+Telecom delivers the outer bundle as `ConnectionRequest.extras`, and
+`FakeConnectionService` reads the child bundle from the nested key. An
+earlier build wrote the app values at the TOP level while the service
+read the nested bundle, so caller name, audio URI, and history id all
+arrived empty on the Telecom path — keep both sides aligned with this
+contract when touching either one.
 
 ## Reboot
 

@@ -65,6 +65,7 @@
     <string name="history_declined">Declined</string>
     <string name="history_completed">Completed</string>
     <string name="history_scheduled">Scheduled</string>
+    <string name="history_failed">Failed</string>
     <string name="history_clear">Clear history</string>
     <string name="history_clear_confirm">Delete all history entries?</string>
     <string name="duration_seconds">%1$d sec</string>
@@ -91,7 +92,7 @@
     <string name="settings_call_engine">Call presentation</string>
     <string name="call_mode_telecom">System dialer (Telecom)</string>
     <string name="call_mode_app">App call screen</string>
-    <string name="call_mode_desc">Telecom shows the call in the system dialer when the account is enabled. The app screen always works.</string>
+    <string name="call_mode_desc">Telecom mode shows the call ONLY in the system dialer and requires the Fake Call account to be enabled — if it is not, the call does not ring and you get a notification instead. App screen mode always uses the in-app call screen.</string>
     <string name="settings_account_label">Call account label</string>
     <string name="settings_account_label_desc">The name shown for the Fake Call account in system settings. Changing it re-registers the account.</string>
     <string name="settings_defaults">Default caller</string>
@@ -143,7 +144,9 @@
     <string name="notif_update_text">Tap to see what\'s new and update.</string>
 
     <!-- Errors / misc -->
-    <string name="error_no_dialer_account">The call account could not be used; the app call screen was shown instead.</string>
+    <string name="error_no_dialer_account">The call account could not be used, so the call was not placed.</string>
+    <string name="telecom_unavailable_title">System call account not available</string>
+    <string name="telecom_unavailable_text">The fake call could not ring in the system dialer because the Fake Call account is not enabled. Tap to open call account settings and enable it.</string>
 
         <string name="hero_title">Schedule Call</string>
     <string name="hero_subtitle">Set the time, caller, and more</string>

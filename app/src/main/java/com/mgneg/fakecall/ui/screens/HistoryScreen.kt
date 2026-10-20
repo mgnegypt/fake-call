@@ -75,6 +75,7 @@ fun HistoryScreen() {
                             CallStatus.ANSWERED, CallStatus.COMPLETED ->
                                 Icons.Filled.CallReceived to R.string.history_completed
                             CallStatus.DECLINED -> Icons.Filled.CallMissed to R.string.history_declined
+                            CallStatus.FAILED -> Icons.Filled.CallMissed to R.string.history_failed
                             else -> Icons.Filled.Schedule to R.string.history_scheduled
                         }
                         Icon(icon, contentDescription = null)
