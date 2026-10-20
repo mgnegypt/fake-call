@@ -53,9 +53,8 @@ call screen, plays the ringtone, and writes the call-log entry.
    `FakeConnection` callbacks (`onAnswer` / `onReject` / `onDisconnect`)
    fire from the user's actions in that system UI, drive the history row,
    and play the answer audio on the voice-communication route. Our own call
-   activity stays out of the way on this path; `Connection.onShowIncomingCallUi`
-   is kept only as an OEM safety net (Telecom normally never calls it for
-   call-provider accounts), bridged to the live connection if it ever fires.
+   activity plays NO part on this path — there is no `onShowIncomingCallUi`
+   override and no app-side answering of Telecom calls.
 2. Otherwise (account not enabled, exception, or the user picked "App screen"
    in Settings) → post the full-screen-intent notification and show our own
    incoming-call screen, mirroring the same states (ringing → in-call →
@@ -75,3 +74,17 @@ screen warns (with a shortcut) when neither path is fully permitted
 
 Alarms do not survive reboot. `BootReceiver` (on `BOOT_COMPLETED`) re-registers
 every pending scheduled call from Room and re-registers the PhoneAccount.
+
+Forensic addendum (2026-10-20, from the owner's device screenshots — our UI
+still opened over the system's and the caller showed as "Unknown"):
+
+- `ConnectionRequest` extras: the bundle passed to `addNewIncomingCall`
+  arrives nested under `TelecomManager.EXTRA_INCOMING_CALL_EXTRAS`. Reading
+  the top level loses caller name, audio URI, and history id. Fixed.
+- The connection itself must carry `setAddress(tel:…)` and a display name
+  (falling back to the number), `setAudioModeIsVoip(true)`, and the
+  initializing → ringing sequence, or the system UI renders "Unknown".
+  Fixed.
+- An `onShowIncomingCallUi` override — even as a "safety net" — makes some
+  OEM Telecom builds hand the UI to the app on top of the system's own
+  presentation. Removed entirely; the reference mechanism has none.

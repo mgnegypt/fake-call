@@ -21,50 +21,28 @@ class FakeConnection(
     private var finished = false
 
     init {
-        // No PROPERTY_SELF_MANAGED: the account is a call provider, so the
-        // system InCallService owns the UI for this connection.
-        connectionCapabilities = CAPABILITY_MUTE or CAPABILITY_SUPPORTS_VT_LOCAL_BIDIRECTIONAL
-        setCallerDisplayName(callerName, android.telecom.TelecomManager.PRESENTATION_ALLOWED)
+        // Construction aligned with how call-provider connections are
+        // expected to present themselves to the system InCallService:
+        // a real tel: address and display name on the connection itself
+        // (without these the system UI shows "Unknown"), VoIP audio mode,
+        // mute capability, then initializing -> ringing.
+        val address = android.net.Uri.fromParts(
+            android.telecom.PhoneAccount.SCHEME_TEL, callerNumber, null
+        )
+        setAddress(address, android.telecom.TelecomManager.PRESENTATION_ALLOWED)
+        setCallerDisplayName(
+            callerName.ifBlank { callerNumber },
+            android.telecom.TelecomManager.PRESENTATION_ALLOWED
+        )
+        connectionCapabilities = CAPABILITY_MUTE
+        setAudioModeIsVoip(true)
+        setInitializing()
         setRinging()
     }
 
     private val controller get() = (appContext as FakeCallApp).callController
 
-    override fun onAnswer() = doAnswer()
-
-    override fun onReject() = finish(CallStatus.DECLINED)
-
-    override fun onDisconnect() {
-        val status = if (answeredAt > 0) CallStatus.COMPLETED else CallStatus.DECLINED
-        finish(status)
-    }
-
-    /**
-     * Safety net only: with a CALL_PROVIDER account the system InCallService
-     * renders the call and Telecom normally never calls this. If an OEM
-     * build still asks the app for UI, we present ours — its buttons are
-     * bridged to this very connection.
-     */
-    override fun onShowIncomingCallUi() {
-        appContext.startActivity(
-            android.content.Intent(appContext, IncomingCallActivity::class.java)
-                .addFlags(
-                    android.content.Intent.FLAG_ACTIVITY_NEW_TASK or
-                        android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP
-                )
-        )
-    }
-
-    // Entry points for our own call screen (it controls this connection
-    // directly; Connection exposes no public answer()/reject() API).
-    fun answerFromUi() = doAnswer()
-    fun rejectFromUi() = finish(CallStatus.DECLINED)
-    fun endFromUi() {
-        val status = if (answeredAt > 0) CallStatus.COMPLETED else CallStatus.DECLINED
-        finish(status)
-    }
-
-    private fun doAnswer() {
+    override fun onAnswer() {
         if (answeredAt > 0) return
         answeredAt = System.currentTimeMillis()
         setActive()
@@ -74,12 +52,18 @@ class FakeConnection(
         audioUri?.let { audioPlayer.play(it) }
     }
 
+    override fun onReject() = finish(CallStatus.DECLINED)
+
+    override fun onDisconnect() {
+        val status = if (answeredAt > 0) CallStatus.COMPLETED else CallStatus.DECLINED
+        finish(status)
+    }
+
     override fun onAbort() = finish(CallStatus.DECLINED)
 
     private fun finish(status: String) {
         if (finished) return
         finished = true
-        controller.unbindTelecomConnection(this)
         audioPlayer.stop()
         val duration = if (answeredAt > 0)
             ((System.currentTimeMillis() - answeredAt) / 1000).toInt() else 0

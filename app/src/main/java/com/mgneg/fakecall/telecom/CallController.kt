@@ -47,47 +47,15 @@ class CallController(private val context: Context) {
     private val audioPlayer = CallAudioPlayer(context)
     private var ringtonePlayer: RingtonePlayer? = null
 
-    /** The live Telecom connection while a system-path call exists. */
-    @Volatile
-    private var telecomConnection: FakeConnection? = null
-
-    fun bindTelecomConnection(connection: FakeConnection) {
-        telecomConnection = connection
-    }
-
-    fun unbindTelecomConnection(connection: FakeConnection) {
-        if (telecomConnection === connection) telecomConnection = null
-    }
-
-    /** Answer, whichever presentation path the live call is using. */
-    fun answerCurrent() {
-        val s = _state.value as? CallState.Ringing ?: return
-        if (s.path == CallPath.TELECOM) {
-            telecomConnection?.answerFromUi()
-        } else {
-            answerFromAppScreen()
-        }
-    }
-
-    /** Decline, whichever presentation path the live call is using. */
-    fun declineCurrent() {
-        val s = _state.value as? CallState.Ringing ?: return
-        if (s.path == CallPath.TELECOM) {
-            telecomConnection?.rejectFromUi()
-        } else {
-            declineFromAppScreen()
-        }
-    }
-
-    /** End an in-progress call on either path. */
-    fun endCurrent() {
-        val s = _state.value as? CallState.InCall ?: return
-        if (s.path == CallPath.TELECOM) {
-            telecomConnection?.endFromUi()
-        } else {
-            endFromAppScreen()
-        }
-    }
+    /**
+     * Entry points for OUR call screen. That screen only ever serves the
+     * fallback (app-screen) path: on the Telecom path the system phone app
+     * owns the call UI and drives the connection's on* callbacks directly,
+     * so there is deliberately no app-side control of Telecom calls here.
+     */
+    fun answerCurrent() = answerFromAppScreen()
+    fun declineCurrent() = declineFromAppScreen()
+    fun endCurrent() = endFromAppScreen()
 
     fun startIncoming(callerName: String, callerNumber: String, audioUri: String?, historyId: Long) {
         app.appScope.launch {
