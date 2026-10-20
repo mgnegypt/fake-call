@@ -63,7 +63,7 @@ class CallController(private val context: Context) {
     fun answerCurrent() {
         val s = _state.value as? CallState.Ringing ?: return
         if (s.path == CallPath.TELECOM) {
-            telecomConnection?.answer()
+            telecomConnection?.answerFromUi()
         } else {
             answerFromAppScreen()
         }
@@ -73,7 +73,7 @@ class CallController(private val context: Context) {
     fun declineCurrent() {
         val s = _state.value as? CallState.Ringing ?: return
         if (s.path == CallPath.TELECOM) {
-            telecomConnection?.reject()
+            telecomConnection?.rejectFromUi()
         } else {
             declineFromAppScreen()
         }
@@ -83,7 +83,7 @@ class CallController(private val context: Context) {
     fun endCurrent() {
         val s = _state.value as? CallState.InCall ?: return
         if (s.path == CallPath.TELECOM) {
-            telecomConnection?.disconnect()
+            telecomConnection?.endFromUi()
         } else {
             endFromAppScreen()
         }

@@ -29,20 +29,47 @@ class FakeConnection(
 
     private val controller get() = (appContext as FakeCallApp).callController
 
-    override fun onAnswer() {
-        answeredAt = System.currentTimeMillis()
-        setActive()
-        controller.onTelecomStateChanged(
-            CallState.InCall(callerName, callerNumber, historyId, CallPath.TELECOM, answeredAt)
-        )
-        audioUri?.let { audioPlayer.play(it) }
-    }
+    override fun onAnswer() = doAnswer()
 
     override fun onReject() = finish(CallStatus.DECLINED)
 
     override fun onDisconnect() {
         val status = if (answeredAt > 0) CallStatus.COMPLETED else CallStatus.DECLINED
         finish(status)
+    }
+
+    /**
+     * Telecom asks the app to present its incoming-call UI (self-managed
+     * contract). Several OEM dialers show no UI of their own for
+     * self-managed accounts, so this hook is what makes the call visible.
+     */
+    override fun onShowIncomingCallUi() {
+        appContext.startActivity(
+            android.content.Intent(appContext, IncomingCallActivity::class.java)
+                .addFlags(
+                    android.content.Intent.FLAG_ACTIVITY_NEW_TASK or
+                        android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP
+                )
+        )
+    }
+
+    // Entry points for our own call screen (it controls this connection
+    // directly; Connection exposes no public answer()/reject() API).
+    fun answerFromUi() = doAnswer()
+    fun rejectFromUi() = finish(CallStatus.DECLINED)
+    fun endFromUi() {
+        val status = if (answeredAt > 0) CallStatus.COMPLETED else CallStatus.DECLINED
+        finish(status)
+    }
+
+    private fun doAnswer() {
+        if (answeredAt > 0) return
+        answeredAt = System.currentTimeMillis()
+        setActive()
+        controller.onTelecomStateChanged(
+            CallState.InCall(callerName, callerNumber, historyId, CallPath.TELECOM, answeredAt)
+        )
+        audioUri?.let { audioPlayer.play(it) }
     }
 
     override fun onAbort() = finish(CallStatus.DECLINED)

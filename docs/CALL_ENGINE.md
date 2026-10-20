@@ -41,13 +41,13 @@ Field finding (2026-10-20): several OEM dialers never render an in-call UI
 for self-managed accounts, so "let the system UI ring" silently produced no
 visible call on real devices. The documented contract for self-managed
 accounts is that the app presents the UI; Telecom signals this through
-`ConnectionService.onShowIncomingCallUi`.
+`Connection.onShowIncomingCallUi`.
 
 `CallController.startIncoming()` now:
 
 1. If the PhoneAccount is enabled → raise the call through Telecom
    (`addNewIncomingCall`). When Telecom asks for UI
-   (`onShowIncomingCallUi`), our incoming-call activity opens; its buttons
+   (`Connection.onShowIncomingCallUi`), our incoming-call activity opens; its buttons
    are bridged to the live `Connection` (`answer()` / `reject()` /
    `disconnect()`), so the call is a real Telecom call — in the system call
    log and audio-routed — with our screen as its face. If the device's
