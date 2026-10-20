@@ -35,6 +35,12 @@ class CallAudioPlayer(private val context: Context) {
         }
     }
 
+    /** Honor the system call UI's mute toggle for the answer clip. */
+    fun setMuted(muted: Boolean) {
+        val level = if (muted) 0f else 1f
+        player?.setVolume(level, level)
+    }
+
     fun stop() {
         player?.runCatching { if (isPlaying) stop() }
         player?.release()

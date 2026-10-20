@@ -41,6 +41,7 @@ import androidx.navigation.compose.rememberNavController
 import com.mgneg.fakecall.BuildConfig
 import com.mgneg.fakecall.FakeCallApp
 import com.mgneg.fakecall.R
+import com.mgneg.fakecall.telecom.CallPath
 import com.mgneg.fakecall.telecom.CallState
 import com.mgneg.fakecall.telecom.IncomingCallActivity
 import com.mgneg.fakecall.ui.screens.AboutScreen
@@ -73,13 +74,19 @@ fun FakeCallRoot(app: FakeCallApp) {
     var showUpdate by remember { mutableStateOf(false) }
     var whatsNew by remember { mutableStateOf<Pair<String, String>?>(null) }
 
-    // Surface the call UI in-app whenever a call is live (either path).
+    // Surface OUR call UI only for a live call on the fallback
+    // (app-screen) path. On the Telecom path the system phone app owns
+    // the call UI end to end — launching our activity there would stack
+    // it on top of the system's presentation (the overlap bug this
+    // design explicitly forbids; see docs/CALL_ENGINE.md). The app
+    // root only needs to bring the fallback screen forward when the
+    // app is already composed, e.g. a "Call Now" tap.
     val callState by app.callController.state.collectAsState()
     var surfacedFor by remember { mutableStateOf<Long?>(null) }
     LaunchedEffect(callState) {
         val liveId = when (val s = callState) {
-            is CallState.Ringing -> s.historyId
-            is CallState.InCall -> s.historyId
+            is CallState.Ringing -> s.historyId.takeIf { s.path == CallPath.APP_SCREEN }
+            is CallState.InCall -> s.historyId.takeIf { s.path == CallPath.APP_SCREEN }
             is CallState.Idle -> null
         }
         if (liveId == null) {

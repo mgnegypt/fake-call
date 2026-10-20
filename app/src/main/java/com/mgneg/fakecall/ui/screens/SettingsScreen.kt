@@ -60,14 +60,12 @@ fun SettingsScreen(onShowUpdate: () -> Unit) {
     var accountLabel by remember { mutableStateOf("") }
     var defaultName by remember { mutableStateOf("") }
     var defaultNumber by remember { mutableStateOf("") }
-    var labelLoaded by remember { mutableStateOf(false) }
-    if (!labelLoaded) {
-        labelLoaded = true
-        scope.launch {
-            accountLabel = app.settings.accountLabel.first()
-            defaultName = app.settings.defaultName.first()
-            defaultNumber = app.settings.defaultNumber.first()
-        }
+    // One-shot load in an effect — launching from the composition body
+    // (the previous pattern) fires side effects during composition.
+    androidx.compose.runtime.LaunchedEffect(Unit) {
+        accountLabel = app.settings.accountLabel.first()
+        defaultName = app.settings.defaultName.first()
+        defaultNumber = app.settings.defaultNumber.first()
     }
 
     var checking by remember { mutableStateOf(false) }

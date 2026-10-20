@@ -30,6 +30,7 @@
     <string name="delay_label">Ring after</string>
     <string name="delay_now">Now</string>
     <string name="delay_custom_label">Custom delay (seconds)</string>
+    <string name="delay_custom_chip">Custom</string>
     <string name="audio_label">Audio on answer</string>
     <string name="audio_none">No audio selected</string>
     <string name="audio_pick">Choose audio file</string>

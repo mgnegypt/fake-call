@@ -42,6 +42,13 @@ class FakeConnection(
 
     private val controller get() = (appContext as FakeCallApp).callController
 
+    /**
+     * Some Telecom stacks deliver the answer with an explicit video
+     * state instead of calling the no-arg variant; route both to the
+     * same handler so answering works identically everywhere.
+     */
+    override fun onAnswer(videoState: Int) = onAnswer()
+
     override fun onAnswer() {
         if (answeredAt > 0) return
         answeredAt = System.currentTimeMillis()
@@ -50,6 +57,16 @@ class FakeConnection(
             CallState.InCall(callerName, callerNumber, historyId, CallPath.TELECOM, answeredAt)
         )
         audioUri?.let { audioPlayer.play(it) }
+    }
+
+    /**
+     * We advertise CAPABILITY_MUTE, so honor it: when the user mutes
+     * from the system call UI, silence the answer clip (and restore it
+     * on unmute) instead of leaving it playing at full volume.
+     */
+    override fun onCallAudioStateChanged(state: android.telecom.CallAudioState) {
+        super.onCallAudioStateChanged(state)
+        audioPlayer.setMuted(state.isMuted)
     }
 
     override fun onReject() = finish(CallStatus.DECLINED)

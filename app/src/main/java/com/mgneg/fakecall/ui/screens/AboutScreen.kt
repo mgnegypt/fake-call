@@ -68,7 +68,7 @@ fun AboutScreen(onShowUpdate: () -> Unit) {
             Box(
                 modifier = Modifier
                     .size(72.dp)
-                    .clip(androidx.compose.foundation.shape.RoundedCornerShape(16.dp))
+                    .clip(MaterialTheme.shapes.extraLarge)
                     .background(com.mgneg.fakecall.ui.theme.BrandTile),
                 contentAlignment = androidx.compose.ui.Alignment.Center
             ) {

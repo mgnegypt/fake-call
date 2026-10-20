@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -82,6 +83,7 @@ import com.mgneg.fakecall.data.db.Preset
 import com.mgneg.fakecall.telecom.TelecomAccounts
 import com.mgneg.fakecall.update.UpdateInfo
 import com.mgneg.fakecall.util.Permissions
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
@@ -95,7 +97,13 @@ class HomeViewModel(private val app: FakeCallApp) : ViewModel() {
     )
 
     val presets: StateFlow<List<Preset>> = app.callRepository.presets
-        .stateIn(scope, SharingStarted.Eagerly, emptyList())
+        .stateIn(scope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+    override fun onCleared() {
+        // The scope is hand-rolled (not viewModelScope), so cancel it
+        // explicitly or its collectors outlive the ViewModel.
+        scope.cancel()
+    }
 
     fun trigger(name: String, number: String, audio: String?, delaySec: Int, done: () -> Unit) {
         scope.launch {
@@ -188,14 +196,20 @@ fun HomeScreen(
         }
     }
 
-    val ringtoneTitle = remember(ringtoneUri) {
-        runCatching {
-            RingtoneManager.getRingtone(
-                context,
-                ringtoneUri?.let { Uri.parse(it) }
-                    ?: RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE)
-            )?.getTitle(context)
-        }.getOrNull()
+    // Resolving a ringtone title queries the media provider — keep it
+    // off the main thread and out of composition.
+    val ringtoneTitle by androidx.compose.runtime.produceState<String?>(
+        initialValue = null, ringtoneUri
+    ) {
+        value = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+            runCatching {
+                RingtoneManager.getRingtone(
+                    context,
+                    ringtoneUri?.let { Uri.parse(it) }
+                        ?: RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE)
+                )?.getTitle(context)
+            }.getOrNull()
+        }
     }
 
     val effectiveDelay = if (delayIndex in DELAY_OPTIONS.indices) DELAY_OPTIONS[delayIndex]
@@ -347,7 +361,7 @@ fun HomeScreen(
                     FilterChip(
                         selected = delayIndex == -1,
                         onClick = { delayIndex = -1 },
-                        label = { Text("…") }
+                        label = { Text(stringResource(R.string.delay_custom_chip)) }
                     )
                 }
                 if (delayIndex == -1) {
@@ -525,7 +539,11 @@ private fun FormRow(
     }
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth().clickable(onClick = onClick),
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(min = 56.dp)
+            .clickable(onClick = onClick)
+            .padding(vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
@@ -636,7 +654,7 @@ private fun ReadinessCards() {
 private fun ReadinessCard(title: String, text: String, actionLabel: String, onAction: () -> Unit) {
     Card(modifier = Modifier.fillMaxWidth()) {
         Column(
-            modifier = Modifier.padding(12.dp),
+            modifier = Modifier.padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(6.dp)
         ) {
             Text(title, style = MaterialTheme.typography.titleSmall)

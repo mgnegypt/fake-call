@@ -6,7 +6,6 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -90,21 +89,29 @@ private fun AuroraBackground(content: @Composable () -> Unit) {
                 )
             )
     ) {
+        // Soft glows drawn as radial gradients. (Previously two blurred
+        // circles: a full-screen blur pass is one of the most expensive
+        // effects in Compose and ran for the whole ringing/in-call
+        // duration; a gradient reaches the same look for free.)
         Box(
             modifier = Modifier
                 .align(androidx.compose.ui.Alignment.TopEnd)
-                .size(320.dp)
-                .clip(CircleShape)
-                .background(scheme.primary.copy(alpha = 0.38f))
-                .blur(70.dp)
+                .size(340.dp)
+                .background(
+                    Brush.radialGradient(
+                        listOf(scheme.primary.copy(alpha = 0.38f), Color.Transparent)
+                    )
+                )
         )
         Box(
             modifier = Modifier
                 .align(androidx.compose.ui.Alignment.BottomStart)
-                .size(280.dp)
-                .clip(CircleShape)
-                .background(scheme.tertiary.copy(alpha = 0.30f))
-                .blur(70.dp)
+                .size(300.dp)
+                .background(
+                    Brush.radialGradient(
+                        listOf(scheme.tertiary.copy(alpha = 0.30f), Color.Transparent)
+                    )
+                )
         )
         content()
     }

@@ -8,8 +8,6 @@ import androidx.compose.runtime.getValue
 import com.mgneg.fakecall.FakeCallApp
 import com.mgneg.fakecall.ui.screens.CallScreen
 import com.mgneg.fakecall.ui.theme.FakeCallTheme
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
 
 /** Lock-screen-capable host for the app's own incoming / in-call UI. */
 class IncomingCallActivity : ComponentActivity() {
@@ -17,8 +15,10 @@ class IncomingCallActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val app = application as FakeCallApp
-        val dynamicColor = runBlocking { app.settings.dynamicColor.first() }
         setContent {
+            // Collected, never block the main thread on a DataStore read:
+            // this activity must appear the instant a call fires.
+            val dynamicColor by app.settings.dynamicColor.collectAsState(initial = false)
             FakeCallTheme(dynamicColor = dynamicColor) {
                 val state by app.callController.state.collectAsState()
                 CallScreen(

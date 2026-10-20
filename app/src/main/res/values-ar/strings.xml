@@ -26,6 +26,7 @@
     <string name="delay_label">الرنين بعد</string>
     <string name="delay_now">الآن</string>
     <string name="delay_custom_label">تأخير مخصص (ثوانٍ)</string>
+    <string name="delay_custom_chip">مخصص</string>
     <string name="audio_label">الصوت عند الرد</string>
     <string name="audio_none">لم يتم اختيار ملف صوتي</string>
     <string name="audio_pick">اختيار ملف صوتي</string>

@@ -68,7 +68,7 @@ fun HistoryScreen() {
             LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 items(entries, key = { it.id }) { entry ->
                     Row(
-                        modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp),
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         val (icon, label) = when (entry.status) {
@@ -83,11 +83,16 @@ fun HistoryScreen() {
                                 entry.callerName.ifBlank { stringResource(R.string.call_unknown_caller) },
                                 style = MaterialTheme.typography.titleSmall
                             )
-                            Text(rememberLtr(entry.callerNumber), style = MaterialTheme.typography.bodySmall)
+                            Text(
+                                rememberLtr(entry.callerNumber),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
                             Text(
                                 DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT)
                                     .format(Date(entry.triggerAt)),
-                                style = MaterialTheme.typography.bodySmall
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                         Column(horizontalAlignment = Alignment.End) {
