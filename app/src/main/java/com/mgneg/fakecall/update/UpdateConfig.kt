@@ -5,7 +5,7 @@ package com.mgneg.fakecall.update
  * releases. (Owner/repo as specified in the implementation plan.)
  */
 object UpdateConfig {
-    const val OWNER = "mgneg"
+    const val OWNER = "mgnegypt"
     const val REPO = "fake-call"
     const val LATEST_RELEASE_URL = "https://api.github.com/repos/$OWNER/$REPO/releases/latest"
     const val RELEASES_PAGE_URL = "https://github.com/$OWNER/$REPO/releases"

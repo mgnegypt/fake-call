@@ -32,7 +32,7 @@ privacy, entertainment, presentations, and testing.
 ## Install
 
 1. Download `fake-call-vX.Y.apk` from the
-   [Releases page](https://github.com/mgneg/fake-call/releases).
+   [Releases page](https://github.com/mgnegypt/fake-call/releases).
 2. Open it and allow installs from your browser/file manager if Android asks.
 3. Open Fake Call, and (optionally) enable the **Fake Call** entry under
    system Settings → Apps → Default apps → Phone app / call accounts so calls

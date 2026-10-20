@@ -10,7 +10,7 @@ object ContactLinks {
     const val INSTAGRAM_URL = "https://www.instagram.com/mgnegypt"
     const val X_URL = "https://x.com/MGN_EGYPT"
 
-    const val GITHUB_REPO_URL = "https://github.com/mgneg/fake-call"
+    const val GITHUB_REPO_URL = "https://github.com/mgnegypt/fake-call"
     const val PLACEHOLDER = "<TO_BE_PROVIDED>"
 
     fun isSet(url: String): Boolean = url.isNotBlank() && !url.contains(PLACEHOLDER)

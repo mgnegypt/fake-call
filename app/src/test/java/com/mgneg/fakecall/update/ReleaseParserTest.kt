@@ -17,7 +17,7 @@ class ReleaseParserTest {
           "draft": false,
           "prerelease": false,
           "published_at": "2026-11-01T10:00:00Z",
-          "html_url": "https://github.com/mgneg/fake-call/releases/tag/v1.2",
+          "html_url": "https://github.com/mgnegypt/fake-call/releases/tag/v1.2",
           "assets": [
             {"name": "fake-call-v1.2.apk", "browser_download_url": "https://example.com/fake-call-v1.2.apk"},
             {"name": "fake-call-v1.2.apk.sha256", "browser_download_url": "https://example.com/fake-call-v1.2.apk.sha256"},
