@@ -1,7 +1,7 @@
 package com.mgneg.fakecall.util
 
-import android.icu.text.BidiFormatter
-import android.icu.text.TextDirectionHeuristics
+import android.text.BidiFormatter
+import android.text.TextDirectionHeuristics
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 

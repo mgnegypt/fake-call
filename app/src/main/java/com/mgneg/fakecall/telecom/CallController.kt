@@ -41,7 +41,7 @@ class CallController(private val context: Context) {
 
     private val app get() = context.applicationContext as FakeCallApp
 
-    private val _state = MutableStateFlow<CallState>(Idle)
+    private val _state = MutableStateFlow<CallState>(CallState.Idle)
     val state: StateFlow<CallState> = _state.asStateFlow()
 
     private val audioPlayer = CallAudioPlayer(context)
