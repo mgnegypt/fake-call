@@ -9,9 +9,9 @@ enum class IncomingRoute {
     APP_SCREEN,
 
     /**
-     * The user chose the Telecom presentation but it cannot be used right
-     * now (account disabled or placement rejected). Nothing rings; the
-     * user is told honestly instead of silently getting a different UI.
+     * The user chose the Telecom presentation but placement failed (the
+     * framework rejected or dropped the call). Nothing rings; the user is
+     * told honestly instead of silently getting a different UI.
      */
     TELECOM_UNAVAILABLE
 }
@@ -21,30 +21,36 @@ enum class IncomingRoute {
  * Android types so it is unit-testable on the JVM.
  *
  * The two settings modes are strict:
- * - `"app"` always uses the app call screen; the Telecom account state
- *   and placement result are irrelevant and ignored.
- * - `"telecom"` uses Telecom ONLY. A disabled account or a failed
- *   placement yields [IncomingRoute.TELECOM_UNAVAILABLE] — never a silent
- *   substitution of the app screen, which would mask the real problem and
- *   present a UI the user did not ask for.
+ * - `"app"` always uses the app call screen; placement is never attempted.
+ * - `"telecom"` uses Telecom ONLY, and placement is attempted
+ *   UNCONDITIONALLY — the registrar decides whether the call goes through,
+ *   not a pre-check on our side. An earlier version gated placement on an
+ *   `accountEnabled` probe; on at least one device that probe read false
+ *   while the system settings showed the account toggle ON, and every
+ *   trigger died at the gate without Telecom ever being asked. The
+ *   enabled state is still observed and logged for diagnostics, but it
+ *   no longer gates anything.
  *
- * [placed] is only consulted when the mode is `"telecom"` and the account
- * is enabled (the only combination under which placement is attempted).
+ * A failed placement yields [IncomingRoute.TELECOM_UNAVAILABLE] — never a
+ * silent substitution of the app screen, which would mask the real
+ * problem and present a UI the user did not ask for.
  */
 object CallRouting {
 
     const val MODE_TELECOM = "telecom"
     const val MODE_APP = "app"
 
-    fun decide(mode: String, accountEnabled: Boolean, placed: Boolean): IncomingRoute =
+    fun decide(mode: String, placed: Boolean): IncomingRoute =
         when {
             mode != MODE_TELECOM -> IncomingRoute.APP_SCREEN
-            !accountEnabled -> IncomingRoute.TELECOM_UNAVAILABLE
             placed -> IncomingRoute.TELECOM
             else -> IncomingRoute.TELECOM_UNAVAILABLE
         }
 
-    /** Placement is only worth attempting for a live Telecom route. */
-    fun shouldAttemptPlacement(mode: String, accountEnabled: Boolean): Boolean =
-        mode == MODE_TELECOM && accountEnabled
+    /**
+     * Telecom mode always attempts placement (the framework is the
+     * authority on whether the account can take the call); app mode
+     * never touches Telecom.
+     */
+    fun shouldAttemptPlacement(mode: String): Boolean = mode == MODE_TELECOM
 }

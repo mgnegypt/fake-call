@@ -133,6 +133,8 @@
     <string name="notif_update_text">انقر لعرض الجديد والتحديث.</string>
 
     <string name="error_no_dialer_account">تعذّر استخدام حساب المكالمة، لذا لم يتم إجراء المكالمة.</string>
+    <string name="diag_title">تشخيص آخر محاولة</string>
+    <string name="diag_none">لم تُسجَّل أي محاولة اتصال بعد. شغّل مكالمة وستعرض هذه البطاقة بالضبط ما أبلغ عنه النظام.</string>
     <string name="telecom_unavailable_title">حساب مكالمات النظام غير متاح</string>
     <string name="telecom_unavailable_text">تعذّر رنين المكالمة الوهمية في تطبيق هاتف النظام لأن حساب مكالمة وهمية غير مُفعَّل. انقر لفتح إعدادات حسابات المكالمات وتفعيله.</string>
 

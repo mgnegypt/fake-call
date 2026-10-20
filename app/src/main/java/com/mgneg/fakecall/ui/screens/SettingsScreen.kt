@@ -56,6 +56,8 @@ fun SettingsScreen(onShowUpdate: () -> Unit) {
     val dynamicColor by app.settings.dynamicColor.collectAsState(initial = false)
     val callMode by app.settings.callMode.collectAsState(initial = "telecom")
     val updateNotifications by app.settings.updateNotifications.collectAsState(initial = false)
+    val lastAttempt by app.settings.lastCallAttempt
+        .collectAsState(initial = com.mgneg.fakecall.telecom.CallAttemptDiagnostics())
 
     var accountLabel by remember { mutableStateOf("") }
     var defaultName by remember { mutableStateOf("") }
@@ -128,6 +130,8 @@ fun SettingsScreen(onShowUpdate: () -> Unit) {
         }
         Text(stringResource(R.string.call_mode_desc), style = MaterialTheme.typography.bodySmall)
 
+        DiagnosticsSection(lastAttempt)
+
         SectionTitle(R.string.settings_account_label)
         OutlinedTextField(
             value = accountLabel, onValueChange = { accountLabel = it },
@@ -185,6 +189,40 @@ fun SettingsScreen(onShowUpdate: () -> Unit) {
 
         SectionTitle(R.string.settings_automation)
         Text(stringResource(R.string.settings_automation_desc), style = MaterialTheme.typography.bodyMedium)
+    }
+}
+
+/**
+ * Ground truth of the most recent trigger attempt, recorded by
+ * [com.mgneg.fakecall.telecom.CallController.startIncoming]: the mode,
+ * what our enabled-probe saw, whether Telecom was asked, what it
+ * answered (exception included), and how the registrar itself described
+ * the accounts. This replaces guesswork when a device misbehaves.
+ */
+@Composable
+private fun DiagnosticsSection(attempt: com.mgneg.fakecall.telecom.CallAttemptDiagnostics) {
+    SectionTitle(R.string.diag_title)
+    if (attempt.timestamp == 0L) {
+        Text(stringResource(R.string.diag_none), style = MaterialTheme.typography.bodySmall)
+    } else {
+        val timeText = remember(attempt.timestamp) {
+            java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.US)
+                .format(java.util.Date(attempt.timestamp))
+        }
+        Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+            Text(
+                "time=$timeText",
+                style = MaterialTheme.typography.bodySmall,
+                fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace
+            )
+            attempt.toDisplayLines().drop(1).forEach { line ->
+                Text(
+                    line,
+                    style = MaterialTheme.typography.bodySmall,
+                    fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace
+                )
+            }
+        }
     }
 }
 

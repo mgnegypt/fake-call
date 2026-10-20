@@ -61,17 +61,17 @@ Telecom mode.
 (immediate, scheduled alarm, boot reschedule, automation broadcast,
 preset, QS tile; all arrive via `CallRepository.fireNow`). The routing
 decision itself is the pure, unit-tested `CallRouting.decide(mode,
-accountEnabled, placed)`:
+placed)`:
 
 1. **Mode "telecom" (system dialer) — Telecom ONLY.**
-   - Account enabled and `addNewIncomingCall` accepted → the **system
+   - `addNewIncomingCall` accepted → the **system
      phone app presents the call**. Our `FakeConnection` callbacks
      (`onAnswer` / `onReject` / `onDisconnect`) fire from the user's
      actions in that system UI, drive the history row, and play the
      answer audio on the voice-communication route. Our own call activity
      plays NO part on this path — there is no `onShowIncomingCallUi`
      override and no app-side answering of Telecom calls.
-   - Account disabled OR placement rejected → **nothing rings**. State
+   - Placement rejected/thrown → **nothing rings**. State
      returns to Idle, the history row is finished as `FAILED`, and the
      user gets an honest notification ("System call account not
      available") whose tap/action deep-links to the system call-account
@@ -83,10 +83,24 @@ accountEnabled, placed)`:
    states (ringing → in-call → ended) and logging history identically.
    The Telecom account state is irrelevant in this mode.
 
+Placement is attempted UNCONDITIONALLY in Telecom mode — the registrar
+decides whether the call goes through, not a probe on our side. An
+earlier revision gated placement on an `accountEnabled` check; on the
+owner's REDMAGIC 10 Pro every trigger then died at that gate (FAILED rows
++ the unavailable notification) while the system settings showed the
+Fake Call account toggle ON and the reference app rang normally. Whether
+that probe read a stale/different account state or something else, gating
+on it was the defect: the check is still taken on every trigger, but
+only as diagnostics.
+
 Every trigger logs one line under tag `FakeCallTelecom` with the mode,
-the account-enabled result, whether placement was attempted, its result,
-and the chosen route — so an on-device logcat capture shows exactly which
-link failed instead of guessing.
+the account-enabled probe result, whether placement was attempted, its
+result, the placement exception (class + message) when it throws, and
+the chosen route. The same record — plus a registrar snapshot
+(`getPhoneAccount` for our handle: found/enabled/capabilities, and
+every call-capable account with label + enabled state) — is persisted
+and shown in Settings under "Last call attempt", so the device's own
+report drives the next diagnosis instead of guessing.
 
 Note: switching an existing install's account capability can reset its
 enabled state on some builds — the Home readiness card detects this and

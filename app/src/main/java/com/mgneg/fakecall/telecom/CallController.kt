@@ -65,32 +65,68 @@ class CallController(private val context: Context) {
      *
      * The two call modes are STRICT (see [CallRouting]):
      * - "app": our own call screen, exactly as before.
-     * - "telecom": the system phone app ONLY. If the account is disabled
-     *   or placement fails, NOTHING rings and the app screen is NOT
-     *   substituted — state returns to Idle, the history row is finished
-     *   as FAILED, and the user gets an honest notification deep-linking
-     *   to the system call-account settings. Silently falling back used
-     *   to mask a disabled account forever: the system UI was never
-     *   reached and the user could not tell why.
+     * - "telecom": the system phone app ONLY, and placement is attempted
+     *   UNCONDITIONALLY — the framework decides whether the account can
+     *   take the call. An enabled-probe used to gate placement, and on at
+     *   least one device it read false while the system settings showed
+     *   the account ON, so Telecom was never even asked. The probe is
+     *   still taken, but only as diagnostics. If placement fails,
+     *   NOTHING rings and the app screen is NOT substituted — state
+     *   returns to Idle, the history row is finished as FAILED, and the
+     *   user gets an honest notification deep-linking to the system
+     *   call-account settings.
      *
      * Every trigger leaves a logcat trail under tag "FakeCallTelecom"
-     * (mode / accountEnabled / placeAttempted / placeResult / route) so a
-     * device log capture can pinpoint which link failed.
+     * (mode / accountEnabled / placeAttempted / placeResult /
+     * placeError / route) AND persists a [CallAttemptDiagnostics] record
+     * shown in the Settings "Last call attempt" card, so the device's
+     * own report — not a guess — drives the next fix.
      */
     fun startIncoming(callerName: String, callerNumber: String, audioUri: String?, historyId: Long) {
         app.appScope.launch {
             val mode = app.settings.callMode.first()
+            // Observed for diagnostics only; never gates routing.
             val accountEnabled = TelecomAccounts.isEnabled(context)
-            val attempt = CallRouting.shouldAttemptPlacement(mode, accountEnabled)
-            val placed = attempt && TelecomAccounts.placeIncomingCall(
-                context, callerName, callerNumber, audioUri, historyId
-            )
-            val route = CallRouting.decide(mode, accountEnabled, placed)
+            val attempt = CallRouting.shouldAttemptPlacement(mode)
+            var placeError: Throwable? = null
+            val placed = if (attempt) {
+                when (
+                    val result = TelecomAccounts.placeIncomingCall(
+                        context, callerName, callerNumber, audioUri, historyId
+                    )
+                ) {
+                    TelecomAccounts.PlacementResult.Placed -> true
+                    is TelecomAccounts.PlacementResult.Failed -> {
+                        placeError = result.error
+                        false
+                    }
+                }
+            } else {
+                false
+            }
+            val route = CallRouting.decide(mode, placed)
             Log.i(
                 TAG,
                 "startIncoming historyId=$historyId mode=$mode accountEnabled=$accountEnabled " +
-                    "placeAttempted=$attempt placeResult=$placed route=$route"
+                    "placeAttempted=$attempt placeResult=$placed " +
+                    "placeError=${placeError?.let { "${it.javaClass.simpleName}: ${it.message}" } ?: "none"} " +
+                    "route=$route"
             )
+            runCatching {
+                app.settings.saveLastCallAttempt(
+                    CallAttemptDiagnostics(
+                        timestamp = System.currentTimeMillis(),
+                        mode = mode,
+                        accountEnabled = accountEnabled,
+                        placeAttempted = attempt,
+                        placeResult = placed,
+                        placeErrorClass = placeError?.javaClass?.simpleName,
+                        placeErrorMessage = placeError?.message,
+                        route = route.name,
+                        snapshot = RegistrarSnapshot.capture(context)
+                    )
+                )
+            }.onFailure { Log.w(TAG, "failed to persist call diagnostics", it) }
             when (route) {
                 IncomingRoute.TELECOM -> {
                     _state.value = CallState.Ringing(
@@ -109,9 +145,11 @@ class CallController(private val context: Context) {
                 IncomingRoute.TELECOM_UNAVAILABLE -> {
                     Log.w(
                         TAG,
-                        "Telecom mode requested but unavailable " +
-                            "(accountEnabled=$accountEnabled placeResult=$placed); " +
-                            "not substituting the app screen"
+                        "Telecom mode requested but placement failed " +
+                            "(accountEnabled=$accountEnabled placeResult=$placed " +
+                            "placeError=${placeError?.let { "${it.javaClass.simpleName}: ${it.message}" } ?: "none"}); " +
+                            "not substituting the app screen",
+                        placeError
                     )
                     _state.value = CallState.Idle
                     IncomingCallNotifier.showTelecomUnavailable(context)

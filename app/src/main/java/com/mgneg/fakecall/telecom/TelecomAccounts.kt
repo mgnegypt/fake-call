@@ -51,8 +51,17 @@ object TelecomAccounts {
     fun accountSettingsIntent(): Intent = Intent(TelecomManager.ACTION_CHANGE_PHONE_ACCOUNTS)
 
     /**
-     * Raise an incoming call through Telecom. Returns false if it could not
-     * be placed.
+     * Outcome of a placement attempt: success, or the refusal carried as a
+     * typed error so callers can log and record exactly what the framework
+     * said instead of collapsing every failure into a bare `false`.
+     */
+    sealed interface PlacementResult {
+        data object Placed : PlacementResult
+        data class Failed(val error: Throwable?) : PlacementResult
+    }
+
+    /**
+     * Raise an incoming call through Telecom.
      *
      * Extras contract (must mirror [FakeConnectionService]): the address
      * sits at the TOP level under [TelecomManager.EXTRA_INCOMING_CALL_ADDRESS],
@@ -68,11 +77,11 @@ object TelecomAccounts {
         callerNumber: String,
         audioUri: String?,
         historyId: Long
-    ): Boolean {
+    ): PlacementResult {
         val tm = context.getSystemService(TelecomManager::class.java)
         if (tm == null) {
             android.util.Log.w(TAG, "placeIncomingCall: TelecomManager unavailable")
-            return false
+            return PlacementResult.Failed(null)
         }
         val appExtras = Bundle().apply {
             putLong(EXTRA_HISTORY_ID, historyId)
@@ -88,10 +97,10 @@ object TelecomAccounts {
         }
         return runCatching {
             tm.addNewIncomingCall(handle(context), extras)
-            true
+            PlacementResult.Placed
         }.onFailure {
             android.util.Log.w(TAG, "placeIncomingCall: addNewIncomingCall failed", it)
-        }.getOrDefault(false)
+        }.getOrElse { PlacementResult.Failed(it) }
     }
 
     private const val TAG = "FakeCallTelecom"

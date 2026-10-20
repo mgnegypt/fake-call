@@ -8,6 +8,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.mgneg.fakecall.telecom.CallAttemptDiagnostics
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -35,6 +36,16 @@ class SettingsStore(private val context: Context) {
         val INTRO_SHOWN = booleanPreferencesKey("intro_shown")
         val RINGTONE_URI = stringPreferencesKey("ringtone_uri")
         val VIBRATE_ON_RING = booleanPreferencesKey("vibrate_on_ring")
+        // Last-call-attempt diagnostics (see telecom/CallDiagnostics.kt).
+        val DIAG_TIMESTAMP = longPreferencesKey("diag_timestamp")
+        val DIAG_MODE = stringPreferencesKey("diag_mode")
+        val DIAG_ACCOUNT_ENABLED = booleanPreferencesKey("diag_account_enabled")
+        val DIAG_PLACE_ATTEMPTED = booleanPreferencesKey("diag_place_attempted")
+        val DIAG_PLACE_RESULT = booleanPreferencesKey("diag_place_result")
+        val DIAG_PLACE_ERROR_CLASS = stringPreferencesKey("diag_place_error_class")
+        val DIAG_PLACE_ERROR_MESSAGE = stringPreferencesKey("diag_place_error_message")
+        val DIAG_ROUTE = stringPreferencesKey("diag_route")
+        val DIAG_SNAPSHOT = stringPreferencesKey("diag_snapshot")
     }
 
     val language: Flow<String> = context.dataStore.data.map { it[Keys.LANGUAGE] ?: "system" }
@@ -50,6 +61,34 @@ class SettingsStore(private val context: Context) {
     val introShown: Flow<Boolean> = context.dataStore.data.map { it[Keys.INTRO_SHOWN] ?: false }
     val ringtoneUri: Flow<String?> = context.dataStore.data.map { it[Keys.RINGTONE_URI] }
     val vibrateOnRing: Flow<Boolean> = context.dataStore.data.map { it[Keys.VIBRATE_ON_RING] ?: true }
+
+    /** The most recent trigger attempt's diagnostics; timestamp 0 means none recorded yet. */
+    val lastCallAttempt: Flow<CallAttemptDiagnostics> = context.dataStore.data.map { p ->
+        CallAttemptDiagnostics(
+            timestamp = p[Keys.DIAG_TIMESTAMP] ?: 0L,
+            mode = p[Keys.DIAG_MODE] ?: "",
+            accountEnabled = p[Keys.DIAG_ACCOUNT_ENABLED] ?: false,
+            placeAttempted = p[Keys.DIAG_PLACE_ATTEMPTED] ?: false,
+            placeResult = p[Keys.DIAG_PLACE_RESULT] ?: false,
+            placeErrorClass = p[Keys.DIAG_PLACE_ERROR_CLASS],
+            placeErrorMessage = p[Keys.DIAG_PLACE_ERROR_MESSAGE],
+            route = p[Keys.DIAG_ROUTE] ?: "",
+            snapshot = p[Keys.DIAG_SNAPSHOT]?.split("\n")?.filter { it.isNotEmpty() } ?: emptyList()
+        )
+    }
+
+    suspend fun saveLastCallAttempt(d: CallAttemptDiagnostics) = edit { p ->
+        p[Keys.DIAG_TIMESTAMP] = d.timestamp
+        p[Keys.DIAG_MODE] = d.mode
+        p[Keys.DIAG_ACCOUNT_ENABLED] = d.accountEnabled
+        p[Keys.DIAG_PLACE_ATTEMPTED] = d.placeAttempted
+        p[Keys.DIAG_PLACE_RESULT] = d.placeResult
+        d.placeErrorClass?.let { p[Keys.DIAG_PLACE_ERROR_CLASS] = it } ?: p.remove(Keys.DIAG_PLACE_ERROR_CLASS)
+        d.placeErrorMessage?.let { p[Keys.DIAG_PLACE_ERROR_MESSAGE] = it }
+            ?: p.remove(Keys.DIAG_PLACE_ERROR_MESSAGE)
+        p[Keys.DIAG_ROUTE] = d.route
+        p[Keys.DIAG_SNAPSHOT] = d.snapshot.joinToString("\n")
+    }
 
     data class UpdateCache(
         val lastCheck: Long = 0,

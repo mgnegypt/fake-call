@@ -8,41 +8,27 @@ import org.junit.Test
 class CallRoutingTest {
 
     @Test
-    fun `app mode always uses the app screen regardless of account or placement`() {
+    fun `app mode always uses the app screen regardless of placement`() {
         assertEquals(
             IncomingRoute.APP_SCREEN,
-            CallRouting.decide(CallRouting.MODE_APP, accountEnabled = false, placed = false)
+            CallRouting.decide(CallRouting.MODE_APP, placed = false)
         )
         assertEquals(
             IncomingRoute.APP_SCREEN,
-            CallRouting.decide(CallRouting.MODE_APP, accountEnabled = true, placed = true)
+            CallRouting.decide(CallRouting.MODE_APP, placed = true)
         )
         // Unknown / legacy values behave like the app screen, never Telecom.
         assertEquals(
             IncomingRoute.APP_SCREEN,
-            CallRouting.decide("something-else", accountEnabled = true, placed = true)
+            CallRouting.decide("something-else", placed = true)
         )
     }
 
     @Test
-    fun `telecom mode with enabled account and successful placement uses telecom`() {
+    fun `telecom mode with successful placement uses telecom`() {
         assertEquals(
             IncomingRoute.TELECOM,
-            CallRouting.decide(CallRouting.MODE_TELECOM, accountEnabled = true, placed = true)
-        )
-    }
-
-    @Test
-    fun `telecom mode with disabled account is unavailable and never falls back`() {
-        assertEquals(
-            IncomingRoute.TELECOM_UNAVAILABLE,
-            CallRouting.decide(CallRouting.MODE_TELECOM, accountEnabled = false, placed = false)
-        )
-        // Even a (hypothetical) successful placement must not rescue a
-        // disabled account: placement is not attempted in that state.
-        assertEquals(
-            IncomingRoute.TELECOM_UNAVAILABLE,
-            CallRouting.decide(CallRouting.MODE_TELECOM, accountEnabled = false, placed = true)
+            CallRouting.decide(CallRouting.MODE_TELECOM, placed = true)
         )
     }
 
@@ -50,15 +36,16 @@ class CallRoutingTest {
     fun `telecom mode with failed placement is unavailable and never falls back`() {
         assertEquals(
             IncomingRoute.TELECOM_UNAVAILABLE,
-            CallRouting.decide(CallRouting.MODE_TELECOM, accountEnabled = true, placed = false)
+            CallRouting.decide(CallRouting.MODE_TELECOM, placed = false)
         )
     }
 
     @Test
-    fun `placement is attempted only for telecom mode with an enabled account`() {
-        assertTrue(CallRouting.shouldAttemptPlacement(CallRouting.MODE_TELECOM, accountEnabled = true))
-        assertFalse(CallRouting.shouldAttemptPlacement(CallRouting.MODE_TELECOM, accountEnabled = false))
-        assertFalse(CallRouting.shouldAttemptPlacement(CallRouting.MODE_APP, accountEnabled = true))
-        assertFalse(CallRouting.shouldAttemptPlacement(CallRouting.MODE_APP, accountEnabled = false))
+    fun `placement is attempted unconditionally in telecom mode and never in app mode`() {
+        // The registrar — not an enabled-probe on our side — decides
+        // whether a telecom call goes through.
+        assertTrue(CallRouting.shouldAttemptPlacement(CallRouting.MODE_TELECOM))
+        assertFalse(CallRouting.shouldAttemptPlacement(CallRouting.MODE_APP))
+        assertFalse(CallRouting.shouldAttemptPlacement("something-else"))
     }
 }
