@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">مكالمة وهمية</string>
+    <string name="app_tagline">مكالمة تصل في اللحظة التي تحتاجها فيها</string>
+
+    <string name="nav_home">الرئيسية</string>
+    <string name="nav_history">السجل</string>
+    <string name="nav_settings">الإعدادات</string>
+    <string name="nav_about">حول التطبيق</string>
+    <string name="nav_open_drawer">فتح قائمة التنقل</string>
+    <string name="nav_update_available">يوجد تحديث: v%1$s</string>
+
+    <string name="action_save">حفظ</string>
+    <string name="action_cancel">إلغاء</string>
+    <string name="action_delete">حذف</string>
+    <string name="action_back">رجوع</string>
+    <string name="action_enable">تفعيل</string>
+    <string name="action_open_settings">فتح الإعدادات</string>
+    <string name="action_dismiss">إغلاق</string>
+
+    <string name="intro_skip">تخطَّ</string>
+
+    <string name="home_title">مكالمة وهمية جديدة</string>
+    <string name="caller_name_label">اسم المتصل</string>
+    <string name="caller_number_label">رقم المتصل</string>
+    <string name="delay_label">الرنين بعد</string>
+    <string name="delay_now">الآن</string>
+    <string name="delay_custom_label">تأخير مخصص (ثوانٍ)</string>
+    <string name="audio_label">الصوت عند الرد</string>
+    <string name="audio_none">لم يتم اختيار ملف صوتي</string>
+    <string name="audio_pick">اختيار ملف صوتي</string>
+    <string name="audio_change">تغيير</string>
+    <string name="audio_clear">إزالة</string>
+    <string name="schedule_button">جدولة المكالمة</string>
+    <string name="call_now_button">اتصل الآن</string>
+    <string name="scheduled_confirmation">تمت جدولة المكالمة بعد %1$s</string>
+    <string name="preset_save_button">حفظ كإعداد مسبق</string>
+    <string name="preset_name_title">اسم الإعداد المسبق</string>
+    <string name="presets_title">إعدادات سريعة</string>
+    <string name="presets_empty">لا توجد إعدادات مسبقة بعد. احفظ واحدًا للمكالمات بنقرة واحدة واختصارات الشاشة وبلاطات الإعدادات السريعة.</string>
+    <string name="preset_limit_reached">يمكنك حفظ 5 إعدادات مسبقة بحد أقصى.</string>
+    <string name="preset_generic_label">إعداد مكالمة وهمية</string>
+    <string name="preset_triggered">جارٍ الاتصال بـ %1$s</string>
+
+    <string name="account_card_title">حساب المكالمات في النظام</string>
+    <string name="account_enabled_text">مُفعَّل. المكالمات الوهمية ترن في تطبيق الهاتف الخاص بالنظام.</string>
+    <string name="account_disabled_text">غير مُفعَّل. فعّل حساب مكالمة وهمية حتى ترن المكالمات في تطبيق الهاتف، أو استخدم شاشة المكالمة داخل التطبيق بدلًا من ذلك.</string>
+    <string name="exact_alarm_card_title">المنبهات الدقيقة</string>
+    <string name="exact_alarm_text">اسمح بالمنبهات الدقيقة حتى ترن المكالمات المجدولة في وقتها.</string>
+    <string name="notifications_card_title">الإشعارات</string>
+    <string name="notifications_text">اسمح بالإشعارات حتى تظهر المكالمة بملء الشاشة أثناء قفل الجهاز.</string>
+    <string name="fullscreen_card_title">مكالمات بملء الشاشة</string>
+    <string name="fullscreen_text">اسمح بإشعارات ملء الشاشة حتى تستطيع شاشة المكالمة الواردة الظهور فوق الشاشة.</string>
+
+    <string name="history_title">سجل المكالمات</string>
+    <string name="history_empty">لا توجد مكالمات وهمية بعد.</string>
+    <string name="history_answered">تم الرد</string>
+    <string name="history_declined">تم الرفض</string>
+    <string name="history_completed">اكتملت</string>
+    <string name="history_scheduled">مجدولة</string>
+    <string name="history_clear">مسح السجل</string>
+    <string name="history_clear_confirm">حذف كل عناصر السجل؟</string>
+    <string name="duration_seconds">%1$d ثانية</string>
+
+    <string name="call_incoming">مكالمة واردة</string>
+    <string name="call_unknown_caller">غير معروف</string>
+    <string name="call_answer">رد</string>
+    <string name="call_decline">رفض</string>
+    <string name="call_end">إنهاء المكالمة</string>
+    <string name="call_mute">كتم</string>
+    <string name="call_speaker">مكبر الصوت</string>
+    <string name="call_ringing">جارٍ الرنين…</string>
+
+    <string name="settings_title">الإعدادات</string>
+    <string name="settings_language">اللغة</string>
+    <string name="language_system">لغة النظام</string>
+    <string name="language_en">English</string>
+    <string name="language_ar">العربية</string>
+    <string name="settings_appearance">المظهر</string>
+    <string name="settings_dynamic_color">الألوان الديناميكية (Monet)</string>
+    <string name="settings_dynamic_color_desc">استخدام ألوان الخلفية على أندرويد 12 فأحدث.</string>
+    <string name="settings_call_engine">طريقة عرض المكالمة</string>
+    <string name="call_mode_telecom">تطبيق هاتف النظام (Telecom)</string>
+    <string name="call_mode_app">شاشة المكالمة في التطبيق</string>
+    <string name="call_mode_desc">وضع Telecom يعرض المكالمة في تطبيق هاتف النظام عند تفعيل الحساب. شاشة التطبيق تعمل دائمًا.</string>
+    <string name="settings_account_label">اسم حساب المكالمة</string>
+    <string name="settings_account_label_desc">الاسم الظاهر لحساب مكالمة وهمية في إعدادات النظام. تغييره يعيد تسجيل الحساب.</string>
+    <string name="settings_defaults">المتصل الافتراضي</string>
+    <string name="settings_default_name">اسم المتصل الافتراضي</string>
+    <string name="settings_default_number">رقم المتصل الافتراضي</string>
+    <string name="settings_updates">التحديثات</string>
+    <string name="settings_update_notifications">إشعاري بالإصدارات الجديدة</string>
+    <string name="settings_check_updates">البحث عن تحديثات</string>
+    <string name="settings_checking">جارٍ البحث…</string>
+    <string name="settings_up_to_date">أنت على أحدث إصدار (v%1$s).</string>
+    <string name="settings_automation">الأتمتة</string>
+    <string name="settings_automation_desc">يمكن للتطبيقات الأخرى (Tasker وMacroDroid) أو ADB تشغيل مكالمة عبر إجراء البث com.mgneg.fakecall.action.TRIGGER مع الإضافات caller_name وcaller_number وdelay (بالثواني).</string>
+
+    <string name="update_title">يوجد تحديث جديد</string>
+    <string name="update_new_version">الإصدار v%1$s</string>
+    <string name="update_download_install">التنزيل والتثبيت</string>
+    <string name="update_open_github">الفتح على GitHub</string>
+    <string name="update_downloading">جارٍ التنزيل… %1$d%%</string>
+    <string name="update_verifying">جارٍ التحقق من البصمة…</string>
+    <string name="update_failed">فشل التحديث. يمكنك تنزيله من GitHub بدلًا من ذلك.</string>
+    <string name="update_install_permission">لتثبيت التحديثات داخل التطبيق، اسمح بالتثبيت من هذا المصدر في إعدادات النظام.</string>
+    <string name="whats_new_title">ما الجديد في v%1$s</string>
+
+    <string name="about_title">حول التطبيق</string>
+    <string name="about_version">الإصدار %1$s</string>
+    <string name="about_developer_title">من هو المطوّر</string>
+    <string name="about_developed_by">من تطوير mgneg</string>
+    <string name="about_bio">mgneg مطوّر مستقل يبني أدوات أندرويد صغيرة وصادقة. سيتم تحديث هذه المساحة بنبذة أكمل قريبًا.</string>
+    <string name="about_purpose_title">الغرض من التطبيق</string>
+    <string name="about_purpose">يحاكي تطبيق مكالمة وهمية مكالمة هاتفية واردة في وقت تختاره، باسم ورقم متصل تحددهما، مع صوت اختياري عند الرد. يستخدمه الناس للخصوصية والترفيه والعروض التوضيحية والاختبار.</string>
+    <string name="about_disclaimer_title">إخلاء المسؤولية</string>
+    <string name="about_disclaimer">هذا التطبيق مخصص للترفيه والخصوصية والعروض التوضيحية والاختبار فقط. لا تستخدمه في الخداع أو الاحتيال أو المضايقة أو التهديد أو انتحال شخصية أي فرد أو جهة أو سلطة، أو في إلحاق أي ضرر. المطوّر غير مسؤول عن أي إساءة استخدام أو عن أي عواقب تنتج عن استخدام التطبيق. أنت وحدك المسؤول عن طريقة استخدامك له وعن الالتزام بالقوانين المعمول بها.</string>
+    <string name="about_contact_title">تواصل مع المطوّر</string>
+    <string name="contact_facebook">فيسبوك</string>
+    <string name="contact_whatsapp">واتساب</string>
+    <string name="contact_instagram">إنستغرام</string>
+    <string name="contact_x">X (تويتر سابقًا)</string>
+    <string name="about_links_title">المشروع</string>
+    <string name="about_github">مستودع GitHub</string>
+    <string name="about_license">رخصة MIT</string>
+    <string name="about_licenses">تراخيص المصادر المفتوحة</string>
+
+    <string name="notif_channel_calls">المكالمات الوهمية</string>
+    <string name="notif_channel_updates">تحديثات التطبيق</string>
+    <string name="notif_update_title">إصدار Fake Call v%1$s متاح</string>
+    <string name="notif_update_text">انقر لعرض الجديد والتحديث.</string>
+
+    <string name="error_no_dialer_account">تعذّر استخدام حساب المكالمة؛ تم عرض شاشة المكالمة داخل التطبيق بدلًا من ذلك.</string>
+
+    <plurals name="delay_seconds">
+        <item quantity="zero">%d ثانية</item>
+        <item quantity="one">ثانية واحدة</item>
+        <item quantity="two">ثانيتان</item>
+        <item quantity="few">%d ثوانٍ</item>
+        <item quantity="many">%d ثانية</item>
+        <item quantity="other">%d ثانية</item>
+    </plurals>
+    <plurals name="delay_minutes">
+        <item quantity="zero">%d دقيقة</item>
+        <item quantity="one">دقيقة واحدة</item>
+        <item quantity="two">دقيقتان</item>
+        <item quantity="few">%d دقائق</item>
+        <item quantity="many">%d دقيقة</item>
+        <item quantity="other">%d دقيقة</item>
+    </plurals>
+</resources>

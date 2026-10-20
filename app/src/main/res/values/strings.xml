@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Fake Call</string>
+    <string name="app_tagline">A call that arrives exactly when you need it</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_history">History</string>
+    <string name="nav_settings">Settings</string>
+    <string name="nav_about">About</string>
+    <string name="nav_open_drawer">Open navigation menu</string>
+    <string name="nav_update_available">Update available: v%1$s</string>
+
+    <!-- Common -->
+    <string name="action_save">Save</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_back">Back</string>
+    <string name="action_enable">Enable</string>
+    <string name="action_open_settings">Open settings</string>
+    <string name="action_dismiss">Dismiss</string>
+
+    <!-- Intro -->
+    <string name="intro_skip">Skip</string>
+
+    <!-- Home -->
+    <string name="home_title">New fake call</string>
+    <string name="caller_name_label">Caller name</string>
+    <string name="caller_number_label">Caller number</string>
+    <string name="delay_label">Ring after</string>
+    <string name="delay_now">Now</string>
+    <string name="delay_custom_label">Custom delay (seconds)</string>
+    <string name="audio_label">Audio on answer</string>
+    <string name="audio_none">No audio selected</string>
+    <string name="audio_pick">Choose audio file</string>
+    <string name="audio_change">Change</string>
+    <string name="audio_clear">Remove</string>
+    <string name="schedule_button">Schedule call</string>
+    <string name="call_now_button">Call now</string>
+    <string name="scheduled_confirmation">Call scheduled in %1$s</string>
+    <string name="preset_save_button">Save as preset</string>
+    <string name="preset_name_title">Preset name</string>
+    <string name="presets_title">Quick presets</string>
+    <string name="presets_empty">No presets yet. Save one for one-tap calls, launcher shortcuts, and Quick Settings tiles.</string>
+    <string name="preset_limit_reached">You can save up to 5 presets.</string>
+    <string name="preset_generic_label">Fake Call preset</string>
+    <string name="preset_triggered">Calling %1$s</string>
+
+    <!-- Permission and readiness cards -->
+    <string name="account_card_title">System call account</string>
+    <string name="account_enabled_text">Enabled. Fake calls ring in the system dialer.</string>
+    <string name="account_disabled_text">Not enabled. Enable the Fake Call account so calls ring in the system dialer, or use the app call screen instead.</string>
+    <string name="exact_alarm_card_title">Exact alarms</string>
+    <string name="exact_alarm_text">Allow exact alarms so scheduled calls ring on time.</string>
+    <string name="notifications_card_title">Notifications</string>
+    <string name="notifications_text">Allow notifications so the call can appear full-screen when the device is locked.</string>
+    <string name="fullscreen_card_title">Full-screen calls</string>
+    <string name="fullscreen_text">Allow full-screen notifications so the incoming call screen can take over the display.</string>
+
+    <!-- History -->
+    <string name="history_title">Call history</string>
+    <string name="history_empty">No simulated calls yet.</string>
+    <string name="history_answered">Answered</string>
+    <string name="history_declined">Declined</string>
+    <string name="history_completed">Completed</string>
+    <string name="history_scheduled">Scheduled</string>
+    <string name="history_clear">Clear history</string>
+    <string name="history_clear_confirm">Delete all history entries?</string>
+    <string name="duration_seconds">%1$d sec</string>
+
+    <!-- Call screens -->
+    <string name="call_incoming">Incoming call</string>
+    <string name="call_unknown_caller">Unknown</string>
+    <string name="call_answer">Answer</string>
+    <string name="call_decline">Decline</string>
+    <string name="call_end">End call</string>
+    <string name="call_mute">Mute</string>
+    <string name="call_speaker">Speaker</string>
+    <string name="call_ringing">Ringing…</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_language">Language</string>
+    <string name="language_system">System default</string>
+    <string name="language_en">English</string>
+    <string name="language_ar">العربية</string>
+    <string name="settings_appearance">Appearance</string>
+    <string name="settings_dynamic_color">Dynamic color (Monet)</string>
+    <string name="settings_dynamic_color_desc">Use colors from your wallpaper on Android 12 and above.</string>
+    <string name="settings_call_engine">Call presentation</string>
+    <string name="call_mode_telecom">System dialer (Telecom)</string>
+    <string name="call_mode_app">App call screen</string>
+    <string name="call_mode_desc">Telecom shows the call in the system dialer when the account is enabled. The app screen always works.</string>
+    <string name="settings_account_label">Call account label</string>
+    <string name="settings_account_label_desc">The name shown for the Fake Call account in system settings. Changing it re-registers the account.</string>
+    <string name="settings_defaults">Default caller</string>
+    <string name="settings_default_name">Default caller name</string>
+    <string name="settings_default_number">Default caller number</string>
+    <string name="settings_updates">Updates</string>
+    <string name="settings_update_notifications">Notify about new versions</string>
+    <string name="settings_check_updates">Check for updates</string>
+    <string name="settings_checking">Checking…</string>
+    <string name="settings_up_to_date">You are on the latest version (v%1$s).</string>
+    <string name="settings_automation">Automation</string>
+    <string name="settings_automation_desc">Other apps (Tasker, MacroDroid) or ADB can trigger a call with the broadcast action com.mgneg.fakecall.action.TRIGGER and the extras caller_name, caller_number, delay (seconds).</string>
+
+    <!-- Updates -->
+    <string name="update_title">Update available</string>
+    <string name="update_new_version">Version v%1$s</string>
+    <string name="update_download_install">Download and install</string>
+    <string name="update_open_github">Open on GitHub</string>
+    <string name="update_downloading">Downloading… %1$d%%</string>
+    <string name="update_verifying">Verifying checksum…</string>
+    <string name="update_failed">Update failed. You can download it from GitHub instead.</string>
+    <string name="update_install_permission">To install updates in the app, allow installs from this source in system settings.</string>
+    <string name="whats_new_title">What\'s new in v%1$s</string>
+
+    <!-- About -->
+    <string name="about_title">About</string>
+    <string name="about_version">Version %1$s</string>
+    <string name="about_developer_title">Who is the developer</string>
+    <string name="about_developed_by">Developed by mgneg</string>
+    <string name="about_bio">mgneg is an independent developer building small, honest Android tools. This space will be updated with a fuller bio soon.</string>
+    <string name="about_purpose_title">Purpose of the app</string>
+    <string name="about_purpose">Fake Call simulates an incoming phone call at a time you choose, with a caller name and number you set, and optional audio when you answer. People use it for privacy, entertainment, presentations, and testing.</string>
+    <string name="about_disclaimer_title">Disclaimer</string>
+    <string name="about_disclaimer">This app is intended for entertainment, privacy, demonstrations, and testing only. Do not use it to deceive, defraud, harass, threaten, or impersonate any person, company, or authority, or to cause harm of any kind. The developer is not responsible for any misuse or for any consequences arising from the use of this app. You are solely responsible for how you use it and for complying with the laws that apply to you.</string>
+    <string name="about_contact_title">Contact the developer</string>
+    <string name="contact_facebook">Facebook</string>
+    <string name="contact_whatsapp">WhatsApp</string>
+    <string name="contact_instagram">Instagram</string>
+    <string name="contact_x">X (formerly Twitter)</string>
+    <string name="about_links_title">Project</string>
+    <string name="about_github">GitHub repository</string>
+    <string name="about_license">MIT License</string>
+    <string name="about_licenses">Open-source licenses</string>
+
+    <!-- Notifications -->
+    <string name="notif_channel_calls">Fake calls</string>
+    <string name="notif_channel_updates">App updates</string>
+    <string name="notif_update_title">Fake Call v%1$s is available</string>
+    <string name="notif_update_text">Tap to see what\'s new and update.</string>
+
+    <!-- Errors / misc -->
+    <string name="error_no_dialer_account">The call account could not be used; the app call screen was shown instead.</string>
+
+    <plurals name="delay_seconds">
+        <item quantity="one">%d second</item>
+        <item quantity="other">%d seconds</item>
+    </plurals>
+    <plurals name="delay_minutes">
+        <item quantity="one">%d minute</item>
+        <item quantity="other">%d minutes</item>
+    </plurals>
+</resources>
