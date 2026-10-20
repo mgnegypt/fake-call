@@ -66,6 +66,7 @@ adb shell am broadcast \
 | Install packages | Install in-app updates you explicitly confirm |
 | Internet | Update checks against GitHub Releases only |
 | Boot completed | Re-schedule pending calls after a reboot |
+| Battery optimization exemption | Keep scheduled calls from being delayed or killed by OEM battery saving (requested in the app, never forced) |
 | Vibrate / audio settings | Ring vibration and voice-route audio playback |
 
 ## Building from source

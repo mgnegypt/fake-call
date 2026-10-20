@@ -140,6 +140,15 @@
     <string name="ringtone_default">الافتراضية</string>
     <string name="vibration_label">الاهتزاز</string>
 
+        <string name="battery_card_title">تحسين البطارية</string>
+    <string name="battery_text">اسمح باستخدام البطارية دون قيود حتى لا تتأخر المكالمات المجدولة أو تُقتل بسبب توفير الطاقة.</string>
+    <string name="settings_permissions">الأذونات</string>
+    <string name="perm_granted">ممنوح</string>
+    <string name="perm_missing">غير ممنوح</string>
+    <string name="perm_phone_state">حالة الهاتف</string>
+    <string name="perm_battery">البطارية (بدون قيود)</string>
+    <string name="perm_install_updates">تثبيت التحديثات</string>
+
     <plurals name="delay_seconds">
         <item quantity="zero">%d ثانية</item>
         <item quantity="one">ثانية واحدة</item>

@@ -552,6 +552,7 @@ private fun ReadinessCards() {
     var exactOk by remember { mutableStateOf(true) }
     var notifOk by remember { mutableStateOf(true) }
     var fsOk by remember { mutableStateOf(true) }
+    var batteryOk by remember { mutableStateOf(true) }
     var phoneStateGranted by remember { mutableStateOf(false) }
 
     fun refresh() {
@@ -559,6 +560,7 @@ private fun ReadinessCards() {
         exactOk = Permissions.canScheduleExact(context)
         notifOk = Permissions.notificationsEnabled(context)
         fsOk = Permissions.canFullScreenIntent(context)
+        batteryOk = Permissions.isIgnoringBatteryOptimizations(context)
         phoneStateGranted = ContextCompat.checkSelfPermission(
             context, Manifest.permission.READ_PHONE_STATE
         ) == PackageManager.PERMISSION_GRANTED
@@ -618,6 +620,14 @@ private fun ReadinessCards() {
             text = stringResource(R.string.fullscreen_text),
             actionLabel = stringResource(R.string.action_enable),
             onAction = { activity?.startActivity(Permissions.fullScreenSettingsIntent(context)) }
+        )
+    }
+    if (!batteryOk) {
+        ReadinessCard(
+            title = stringResource(R.string.battery_card_title),
+            text = stringResource(R.string.battery_text),
+            actionLabel = stringResource(R.string.action_enable),
+            onAction = { activity?.startActivity(Permissions.batteryOptimizationIntent(context)) }
         )
     }
 }

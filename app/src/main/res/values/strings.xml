@@ -152,6 +152,15 @@
     <string name="ringtone_default">Default</string>
     <string name="vibration_label">Vibration</string>
 
+        <string name="battery_card_title">Battery optimization</string>
+    <string name="battery_text">Allow unrestricted battery use so scheduled calls are not delayed or killed by battery saving.</string>
+    <string name="settings_permissions">Permissions</string>
+    <string name="perm_granted">Granted</string>
+    <string name="perm_missing">Not granted</string>
+    <string name="perm_phone_state">Phone state</string>
+    <string name="perm_battery">Battery (unrestricted)</string>
+    <string name="perm_install_updates">Install updates</string>
+
     <plurals name="delay_seconds">
         <item quantity="one">%d second</item>
         <item quantity="other">%d seconds</item>

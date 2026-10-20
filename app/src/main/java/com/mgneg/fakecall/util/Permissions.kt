@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
+import android.os.PowerManager
 import android.provider.Settings
 
 /** Readiness checks + intents to the relevant system settings screens. */
@@ -56,6 +57,18 @@ object Permissions {
     fun installPermissionIntent(context: Context): Intent =
         Intent(
             Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
+            Uri.parse("package:${context.packageName}")
+        )
+
+    /** True when the app is exempt from battery optimization (Doze). */
+    fun isIgnoringBatteryOptimizations(context: Context): Boolean {
+        val pm = context.getSystemService(PowerManager::class.java)
+        return pm.isIgnoringBatteryOptimizations(context.packageName)
+    }
+
+    fun batteryOptimizationIntent(context: Context): Intent =
+        Intent(
+            Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS,
             Uri.parse("package:${context.packageName}")
         )
 

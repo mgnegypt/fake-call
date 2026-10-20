@@ -9,8 +9,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.verticalScroll
+import android.Manifest
+import android.app.Activity
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Switch
@@ -31,7 +38,11 @@ import com.mgneg.fakecall.BuildConfig
 import com.mgneg.fakecall.FakeCallApp
 import com.mgneg.fakecall.R
 import com.mgneg.fakecall.i18n.LanguageManager
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import com.mgneg.fakecall.telecom.TelecomAccounts
+import com.mgneg.fakecall.util.Permissions
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
@@ -146,6 +157,8 @@ fun SettingsScreen(onShowUpdate: () -> Unit) {
             modifier = Modifier.fillMaxWidth(), singleLine = true
         )
 
+        PermissionsSection(app)
+
         SectionTitle(R.string.settings_updates)
         SwitchRow(
             title = stringResource(R.string.settings_update_notifications),
@@ -197,5 +210,97 @@ private fun SwitchRow(title: String, desc: String?, checked: Boolean, onChange: 
             if (desc != null) Text(desc, style = MaterialTheme.typography.bodySmall)
         }
         Switch(checked = checked, onCheckedChange = onChange)
+    }
+}
+
+/**
+ * Persistent permissions checklist (also mirrored as auto-hiding cards on
+ * Home). Every row shows the LIVE state, re-checked on ON_RESUME, with the
+ * fastest path to grant: runtime dialog where the platform allows one,
+ * the exact system settings screen otherwise.
+ */
+@Composable
+private fun PermissionsSection(app: FakeCallApp) {
+    val context = LocalContext.current
+    val activity = context as? Activity
+
+    var accountEnabled by remember { mutableStateOf(false) }
+    var phoneState by remember { mutableStateOf(false) }
+    var exactOk by remember { mutableStateOf(true) }
+    var notifOk by remember { mutableStateOf(true) }
+    var fsOk by remember { mutableStateOf(true) }
+    var batteryOk by remember { mutableStateOf(true) }
+    var installOk by remember { mutableStateOf(true) }
+
+    fun refresh() {
+        accountEnabled = TelecomAccounts.isEnabled(context)
+        phoneState = ContextCompat.checkSelfPermission(
+            context, Manifest.permission.READ_PHONE_STATE
+        ) == PackageManager.PERMISSION_GRANTED
+        exactOk = Permissions.canScheduleExact(context)
+        notifOk = Permissions.notificationsEnabled(context)
+        fsOk = Permissions.canFullScreenIntent(context)
+        batteryOk = Permissions.isIgnoringBatteryOptimizations(context)
+        installOk = Permissions.canInstallUnknownApps(context)
+    }
+    androidx.compose.runtime.LaunchedEffect(Unit) { refresh() }
+    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { refresh() }
+
+    val phoneStateLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { refresh() }
+    val notifLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { refresh() }
+
+    SectionTitle(R.string.settings_permissions)
+    PermissionRow(stringResource(R.string.account_card_title), accountEnabled) {
+        if (!phoneState) phoneStateLauncher.launch(Manifest.permission.READ_PHONE_STATE)
+        else activity?.startActivity(TelecomAccounts.accountSettingsIntent())
+    }
+    PermissionRow(stringResource(R.string.perm_phone_state), phoneState) {
+        phoneStateLauncher.launch(Manifest.permission.READ_PHONE_STATE)
+    }
+    PermissionRow(stringResource(R.string.exact_alarm_card_title), exactOk) {
+        activity?.startActivity(Permissions.exactAlarmSettingsIntent(context))
+    }
+    PermissionRow(stringResource(R.string.notifications_card_title), notifOk) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            notifLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+        } else {
+            activity?.startActivity(Permissions.notificationSettingsIntent(context))
+        }
+    }
+    PermissionRow(stringResource(R.string.fullscreen_card_title), fsOk) {
+        activity?.startActivity(Permissions.fullScreenSettingsIntent(context))
+    }
+    PermissionRow(stringResource(R.string.perm_battery), batteryOk) {
+        activity?.startActivity(Permissions.batteryOptimizationIntent(context))
+    }
+    PermissionRow(stringResource(R.string.perm_install_updates), installOk) {
+        activity?.startActivity(Permissions.installPermissionIntent(context))
+    }
+}
+
+@Composable
+private fun PermissionRow(title: String, granted: Boolean, onGrant: () -> Unit) {
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(title, style = MaterialTheme.typography.bodyLarge)
+            Text(
+                stringResource(if (granted) R.string.perm_granted else R.string.perm_missing),
+                style = MaterialTheme.typography.bodySmall,
+                color = if (granted) MaterialTheme.colorScheme.primary
+                else MaterialTheme.colorScheme.error
+            )
+        }
+        if (!granted) {
+            OutlinedButton(onClick = onGrant) {
+                Text(stringResource(R.string.action_enable))
+            }
+        }
     }
 }

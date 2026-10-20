@@ -6,11 +6,13 @@
 ### Improved
 - Dual visual identity: Volt UI in dark mode (bold, high-contrast, lime-accented) and Aura UI in light mode (calm, organic, sage-green), with matching splash screens, launcher artwork, shapes, and system bars
 - Dynamic color (Monet) is now an opt-in in Settings; the brand palettes are the default
+- Permission setup verified against the reference checklist style: a persistent Permissions section in Settings shows the live state of every permission, and battery-optimization exemption is now checked and offered — a common cause of missed scheduled calls on OEM devices
 
 ## العربية
 ### تم التحسين
 - هوية بصرية مزدوجة: واجهة Volt في الوضع الداكن (جريئة وعالية التباين بلمسات ليمونية) وواجهة Aura في الوضع الفاتح (هادئة وطبيعية بأخضر المريمية)، مع شاشات بداية وأيقونة وأشكال وأشرطة نظام متناسقة
 - الألوان الديناميكية (Monet) أصبحت اختيارية من الإعدادات؛ لوحات العلامة هي الافتراضية
+- إعدادات الأذونات بمزيد من التحقق: قسم أذونات دائم في الإعدادات يعرض الحالة الحية لكل إذن، وإعفاء تحسين البطارية أصبح يُفحص ويُعرض — وهو سبب شائع لضياع المكالمات المجدولة على أجهزة الشركات
 
 ## [1.0] - 2026-10-20
 
