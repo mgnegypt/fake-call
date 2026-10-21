@@ -231,6 +231,16 @@
     <string name="unit_minutes">minutes</string>
     <string name="unit_hours">hours</string>
     <string name="contacts_pick">Pick from contacts</string>
+    <string name="about_dev_tagline">Independent developer · small, honest Android tools</string>
+    <string name="about_stat_opensource">Open source</string>
+    <string name="about_stat_bilingual">Arabic &amp; English</string>
+    <string name="about_stat_material3">Material 3</string>
+    <string name="about_tag_privacy">Privacy</string>
+    <string name="about_tag_fun">Entertainment</string>
+    <string name="about_tag_demos">Presentations</string>
+    <string name="about_tag_testing">Testing</string>
+    <string name="about_disclaimer_more">For entertainment and privacy only, read more</string>
+    <string name="about_footer">© mgneg · MIT</string>
     <string name="contacts_title">Choose a contact</string>
     <string name="contacts_search">Search contacts</string>
     <string name="contacts_empty">No contacts with phone numbers</string>

@@ -230,6 +230,16 @@
     <string name="unit_minutes">دقيقة</string>
     <string name="unit_hours">ساعة</string>
     <string name="contacts_pick">اختيار من جهات الاتصال</string>
+    <string name="about_dev_tagline">مطوّر مستقل · أدوات أندرويد صغيرة وصادقة</string>
+    <string name="about_stat_opensource">مفتوح المصدر</string>
+    <string name="about_stat_bilingual">عربي وإنجليزي</string>
+    <string name="about_stat_material3">Material 3</string>
+    <string name="about_tag_privacy">الخصوصية</string>
+    <string name="about_tag_fun">الترفيه</string>
+    <string name="about_tag_demos">العروض التوضيحية</string>
+    <string name="about_tag_testing">الاختبار</string>
+    <string name="about_disclaimer_more">للترفيه والخصوصية فقط، اقرأ المزيد</string>
+    <string name="about_footer">© mgneg · MIT</string>
     <string name="contacts_title">اختر جهة اتصال</string>
     <string name="contacts_search">ابحث في جهات الاتصال</string>
     <string name="contacts_empty">لا توجد جهات اتصال بأرقام هاتف</string>
