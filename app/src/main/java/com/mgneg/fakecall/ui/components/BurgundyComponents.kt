@@ -419,8 +419,12 @@ fun AppSwitch(
     modifier: Modifier = Modifier
 ) {
     val b = burgundy()
-    val knobOffset by animateDpAsState(
-        targetValue = if (checked) 22.dp else 0.dp,
+    // The knob travels from the start edge to the end edge; the offset
+    // must flip sign in RTL or the knob would leave the track.
+    val rtl = androidx.compose.ui.platform.LocalLayoutDirection.current ==
+        androidx.compose.ui.unit.LayoutDirection.Rtl
+    val knobTravel by animateDpAsState(
+        targetValue = if (checked) (if (rtl) (-22).dp else 22.dp) else 0.dp,
         label = "switchKnob"
     )
     Box(
@@ -436,7 +440,7 @@ fun AppSwitch(
         Box(
             modifier = Modifier
                 .align(Alignment.CenterStart)
-                .offset(x = 4.dp + knobOffset)
+                .offset(x = (if (rtl) (-4).dp else 4.dp) + knobTravel)
                 .size(22.dp)
                 .clip(CircleShape)
                 .background(Color.White)
