@@ -19,7 +19,16 @@ class IncomingCallActivity : ComponentActivity() {
             // Collected, never block the main thread on a DataStore read:
             // this activity must appear the instant a call fires.
             val dynamicColor by app.settings.dynamicColor.collectAsState(initial = false)
-            FakeCallTheme(dynamicColor = dynamicColor) {
+            // Same theme-mode resolution as MainActivity: a stored
+            // light/dark choice wins over the system theme here too.
+            val themeMode by app.settings.themeMode.collectAsState(initial = "system")
+            val systemDark = androidx.compose.foundation.isSystemInDarkTheme()
+            val darkTheme = when (themeMode) {
+                "dark" -> true
+                "light" -> false
+                else -> systemDark
+            }
+            FakeCallTheme(darkTheme = darkTheme, dynamicColor = dynamicColor) {
                 val state by app.callController.state.collectAsState()
                 CallScreen(
                     state = state,

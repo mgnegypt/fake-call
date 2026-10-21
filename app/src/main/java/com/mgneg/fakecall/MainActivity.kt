@@ -42,11 +42,28 @@ class MainActivity : AppCompatActivity() {
 
         setContent {
             val dynamicColor by app.settings.dynamicColor.collectAsState(initial = false)
+            val themeMode by app.settings.themeMode.collectAsState(initial = "system")
+            val systemDark = androidx.compose.foundation.isSystemInDarkTheme()
+            // Stored choice wins once set; "system" (and any legacy or
+            // unknown value) follows the system theme, as v1.0 did.
+            val darkTheme = when (themeMode) {
+                "dark" -> true
+                "light" -> false
+                else -> systemDark
+            }
+            // System bars follow the theme: dark icons on light, light
+            // icons on dark.
+            val view = androidx.compose.ui.platform.LocalView.current
+            androidx.compose.runtime.SideEffect {
+                val controller = androidx.core.view.WindowCompat.getInsetsController(window, view)
+                controller.isAppearanceLightStatusBars = !darkTheme
+                controller.isAppearanceLightNavigationBars = !darkTheme
+            }
             var showIntro by remember { mutableStateOf<Boolean?>(null) }
             androidx.compose.runtime.LaunchedEffect(Unit) {
                 showIntro = !app.settings.introShown.first()
             }
-            FakeCallTheme(dynamicColor = dynamicColor) {
+            FakeCallTheme(darkTheme = darkTheme, dynamicColor = dynamicColor) {
                 when (showIntro) {
                     null -> Unit // splash still visible
                     true -> IntroScreen(onDone = {

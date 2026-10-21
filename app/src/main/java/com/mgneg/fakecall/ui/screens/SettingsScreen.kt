@@ -1,31 +1,25 @@
 package com.mgneg.fakecall.ui.screens
 
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import android.Manifest
-import android.app.Activity
-import android.content.pm.PackageManager
-import android.os.Build
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
-import androidx.compose.material3.Button
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.outlined.DarkMode
+import androidx.compose.material.icons.outlined.Language
+import androidx.compose.material.icons.outlined.WaterDrop
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.RadioButton
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -38,27 +32,46 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.mgneg.fakecall.BuildConfig
 import com.mgneg.fakecall.FakeCallApp
 import com.mgneg.fakecall.R
 import com.mgneg.fakecall.i18n.LanguageManager
-import androidx.core.content.ContextCompat
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.compose.LifecycleEventEffect
 import com.mgneg.fakecall.telecom.TelecomAccounts
-import com.mgneg.fakecall.util.Permissions
+import com.mgneg.fakecall.trigger.AutomationReceiver
+import com.mgneg.fakecall.ui.components.AppSwitch
+import com.mgneg.fakecall.ui.components.DropdownField
+import com.mgneg.fakecall.ui.components.GradientButton
+import com.mgneg.fakecall.ui.components.IconBubble
+import com.mgneg.fakecall.ui.components.LabeledField
+import com.mgneg.fakecall.ui.components.SegmentedControl
+import com.mgneg.fakecall.ui.components.SettingRow
+import com.mgneg.fakecall.ui.components.SoftCard
+import com.mgneg.fakecall.ui.components.SoftDivider
+import com.mgneg.fakecall.ui.components.burgundy
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
+/**
+ * Settings, burgundy layout. Sections and order follow the design board;
+ * every control is wired to the exact same setting/handler as before the
+ * redesign (language, theme mode, Monet, call mode, account label,
+ * defaults, permissions, updates, automation, logs).
+ */
 @Composable
 fun SettingsScreen(onShowUpdate: () -> Unit, onOpenLogs: () -> Unit) {
     val context = LocalContext.current
     val app = context.applicationContext as FakeCallApp
     val scope = rememberCoroutineScope()
+    val b = burgundy()
 
     val language by app.settings.language.collectAsState(initial = "system")
     val dynamicColor by app.settings.dynamicColor.collectAsState(initial = false)
+    val themeMode by app.settings.themeMode.collectAsState(initial = "system")
     val callMode by app.settings.callMode.collectAsState(initial = "telecom")
     val updateNotifications by app.settings.updateNotifications.collectAsState(initial = false)
 
@@ -66,7 +79,7 @@ fun SettingsScreen(onShowUpdate: () -> Unit, onOpenLogs: () -> Unit) {
     var defaultName by remember { mutableStateOf("") }
     var defaultNumber by remember { mutableStateOf("") }
     // One-shot load in an effect — launching from the composition body
-    // (the previous pattern) fires side effects during composition.
+    // fires side effects during composition.
     androidx.compose.runtime.LaunchedEffect(Unit) {
         accountLabel = app.settings.accountLabel.first()
         defaultName = app.settings.defaultName.first()
@@ -76,254 +89,301 @@ fun SettingsScreen(onShowUpdate: () -> Unit, onOpenLogs: () -> Unit) {
     var checking by remember { mutableStateOf(false) }
     var checkMessage by remember { mutableStateOf<String?>(null) }
 
+    val systemDark = androidx.compose.foundation.isSystemInDarkTheme()
+    val darkSwitchOn = themeMode == "dark" || (themeMode == "system" && systemDark)
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(10.dp)
+            .padding(start = 20.dp, end = 20.dp, top = 22.dp, bottom = 110.dp),
+        verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
-        Text(stringResource(R.string.settings_title), style = MaterialTheme.typography.titleLarge)
+        Text(stringResource(R.string.settings_title), style = MaterialTheme.typography.headlineMedium)
 
-        SectionTitle(R.string.settings_language)
-        listOf(
-            "system" to stringResource(R.string.language_system),
-            "en" to stringResource(R.string.language_en),
-            "ar" to stringResource(R.string.language_ar)
-        ).forEach { (value, label) ->
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .selectable(selected = language == value) {
-                        scope.launch { app.settings.setLanguage(value) }
-                        LanguageManager.apply(context, value)
-                    }
-                    .padding(vertical = 4.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                RadioButton(selected = language == value, onClick = null)
-                Text(label, modifier = Modifier.padding(horizontal = 8.dp))
-            }
-        }
-
-        SectionTitle(R.string.settings_appearance)
-        SwitchRow(
-            title = stringResource(R.string.settings_dynamic_color),
-            desc = stringResource(R.string.settings_dynamic_color_desc),
-            checked = dynamicColor
-        ) { scope.launch { app.settings.setDynamicColor(it) } }
-
-        SectionTitle(R.string.settings_call_engine)
-        listOf(
-            "telecom" to stringResource(R.string.call_mode_telecom),
-            "app" to stringResource(R.string.call_mode_app)
-        ).forEach { (value, label) ->
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .selectable(selected = callMode == value) {
-                        scope.launch { app.settings.setCallMode(value) }
-                    }
-                    .padding(vertical = 4.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                RadioButton(selected = callMode == value, onClick = null)
-                Text(label, modifier = Modifier.padding(horizontal = 8.dp))
-            }
-        }
-        Text(stringResource(R.string.call_mode_desc), style = MaterialTheme.typography.bodySmall)
-
-        SectionTitle(R.string.settings_account_label)
-        OutlinedTextField(
-            value = accountLabel, onValueChange = { accountLabel = it },
-            modifier = Modifier.fillMaxWidth(), singleLine = true
-        )
-        Text(stringResource(R.string.settings_account_label_desc), style = MaterialTheme.typography.bodySmall)
-        Button(onClick = {
-            scope.launch {
-                app.settings.setAccountLabel(accountLabel)
-                TelecomAccounts.register(context, accountLabel)
-            }
-        }) { Text(stringResource(R.string.action_save)) }
-
-        SectionTitle(R.string.settings_defaults)
-        OutlinedTextField(
-            value = defaultName,
-            onValueChange = { defaultName = it; scope.launch { app.settings.setDefaultName(it) } },
-            label = { Text(stringResource(R.string.settings_default_name)) },
-            modifier = Modifier.fillMaxWidth(), singleLine = true
-        )
-        OutlinedTextField(
-            value = defaultNumber,
-            onValueChange = { defaultNumber = it; scope.launch { app.settings.setDefaultNumber(it) } },
-            label = { Text(stringResource(R.string.settings_default_number)) },
-            modifier = Modifier.fillMaxWidth(), singleLine = true
-        )
-
-        PermissionsSection(app)
-
-        SectionTitle(R.string.settings_updates)
-        SwitchRow(
-            title = stringResource(R.string.settings_update_notifications),
-            desc = null,
-            checked = updateNotifications
-        ) { scope.launch { app.settings.setUpdateNotifications(it) } }
-        Button(
-            onClick = {
-                checking = true
-                scope.launch {
-                    val info = app.updateRepository.checkNow(manual = true)
-                    checking = false
-                    if (info != null) {
-                        onShowUpdate()
-                    } else {
-                        checkMessage = context.getString(R.string.settings_up_to_date, BuildConfig.VERSION_NAME)
-                    }
+        // Language + appearance, one grouped card.
+        SoftCard {
+            Column {
+                SettingRow(
+                    icon = Icons.Outlined.Language,
+                    title = stringResource(R.string.settings_language)
+                ) {
+                    val languageOptions = listOf(
+                        "system" to stringResource(R.string.language_system),
+                        "en" to stringResource(R.string.language_en),
+                        "ar" to stringResource(R.string.language_ar)
+                    )
+                    DropdownField(
+                        value = languageOptions.firstOrNull { it.first == language }?.second
+                            ?: languageOptions[0].second,
+                        options = languageOptions.map { it.second },
+                        onSelect = { index ->
+                            val value = languageOptions[index].first
+                            scope.launch { app.settings.setLanguage(value) }
+                            LanguageManager.apply(context, value)
+                        },
+                        modifier = Modifier.weight(1f)
+                    )
                 }
-            },
-            enabled = !checking,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(stringResource(if (checking) R.string.settings_checking else R.string.settings_check_updates))
-        }
-        checkMessage?.let { Text(it, style = MaterialTheme.typography.bodyMedium) }
-
-        SectionTitle(R.string.settings_automation)
-        Text(stringResource(R.string.settings_automation_desc), style = MaterialTheme.typography.bodyMedium)
-
-        // Logs lives at the very end: the recorded diagnostics of the
-        // last call attempt, on its own screen with a file export.
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .heightIn(min = 56.dp)
-                .clickable(onClick = onOpenLogs),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                stringResource(R.string.logs_title),
-                style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.weight(1f)
-            )
-            Icon(
-                Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                contentDescription = null
-            )
-        }
-    }
-}
-
-@Composable
-private fun SectionTitle(resId: Int) {
-    Text(
-        stringResource(resId),
-        style = MaterialTheme.typography.titleMedium,
-        modifier = Modifier.padding(top = 8.dp)
-    )
-}
-
-@Composable
-private fun SwitchRow(title: String, desc: String?, checked: Boolean, onChange: (Boolean) -> Unit) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Column(modifier = Modifier.weight(1f)) {
-            Text(title, style = MaterialTheme.typography.bodyLarge)
-            if (desc != null) Text(desc, style = MaterialTheme.typography.bodySmall)
-        }
-        Switch(checked = checked, onCheckedChange = onChange)
-    }
-}
-
-/**
- * Persistent permissions checklist (also mirrored as auto-hiding cards on
- * Home). Every row shows the LIVE state, re-checked on ON_RESUME, with the
- * fastest path to grant: runtime dialog where the platform allows one,
- * the exact system settings screen otherwise.
- */
-@Composable
-private fun PermissionsSection(app: FakeCallApp) {
-    val context = LocalContext.current
-    val activity = context as? Activity
-
-    var accountEnabled by remember { mutableStateOf(false) }
-    var phoneState by remember { mutableStateOf(false) }
-    var exactOk by remember { mutableStateOf(true) }
-    var notifOk by remember { mutableStateOf(true) }
-    var fsOk by remember { mutableStateOf(true) }
-    var batteryOk by remember { mutableStateOf(true) }
-    var installOk by remember { mutableStateOf(true) }
-
-    fun refresh() {
-        accountEnabled = TelecomAccounts.isEnabled(context)
-        phoneState = ContextCompat.checkSelfPermission(
-            context, Manifest.permission.READ_PHONE_STATE
-        ) == PackageManager.PERMISSION_GRANTED
-        exactOk = Permissions.canScheduleExact(context)
-        notifOk = Permissions.notificationsEnabled(context)
-        fsOk = Permissions.canFullScreenIntent(context)
-        batteryOk = Permissions.isIgnoringBatteryOptimizations(context)
-        installOk = Permissions.canInstallUnknownApps(context)
-    }
-    androidx.compose.runtime.LaunchedEffect(Unit) { refresh() }
-    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { refresh() }
-
-    val phoneStateLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { refresh() }
-    val notifLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { refresh() }
-
-    SectionTitle(R.string.settings_permissions)
-    PermissionRow(stringResource(R.string.account_card_title), accountEnabled) {
-        if (!phoneState) phoneStateLauncher.launch(Manifest.permission.READ_PHONE_STATE)
-        else activity?.startActivity(TelecomAccounts.accountSettingsIntent())
-    }
-    PermissionRow(stringResource(R.string.perm_phone_state), phoneState) {
-        phoneStateLauncher.launch(Manifest.permission.READ_PHONE_STATE)
-    }
-    PermissionRow(stringResource(R.string.exact_alarm_card_title), exactOk) {
-        activity?.startActivity(Permissions.exactAlarmSettingsIntent(context))
-    }
-    PermissionRow(stringResource(R.string.notifications_card_title), notifOk) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            notifLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-        } else {
-            activity?.startActivity(Permissions.notificationSettingsIntent(context))
-        }
-    }
-    PermissionRow(stringResource(R.string.fullscreen_card_title), fsOk) {
-        activity?.startActivity(Permissions.fullScreenSettingsIntent(context))
-    }
-    PermissionRow(stringResource(R.string.perm_battery), batteryOk) {
-        activity?.startActivity(Permissions.batteryOptimizationIntent(context))
-    }
-    PermissionRow(stringResource(R.string.perm_install_updates), installOk) {
-        activity?.startActivity(Permissions.installPermissionIntent(context))
-    }
-}
-
-@Composable
-private fun PermissionRow(title: String, granted: Boolean, onGrant: () -> Unit) {
-    Row(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Column(modifier = Modifier.weight(1f)) {
-            Text(title, style = MaterialTheme.typography.bodyLarge)
-            Text(
-                stringResource(if (granted) R.string.perm_granted else R.string.perm_missing),
-                style = MaterialTheme.typography.bodySmall,
-                color = if (granted) MaterialTheme.colorScheme.primary
-                else MaterialTheme.colorScheme.error
-            )
-        }
-        if (!granted) {
-            OutlinedButton(onClick = onGrant) {
-                Text(stringResource(R.string.action_enable))
+                SoftDivider()
+                SettingRow(
+                    icon = Icons.Outlined.DarkMode,
+                    title = stringResource(R.string.settings_dark_mode),
+                    subtitle = stringResource(R.string.settings_dark_mode_desc),
+                    onClick = {
+                        scope.launch {
+                            app.settings.setThemeMode(if (darkSwitchOn) "light" else "dark")
+                        }
+                    }
+                ) {
+                    AppSwitch(
+                        checked = darkSwitchOn,
+                        onCheckedChange = { on ->
+                            scope.launch {
+                                app.settings.setThemeMode(if (on) "dark" else "light")
+                            }
+                        }
+                    )
+                }
+                SoftDivider()
+                SettingRow(
+                    icon = Icons.Outlined.WaterDrop,
+                    title = stringResource(R.string.settings_dynamic_color),
+                    subtitle = stringResource(R.string.settings_dynamic_color_desc),
+                    onClick = { scope.launch { app.settings.setDynamicColor(!dynamicColor) } }
+                ) {
+                    AppSwitch(
+                        checked = dynamicColor,
+                        onCheckedChange = { scope.launch { app.settings.setDynamicColor(it) } }
+                    )
+                }
             }
+        }
+
+        // Call display mode.
+        SoftCard(contentPadding = androidx.compose.foundation.layout.PaddingValues(14.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Text(stringResource(R.string.settings_call_engine), style = MaterialTheme.typography.titleMedium)
+                Text(
+                    stringResource(R.string.call_mode_desc),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = b.muted
+                )
+                SegmentedControl(
+                    options = listOf(
+                        stringResource(R.string.call_mode_telecom),
+                        stringResource(R.string.call_mode_app)
+                    ),
+                    selectedIndex = if (callMode == "app") 1 else 0,
+                    onSelect = { index ->
+                        scope.launch {
+                            app.settings.setCallMode(if (index == 1) "app" else "telecom")
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        }
+
+        // Call account label.
+        SoftCard(contentPadding = androidx.compose.foundation.layout.PaddingValues(14.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Text(stringResource(R.string.settings_account_label), style = MaterialTheme.typography.titleMedium)
+                LabeledField(
+                    label = stringResource(R.string.field_name_label),
+                    value = accountLabel,
+                    onValueChange = { accountLabel = it },
+                    placeholder = "Fake Call",
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Text(
+                    stringResource(R.string.settings_account_label_desc),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = b.muted
+                )
+                GradientButton(
+                    text = stringResource(R.string.action_save),
+                    onClick = {
+                        scope.launch {
+                            app.settings.setAccountLabel(accountLabel)
+                            TelecomAccounts.register(context, accountLabel)
+                        }
+                    }
+                )
+            }
+        }
+
+        // Default caller.
+        SoftCard(contentPadding = androidx.compose.foundation.layout.PaddingValues(14.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Text(stringResource(R.string.settings_defaults), style = MaterialTheme.typography.titleMedium)
+                LabeledField(
+                    label = stringResource(R.string.settings_default_name),
+                    value = defaultName,
+                    onValueChange = { v ->
+                        defaultName = v
+                        scope.launch { app.settings.setDefaultName(v) }
+                    },
+                    placeholder = stringResource(R.string.caller_name_placeholder),
+                    modifier = Modifier.fillMaxWidth()
+                )
+                LabeledField(
+                    label = stringResource(R.string.settings_default_number),
+                    value = defaultNumber,
+                    onValueChange = { v ->
+                        defaultNumber = v
+                        scope.launch { app.settings.setDefaultNumber(v) }
+                    },
+                    placeholder = stringResource(R.string.caller_number_placeholder),
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        }
+
+        // Permissions checklist.
+        SoftCard {
+            Column(modifier = Modifier.padding(vertical = 6.dp)) {
+                Text(
+                    stringResource(R.string.settings_permissions),
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.padding(start = 14.dp, end = 14.dp, top = 8.dp, bottom = 4.dp)
+                )
+                val entries = rememberPermissionEntries(app)
+                entries.forEachIndexed { index, entry ->
+                    if (index > 0) SoftDivider()
+                    PermissionCheckRow(entry)
+                }
+            }
+        }
+
+        // Updates.
+        SoftCard(contentPadding = androidx.compose.foundation.layout.PaddingValues(14.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Text(stringResource(R.string.settings_updates), style = MaterialTheme.typography.titleMedium)
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        stringResource(R.string.settings_update_notifications),
+                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Medium),
+                        modifier = Modifier.weight(1f)
+                    )
+                    AppSwitch(
+                        checked = updateNotifications,
+                        onCheckedChange = { scope.launch { app.settings.setUpdateNotifications(it) } }
+                    )
+                }
+                GradientButton(
+                    text = stringResource(
+                        if (checking) R.string.settings_checking else R.string.settings_check_updates
+                    ),
+                    onClick = {
+                        checking = true
+                        scope.launch {
+                            val info = app.updateRepository.checkNow(manual = true)
+                            checking = false
+                            if (info != null) {
+                                onShowUpdate()
+                            } else {
+                                checkMessage = context.getString(
+                                    R.string.settings_up_to_date, BuildConfig.VERSION_NAME
+                                )
+                            }
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    height = 52,
+                    enabled = !checking
+                )
+                checkMessage?.let {
+                    Text(it, style = MaterialTheme.typography.bodyMedium)
+                }
+            }
+        }
+
+        // Automation.
+        SoftCard(contentPadding = androidx.compose.foundation.layout.PaddingValues(14.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Text(stringResource(R.string.settings_automation), style = MaterialTheme.typography.titleMedium)
+                Text(
+                    stringResource(R.string.settings_automation_desc),
+                    fontSize = 13.sp,
+                    color = b.muted
+                )
+                Text(
+                    AutomationReceiver.ACTION_TRIGGER,
+                    fontFamily = FontFamily.Monospace,
+                    fontSize = 12.sp,
+                    color = b.text,
+                    textAlign = TextAlign.Start,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(b.field, RoundedCornerShape(14.dp))
+                        .padding(horizontal = 12.dp, vertical = 10.dp)
+                )
+            }
+        }
+
+        // Logs row.
+        SoftCard(onClick = onOpenLogs) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp)
+                    .padding(horizontal = 14.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    stringResource(R.string.logs_title),
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.weight(1f)
+                )
+                Icon(
+                    Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                    contentDescription = null,
+                    tint = b.muted
+                )
+            }
+        }
+    }
+}
+
+/** Checklist row: icon bubble + title; gradient Enable or granted check. */
+@Composable
+private fun PermissionCheckRow(entry: PermissionEntry) {
+    val b = burgundy()
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 14.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        IconBubble(entry.icon, contentDescription = null)
+        Text(
+            stringResource(entry.titleRes),
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.weight(1f)
+        )
+        if (entry.granted) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    Icons.Filled.Check,
+                    contentDescription = null,
+                    tint = b.accentText,
+                    modifier = Modifier.size(18.dp)
+                )
+                Text(
+                    stringResource(R.string.perm_granted),
+                    color = b.accentText,
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(start = 4.dp)
+                )
+            }
+        } else {
+            GradientButton(
+                text = stringResource(R.string.action_enable),
+                onClick = entry.onEnable
+            )
         }
     }
 }
