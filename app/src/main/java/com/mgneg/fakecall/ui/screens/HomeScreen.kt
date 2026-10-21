@@ -59,6 +59,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -1036,10 +1037,13 @@ private fun ContactsPickerDialog(
     val filtered = remember(contacts, query) {
         val all = contacts ?: emptyList()
         if (query.isBlank()) all
-        else all.filter {
-            it.name.contains(query, ignoreCase = true) ||
-                it.number.filter { c -> c.isDigit() }
-                    .contains(query.filter { c -> c.isDigit() })
+        else {
+            val queryDigits = query.filter { c -> c.isDigit() }
+            all.filter {
+                it.name.contains(query, ignoreCase = true) ||
+                    (queryDigits.isNotEmpty() &&
+                        it.number.filter { c -> c.isDigit() }.contains(queryDigits))
+            }
         }
     }
 
