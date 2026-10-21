@@ -381,5 +381,248 @@ fun AboutScreen(onShowUpdate: () -> Unit) {
 
             // ---- Disclaimer: collapsed row, expands to the full text.
             SoftCard(
-                contentPadding = Paddin
-...[truncated 6102 chars]
+                contentPadding = PaddingValues(16.dp),
+                onClick = { disclaimerOpen = !disclaimerOpen }
+            ) {
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(40.dp)
+                                .clip(CircleShape)
+                                .background(b.danger.copy(alpha = 0.14f)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                Icons.Filled.WarningAmber,
+                                contentDescription = null,
+                                tint = b.danger,
+                                modifier = Modifier.size(21.dp)
+                            )
+                        }
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                stringResource(R.string.about_disclaimer_title),
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 15.sp,
+                                color = b.danger
+                            )
+                            Text(
+                                stringResource(R.string.about_disclaimer_more),
+                                fontSize = 12.sp,
+                                color = b.muted
+                            )
+                        }
+                        Icon(
+                            Icons.Filled.KeyboardArrowDown,
+                            contentDescription = null,
+                            tint = b.muted,
+                            modifier = Modifier
+                                .size(22.dp)
+                                .rotate(if (disclaimerOpen) 180f else 0f)
+                        )
+                    }
+                    if (disclaimerOpen) {
+                        Text(
+                            stringResource(R.string.about_disclaimer),
+                            fontSize = 13.sp,
+                            color = b.muted
+                        )
+                    }
+                }
+            }
+
+            // ---- Project links: one divided card.
+            SoftCard(contentPadding = PaddingValues(vertical = 6.dp)) {
+                Column {
+                    LinkRow(Icons.Filled.Code, R.string.about_github) {
+                        open(ContactLinks.GITHUB_REPO_URL)
+                    }
+                    SoftDivider(
+                        modifier = Modifier.padding(start = 62.dp, end = 14.dp)
+                    )
+                    LinkRow(Icons.Filled.Shield, R.string.about_license) {
+                        showLicense = true
+                    }
+                    SoftDivider(
+                        modifier = Modifier.padding(start = 62.dp, end = 14.dp)
+                    )
+                    LinkRow(Icons.Filled.Description, R.string.about_licenses) {
+                        showDeps = true
+                    }
+                }
+            }
+
+            Text(
+                stringResource(R.string.about_footer),
+                fontSize = 12.sp,
+                color = b.muted,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+    }
+
+    if (showLicense) {
+        AlertDialog(
+            onDismissRequest = { showLicense = false },
+            title = { Text(stringResource(R.string.about_license)) },
+            text = {
+                Text(
+                    "MIT License\n\nCopyright (c) 2026 mgneg\n\n" +
+                        "Permission is hereby granted, free of charge, to any person obtaining a copy " +
+                        "of this software and associated documentation files (the \"Software\"), to deal " +
+                        "in the Software without restriction, subject to the conditions in the LICENSE " +
+                        "file shipped with the source code.",
+                    style = MaterialTheme.typography.bodySmall
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = { showLicense = false }) {
+                    Text(stringResource(R.string.action_dismiss))
+                }
+            }
+        )
+    }
+    if (showDeps) {
+        AlertDialog(
+            onDismissRequest = { showDeps = false },
+            title = { Text(stringResource(R.string.about_licenses)) },
+            text = {
+                Text(
+                    "AndroidX & Jetpack Compose — Apache-2.0\n" +
+                        "Kotlin & kotlinx — Apache-2.0\n" +
+                        "Material Components — Apache-2.0\n" +
+                        "Simple Icons (brand logos) — CC0\n\n" +
+                        "Full list: THIRD_PARTY_NOTICES.md in the source repository.",
+                    style = MaterialTheme.typography.bodySmall
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = { showDeps = false }) {
+                    Text(stringResource(R.string.action_dismiss))
+                }
+            }
+        )
+    }
+}
+
+/** Glass pill on the hero gradient (board .gp). */
+@Composable
+private fun GlassChip(text: String) {
+    Text(
+        text,
+        color = Color.White,
+        fontSize = 13.sp,
+        fontWeight = FontWeight.Bold,
+        modifier = Modifier
+            .clip(RoundedCornerShape(50))
+            .background(Color.White.copy(alpha = 0.16f))
+            .border(1.dp, Color.White.copy(alpha = 0.25f), RoundedCornerShape(50))
+            .padding(horizontal = 12.dp, vertical = 6.dp)
+    )
+}
+
+/** Static tag pill inside the purpose card. */
+@Composable
+private fun TagPill(textRes: Int) {
+    val b = burgundy()
+    Text(
+        stringResource(textRes),
+        color = b.accentText,
+        fontSize = 12.sp,
+        fontWeight = FontWeight.Bold,
+        modifier = Modifier
+            .clip(RoundedCornerShape(50))
+            .background(b.tint)
+            .padding(horizontal = 10.dp, vertical = 5.dp)
+    )
+}
+
+/** One of the three stat cards straddling the hero edge. */
+@Composable
+private fun androidx.compose.foundation.layout.RowScope.StatCard(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    textRes: Int
+) {
+    val b = burgundy()
+    SoftCard(
+        modifier = Modifier.weight(1f),
+        contentPadding = PaddingValues(vertical = 12.dp, horizontal = 6.dp)
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(7.dp),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(34.dp)
+                    .clip(CircleShape)
+                    .background(b.tint),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    icon,
+                    contentDescription = null,
+                    tint = b.accentText,
+                    modifier = Modifier.size(19.dp)
+                )
+            }
+            Text(
+                stringResource(textRes),
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center
+            )
+        }
+    }
+}
+
+/** Icon-bubble row with a trailing chevron, inside the links card. */
+@Composable
+private fun LinkRow(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    textRes: Int,
+    onClick: () -> Unit
+) {
+    val b = burgundy()
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(role = Role.Button, onClick = onClick)
+            .padding(horizontal = 14.dp, vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .size(38.dp)
+                .clip(CircleShape)
+                .background(b.tint),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                icon,
+                contentDescription = null,
+                tint = b.accentText,
+                modifier = Modifier.size(20.dp)
+            )
+        }
+        Text(
+            stringResource(textRes),
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.weight(1f)
+        )
+        Icon(
+            Icons.AutoMirrored.Filled.KeyboardArrowRight,
+            contentDescription = null,
+            tint = b.muted,
+            modifier = Modifier.size(20.dp)
+        )
+    }
+}
