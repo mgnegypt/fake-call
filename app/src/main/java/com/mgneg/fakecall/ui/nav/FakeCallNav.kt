@@ -2,26 +2,15 @@ package com.mgneg.fakecall.ui.nav
 
 import android.content.Intent
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.History
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.SystemUpdate
-import androidx.compose.material3.Badge
-import androidx.compose.material3.BadgedBox
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.Scaffold
+import androidx.compose.material.icons.outlined.History
+import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.Tune
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -30,6 +19,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -44,10 +34,14 @@ import com.mgneg.fakecall.R
 import com.mgneg.fakecall.telecom.CallPath
 import com.mgneg.fakecall.telecom.CallState
 import com.mgneg.fakecall.telecom.IncomingCallActivity
+import com.mgneg.fakecall.ui.components.AppBackground
+import com.mgneg.fakecall.ui.components.FloatingNavBar
+import com.mgneg.fakecall.ui.components.NavSlot
 import com.mgneg.fakecall.ui.screens.AboutScreen
 import com.mgneg.fakecall.ui.screens.HistoryScreen
 import com.mgneg.fakecall.ui.screens.HomeScreen
 import com.mgneg.fakecall.ui.screens.LogsScreen
+import com.mgneg.fakecall.ui.screens.PermissionsScreen
 import com.mgneg.fakecall.ui.screens.SettingsScreen
 import com.mgneg.fakecall.ui.screens.UpdateSheet
 import com.mgneg.fakecall.ui.screens.WhatsNewSheet
@@ -62,9 +56,11 @@ object Routes {
 
     /** Sub-destination of Settings (the diagnostics logs screen). */
     const val LOGS = "logs"
+
+    /** Sub-destination of Home (the permissions screen, design board 05). */
+    const val PERMISSIONS = "permissions"
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FakeCallRoot(app: FakeCallApp) {
     val context = LocalContext.current
@@ -77,6 +73,28 @@ fun FakeCallRoot(app: FakeCallApp) {
     val updateInfo by app.updateRepository.available.collectAsState()
     var showUpdate by remember { mutableStateOf(false) }
     var whatsNew by remember { mutableStateOf<Pair<String, String>?>(null) }
+
+    // The floating bar's FAB is the existing "Call now" action. While
+    // Home is composed it registers its exact handler (current form
+    // values); from other tabs the FAB falls back to the stored default
+    // caller with no delay — what Home itself would dial after a tab
+    // round-trip reloads the form from those same defaults.
+    var callNowHandler by remember { mutableStateOf<(() -> Unit)?>(null) }
+    val onFabClick: () -> Unit = {
+        val handler = callNowHandler
+        if (handler != null) {
+            handler()
+        } else {
+            scope.launch {
+                app.callRepository.triggerCall(
+                    app.settings.defaultName.first(),
+                    app.settings.defaultNumber.first(),
+                    null,
+                    0
+                )
+            }
+        }
+    }
 
     // Surface OUR call UI only for a live call on the fallback
     // (app-screen) path. On the Telecom path the system phone app owns
@@ -120,80 +138,74 @@ fun FakeCallRoot(app: FakeCallApp) {
         }
     }
 
-    val items = listOf(
-        Triple(Routes.HOME, R.string.nav_home, Icons.Filled.Home),
-        Triple(Routes.HISTORY, R.string.nav_history, Icons.Filled.History),
-        Triple(Routes.SETTINGS, R.string.nav_settings, Icons.Filled.Settings),
-        Triple(Routes.ABOUT, R.string.nav_about, Icons.Filled.Info)
+    val mainRoutes = listOf(Routes.HOME, Routes.HISTORY, Routes.SETTINGS, Routes.ABOUT)
+    val slots = listOf(
+        NavSlot(Routes.HOME, stringResource(R.string.nav_home), Icons.Outlined.Home),
+        NavSlot(Routes.HISTORY, stringResource(R.string.nav_history), Icons.Outlined.History),
+        NavSlot(
+            Routes.SETTINGS, stringResource(R.string.nav_settings), Icons.Outlined.Tune,
+            showDot = updateInfo != null
+        ),
+        NavSlot(Routes.ABOUT, stringResource(R.string.nav_about), Icons.Outlined.Info)
     )
+    // Logs keeps the Settings tab highlighted, as before.
+    val highlightedRoute = if (route == Routes.LOGS) Routes.SETTINGS else route
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.app_name)) },
-                actions = {
-                    if (updateInfo != null) {
-                        IconButton(onClick = { showUpdate = true }) {
-                            BadgedBox(badge = { Badge() }) {
-                                Icon(
-                                    Icons.Filled.SystemUpdate,
-                                    contentDescription = stringResource(R.string.update_title)
-                                )
-                            }
-                        }
-                    }
-                }
-            )
-        },
-        bottomBar = {
-            NavigationBar {
-                items.forEach { (dest, label, icon) ->
-                    NavigationBarItem(
-                        // Logs is a sub-screen of Settings: keep the
-                        // Settings tab highlighted while it is showing.
-                        selected = route == dest ||
-                            (dest == Routes.SETTINGS && route == Routes.LOGS),
-                        onClick = {
-                            navController.navigate(dest) {
-                                popUpTo(Routes.HOME) { saveState = true }
-                                launchSingleTop = true
-                                restoreState = true
-                            }
-                        },
-                        icon = {
-                            if (dest == Routes.SETTINGS && updateInfo != null) {
-                                BadgedBox(badge = { Badge(modifier = Modifier.size(8.dp)) }) {
-                                    Icon(icon, contentDescription = null)
-                                }
-                            } else {
-                                Icon(icon, contentDescription = null)
-                            }
-                        },
-                        label = { Text(stringResource(label)) }
-                    )
-                }
-            }
-        },
-        snackbarHost = { SnackbarHost(snackbar) }
-    ) { padding ->
-        Box(modifier = Modifier.padding(padding)) {
+    AppBackground {
+        Box(modifier = Modifier.fillMaxSize()) {
             NavHost(navController = navController, startDestination = Routes.HOME) {
                 composable(Routes.HOME) {
                     HomeScreen(
                         snackbar = snackbar,
-                        updateInfo = updateInfo,
-                        onShowUpdate = { showUpdate = true }
+                        onOpenPermissions = { navController.navigate(Routes.PERMISSIONS) },
+                        onCallNowReady = { callNowHandler = it }
                     )
                 }
-                composable(Routes.HISTORY) { HistoryScreen() }
+                composable(Routes.HISTORY) {
+                    HistoryScreen(onScheduleCall = {
+                        navController.navigate(Routes.HOME) {
+                            popUpTo(Routes.HOME) { saveState = true }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    })
+                }
                 composable(Routes.SETTINGS) {
                     SettingsScreen(
                         onShowUpdate = { showUpdate = true },
                         onOpenLogs = { navController.navigate(Routes.LOGS) }
                     )
                 }
-                composable(Routes.LOGS) { LogsScreen() }
+                composable(Routes.LOGS) { LogsScreen(onBack = { navController.popBackStack() }) }
+                composable(Routes.PERMISSIONS) {
+                    PermissionsScreen(onBack = { navController.popBackStack() })
+                }
                 composable(Routes.ABOUT) { AboutScreen(onShowUpdate = { showUpdate = true }) }
+            }
+
+            SnackbarHost(
+                snackbar,
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 104.dp)
+            )
+
+            // Hidden on sub-screens (Logs, Permissions) per the design.
+            if (route in mainRoutes) {
+                FloatingNavBar(
+                    slots = slots,
+                    currentRoute = highlightedRoute,
+                    onNavigate = { dest ->
+                        navController.navigate(dest) {
+                            popUpTo(Routes.HOME) { saveState = true }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    },
+                    onFabClick = onFabClick,
+                    fabContentDescription = stringResource(R.string.call_now_button),
+                    modifier = Modifier.align(Alignment.BottomCenter)
+                )
             }
         }
     }

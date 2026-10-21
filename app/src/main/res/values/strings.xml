@@ -176,4 +176,61 @@
         <item quantity="one">%d minute</item>
         <item quantity="other">%d minutes</item>
     </plurals>
+
+    <!-- Burgundy redesign (presentation only) -->
+    <string name="settings_dark_mode">Dark mode</string>
+    <string name="settings_dark_mode_desc">Switch between light and dark</string>
+    <string name="field_name_label">Name</string>
+    <string name="home_ready">Ready for your call</string>
+    <string name="home_schedule_title">Schedule your call</string>
+    <string name="home_rings_in">Rings in</string>
+    <string name="home_rings_auto">Then the phone rings automatically</string>
+    <string name="caller_name_placeholder">e.g. Mom</string>
+    <string name="caller_number_placeholder">+20 100 123 4567</string>
+    <string name="presets_subtitle">Save a preset to start calls with one tap, from launcher shortcuts or Quick Settings tiles.</string>
+    <string name="preset_after">After %1$s</string>
+    <string name="preset_instant">Instantly</string>
+    <string name="common_on">On</string>
+    <string name="common_off">Off</string>
+    <string name="permissions_hero_sub">Enable them so calls arrive on time.</string>
+    <string name="permissions_all_granted">All permissions are enabled</string>
+    <string name="permissions_all_granted_sub">You are all set — calls will ring on time.</string>
+    <plurals name="permissions_need_enabling">
+        <item quantity="one">%1$d permission needs enabling</item>
+        <item quantity="other">%1$d permissions need enabling</item>
+    </plurals>
+    <string name="perm_reason_account">So calls ring in the phone app.</string>
+    <string name="perm_reason_phone_state">To read the call state and present the call correctly.</string>
+    <string name="perm_reason_exact">So scheduled calls ring exactly on time.</string>
+    <string name="perm_reason_notifications">So the call can appear full-screen while the device is locked.</string>
+    <string name="perm_reason_fullscreen">So the call can show over the lock screen.</string>
+    <string name="perm_reason_battery">So power saving does not delay calls.</string>
+    <string name="perm_reason_install">To allow installing new versions of the app.</string>
+    <string name="logs_last_attempt">Last call attempt</string>
+    <string name="logs_mode">Mode</string>
+    <string name="logs_account">System account</string>
+    <string name="logs_attempted">Placement attempted</string>
+    <string name="logs_result">Result</string>
+    <string name="logs_route">Route</string>
+    <string name="logs_error">Error</string>
+    <string name="logs_accounts">Call accounts in the system</string>
+    <string name="logs_raw">Raw log</string>
+    <string name="common_yes">Yes</string>
+    <string name="common_no">No</string>
+    <string name="common_enabled">Enabled</string>
+    <string name="common_disabled">Not enabled</string>
+    <string name="logs_result_success">Succeeded</string>
+    <string name="logs_result_failed">Rejected</string>
+    <string name="logs_route_none">Nothing</string>
+    <string name="history_schedule_cta">Schedule a call</string>
+    <string name="update_available_label">A new version is available</string>
+    <string name="update_current">Current %1$s</string>
+    <string name="custom_time_title">Custom time</string>
+    <string name="action_confirm">Confirm</string>
+    <string name="action_increase">Increase</string>
+    <string name="action_decrease">Decrease</string>
+    <string name="custom_summary">The call will ring after</string>
+    <string name="unit_seconds">seconds</string>
+    <string name="unit_minutes">minutes</string>
+    <string name="unit_hours">hours</string>
 </resources>

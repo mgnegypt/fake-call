@@ -172,4 +172,64 @@
         <item quantity="many">%d دقيقة</item>
         <item quantity="other">%d دقيقة</item>
     </plurals>
+
+    <!-- Burgundy redesign (presentation only) -->
+    <string name="settings_dark_mode">الوضع الداكن</string>
+    <string name="settings_dark_mode_desc">بدّل بين الفاتح والداكن</string>
+    <string name="field_name_label">الاسم</string>
+    <string name="home_ready">جاهز للمكالمة</string>
+    <string name="home_schedule_title">جدول مكالمتك</string>
+    <string name="home_rings_in">الرنين بعد</string>
+    <string name="home_rings_auto">ثم يرن الهاتف تلقائياً</string>
+    <string name="caller_name_placeholder">مثال: ماما</string>
+    <string name="caller_number_placeholder">+20 100 123 4567</string>
+    <string name="presets_subtitle">احفظ إعداداً لتشغيل المكالمات بنقرة واحدة، أو من اختصارات الشاشة والإعدادات السريعة.</string>
+    <string name="preset_after">بعد %1$s</string>
+    <string name="preset_instant">فورًا</string>
+    <string name="common_on">مفعّل</string>
+    <string name="common_off">غير مفعّل</string>
+    <string name="permissions_hero_sub">فعّلها لتصل المكالمات في وقتها.</string>
+    <string name="permissions_all_granted">كل الأذونات مفعّلة</string>
+    <string name="permissions_all_granted_sub">كل شيء جاهز — المكالمات سترن في وقتها.</string>
+    <plurals name="permissions_need_enabling">
+        <item quantity="one">إذن واحد يحتاج تفعيل</item>
+        <item quantity="two">إذنان يحتاجان تفعيل</item>
+        <item quantity="few">%1$d أذونات تحتاج تفعيل</item>
+        <item quantity="many">%1$d إذنًا يحتاج تفعيل</item>
+        <item quantity="other">%1$d إذن يحتاج تفعيل</item>
+    </plurals>
+    <string name="perm_reason_account">لترن المكالمات في تطبيق الهاتف.</string>
+    <string name="perm_reason_phone_state">لمعرفة حالة الاتصال وعرض المكالمة بشكل صحيح.</string>
+    <string name="perm_reason_exact">لترن المكالمات المجدولة في وقتها.</string>
+    <string name="perm_reason_notifications">لتظهر المكالمة بملء الشاشة أثناء قفل الجهاز.</string>
+    <string name="perm_reason_fullscreen">لتظهر المكالمة فوق شاشة القفل.</string>
+    <string name="perm_reason_battery">حتى لا تتأخر المكالمات بسبب توفير الطاقة.</string>
+    <string name="perm_reason_install">للسماح بتثبيت الإصدارات الجديدة من التطبيق.</string>
+    <string name="logs_last_attempt">آخر محاولة اتصال</string>
+    <string name="logs_mode">الوضع</string>
+    <string name="logs_account">حساب النظام</string>
+    <string name="logs_attempted">محاولة الإضافة</string>
+    <string name="logs_result">النتيجة</string>
+    <string name="logs_route">المسار</string>
+    <string name="logs_error">الخطأ</string>
+    <string name="logs_accounts">حسابات المكالمات في النظام</string>
+    <string name="logs_raw">السجل الخام</string>
+    <string name="common_yes">نعم</string>
+    <string name="common_no">لا</string>
+    <string name="common_enabled">مفعّل</string>
+    <string name="common_disabled">غير مفعّل</string>
+    <string name="logs_result_success">ناجحة</string>
+    <string name="logs_result_failed">مرفوضة</string>
+    <string name="logs_route_none">لا شيء</string>
+    <string name="history_schedule_cta">جدولة مكالمة</string>
+    <string name="update_available_label">إصدار جديد متاح</string>
+    <string name="update_current">الحالي %1$s</string>
+    <string name="custom_time_title">وقت مخصص</string>
+    <string name="action_confirm">تأكيد</string>
+    <string name="action_increase">زيادة</string>
+    <string name="action_decrease">إنقاص</string>
+    <string name="custom_summary">سترن المكالمة بعد</string>
+    <string name="unit_seconds">ثانية</string>
+    <string name="unit_minutes">دقيقة</string>
+    <string name="unit_hours">ساعة</string>
 </resources>

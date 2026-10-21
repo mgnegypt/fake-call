@@ -3,50 +3,56 @@ package com.mgneg.fakecall.ui.screens
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Call
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.mgneg.fakecall.BuildConfig
 import com.mgneg.fakecall.FakeCallApp
 import com.mgneg.fakecall.R
+import com.mgneg.fakecall.ui.components.GradientButton
+import com.mgneg.fakecall.ui.components.GradientTile
+import com.mgneg.fakecall.ui.components.SoftCard
+import com.mgneg.fakecall.ui.components.SoftChip
+import com.mgneg.fakecall.ui.components.burgundy
 import com.mgneg.fakecall.util.ContactLinks
-import androidx.compose.runtime.rememberCoroutineScope
 import kotlinx.coroutines.launch
 
+/**
+ * About, burgundy layout: same strings, same URLs, same licence
+ * dialogs — only the presentation changed (board 10).
+ */
 @Composable
 fun AboutScreen(onShowUpdate: () -> Unit) {
     val context = LocalContext.current
     val app = context.applicationContext as FakeCallApp
     val scope = rememberCoroutineScope()
+    val b = burgundy()
     var showLicense by remember { mutableStateOf(false) }
     var showDeps by remember { mutableStateOf(false) }
 
@@ -58,46 +64,72 @@ fun AboutScreen(onShowUpdate: () -> Unit) {
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
-            .padding(16.dp),
+            .padding(start = 20.dp, end = 20.dp, top = 22.dp, bottom = 110.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Column(
             modifier = Modifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
-            Box(
-                modifier = Modifier
-                    .size(72.dp)
-                    .clip(MaterialTheme.shapes.extraLarge)
-                    .background(com.mgneg.fakecall.ui.theme.BrandTile),
-                contentAlignment = androidx.compose.ui.Alignment.Center
-            ) {
-                Image(
-                    painter = painterResource(R.drawable.ic_launcher_foreground),
-                    contentDescription = null,
-                    modifier = Modifier.size(72.dp)
-                )
-            }
-            Text(stringResource(R.string.app_name), style = MaterialTheme.typography.headlineSmall)
-            Text(stringResource(R.string.about_version, BuildConfig.VERSION_NAME))
-            Spacer(Modifier.height(8.dp))
-            Button(onClick = {
-                scope.launch {
-                    val info = app.updateRepository.checkNow(manual = true)
-                    if (info != null) onShowUpdate()
-                }
-            }) { Text(stringResource(R.string.settings_check_updates)) }
+            GradientTile(
+                Icons.Filled.Call,
+                contentDescription = null,
+                size = 84,
+                radius = 26,
+                iconSize = 40
+            )
+            Text(
+                stringResource(R.string.app_name),
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Black,
+                modifier = Modifier.padding(top = 8.dp)
+            )
+            Text(
+                stringResource(R.string.about_version, BuildConfig.VERSION_NAME),
+                style = MaterialTheme.typography.bodySmall,
+                color = b.muted
+            )
+            GradientButton(
+                text = stringResource(R.string.settings_check_updates),
+                onClick = {
+                    scope.launch {
+                        val info = app.updateRepository.checkNow(manual = true)
+                        if (info != null) onShowUpdate()
+                    }
+                },
+                modifier = Modifier.padding(top = 6.dp)
+            )
         }
 
         AboutCard(R.string.about_developer_title) {
             Text(stringResource(R.string.about_developed_by), style = MaterialTheme.typography.titleSmall)
-            Text(stringResource(R.string.about_bio), style = MaterialTheme.typography.bodyMedium)
+            Text(
+                stringResource(R.string.about_bio),
+                fontSize = 13.sp,
+                color = b.muted
+            )
         }
         AboutCard(R.string.about_purpose_title) {
-            Text(stringResource(R.string.about_purpose), style = MaterialTheme.typography.bodyMedium)
+            Text(
+                stringResource(R.string.about_purpose),
+                fontSize = 13.sp,
+                color = b.muted
+            )
         }
-        AboutCard(R.string.about_disclaimer_title) {
-            Text(stringResource(R.string.about_disclaimer), style = MaterialTheme.typography.bodyMedium)
+        SoftCard(contentPadding = androidx.compose.foundation.layout.PaddingValues(14.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Text(
+                    stringResource(R.string.about_disclaimer_title),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = b.danger
+                )
+                Text(
+                    stringResource(R.string.about_disclaimer),
+                    fontSize = 13.sp,
+                    color = b.muted
+                )
+            }
         }
 
         Text(stringResource(R.string.about_contact_title), style = MaterialTheme.typography.titleMedium)
@@ -106,25 +138,58 @@ fun AboutScreen(onShowUpdate: () -> Unit) {
             Triple(ContactLinks.WHATSAPP_URL, R.drawable.ic_brand_whatsapp, R.string.contact_whatsapp),
             Triple(ContactLinks.INSTAGRAM_URL, R.drawable.ic_brand_instagram, R.string.contact_instagram),
             Triple(ContactLinks.X_URL, R.drawable.ic_brand_x, R.string.contact_x)
-        )
-        contacts.filter { ContactLinks.isSet(it.first) }.forEach { (url, icon, label) ->
-            OutlinedButton(onClick = { open(url) }, modifier = Modifier.fillMaxWidth()) {
-                Image(painter = painterResource(icon), contentDescription = null, modifier = Modifier.size(18.dp))
-                Text(stringResource(label), modifier = Modifier.padding(horizontal = 8.dp))
+        ).filter { ContactLinks.isSet(it.first) }
+        // Two-column link grid (board .lk cards).
+        contacts.chunked(2).forEach { rowItems ->
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                rowItems.forEach { (url, icon, label) ->
+                    SoftCard(
+                        modifier = Modifier.weight(1f),
+                        onClick = { open(url) }
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 12.dp, vertical = 10.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Box30Icon(icon)
+                            Text(
+                                stringResource(label),
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
+                }
+                if (rowItems.size == 1) {
+                    androidx.compose.foundation.layout.Spacer(Modifier.weight(1f))
+                }
             }
         }
 
         Text(stringResource(R.string.about_links_title), style = MaterialTheme.typography.titleMedium)
-        OutlinedButton(onClick = { open(ContactLinks.GITHUB_REPO_URL) }, modifier = Modifier.fillMaxWidth()) {
-            Text(stringResource(R.string.about_github))
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            SoftChip(
+                text = stringResource(R.string.about_github),
+                selected = false,
+                onClick = { open(ContactLinks.GITHUB_REPO_URL) }
+            )
+            SoftChip(
+                text = stringResource(R.string.about_license),
+                selected = false,
+                onClick = { showLicense = true }
+            )
+            SoftChip(
+                text = stringResource(R.string.about_licenses),
+                selected = false,
+                onClick = { showDeps = true }
+            )
         }
-        OutlinedButton(onClick = { showLicense = true }, modifier = Modifier.fillMaxWidth()) {
-            Text(stringResource(R.string.about_license))
-        }
-        OutlinedButton(onClick = { showDeps = true }, modifier = Modifier.fillMaxWidth()) {
-            Text(stringResource(R.string.about_licenses))
-        }
-        Spacer(Modifier.height(8.dp))
     }
 
     if (showLicense) {
@@ -171,13 +236,31 @@ fun AboutScreen(onShowUpdate: () -> Unit) {
     }
 }
 
+/** 30dp tint bubble holding a brand drawable (board .lk icon). */
+@Composable
+private fun Box30Icon(drawableRes: Int) {
+    val b = burgundy()
+    androidx.compose.foundation.layout.Box(
+        modifier = Modifier
+            .size(30.dp)
+            .androidx.compose.foundation.background(
+                b.tint,
+                androidx.compose.foundation.shape.CircleShape
+            ),
+        contentAlignment = Alignment.Center
+    ) {
+        Image(
+            painter = painterResource(drawableRes),
+            contentDescription = null,
+            modifier = Modifier.size(16.dp)
+        )
+    }
+}
+
 @Composable
 private fun AboutCard(titleRes: Int, content: @Composable () -> Unit) {
-    Card(modifier = Modifier.fillMaxWidth()) {
-        Column(
-            modifier = Modifier.padding(14.dp),
-            verticalArrangement = Arrangement.spacedBy(6.dp)
-        ) {
+    SoftCard(contentPadding = androidx.compose.foundation.layout.PaddingValues(14.dp)) {
+        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Text(stringResource(titleRes), style = MaterialTheme.typography.titleMedium)
             content()
         }
