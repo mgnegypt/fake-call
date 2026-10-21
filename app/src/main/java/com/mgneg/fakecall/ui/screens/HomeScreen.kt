@@ -490,7 +490,7 @@ fun HomeScreen(
                 .height(60.dp)
                 .clip(RoundedCornerShape(30.dp))
                 .background(primaryGradient())
-                .clickable { startCall(effectiveDelay) }
+                .clickable(role = androidx.compose.ui.semantics.Role.Button) { startCall(effectiveDelay) }
                 .padding(start = 24.dp, end = 8.dp)
         ) {
             Text(
@@ -601,7 +601,7 @@ fun HomeScreen(
                                 .size(48.dp)
                                 .clip(CircleShape)
                                 .background(primaryGradient())
-                                .clickable {
+                                .clickable(role = androidx.compose.ui.semantics.Role.Button) {
                                     vm.trigger(
                                         preset.callerName, preset.callerNumber,
                                         preset.audioUri, preset.delaySec
@@ -931,7 +931,7 @@ private fun StepperButton(
             .size(44.dp)
             .clip(CircleShape)
             .background(b.tint)
-            .clickable(onClick = onClick),
+            .clickable(role = androidx.compose.ui.semantics.Role.Button, onClick = onClick),
         contentAlignment = Alignment.Center
     ) {
         Icon(icon, contentDescription = contentDescription, tint = b.accentText)

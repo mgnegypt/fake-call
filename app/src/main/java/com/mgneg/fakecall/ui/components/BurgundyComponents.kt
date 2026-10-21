@@ -3,6 +3,7 @@ package com.mgneg.fakecall.ui.components
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -75,7 +76,9 @@ fun AppBackground(content: @Composable () -> Unit) {
                     Brush.radialGradient(listOf(b.glow, Color.Transparent))
                 )
         )
-        content()
+        androidx.compose.runtime.CompositionLocalProvider(
+            androidx.compose.material3.LocalContentColor provides b.text
+        ) { content() }
     }
 }
 
@@ -95,7 +98,11 @@ fun SoftCard(
         .clip(shape)
         .background(b.card)
     if (onClick != null) box = box.clickable(onClick = onClick)
-    Box(modifier = modifier.then(box).padding(contentPadding)) { content() }
+    Box(modifier = modifier.then(box).padding(contentPadding)) {
+        androidx.compose.runtime.CompositionLocalProvider(
+            androidx.compose.material3.LocalContentColor provides b.text
+        ) { content() }
+    }
 }
 
 /** Gradient hero surface with the soft white highlight at top-start. */
@@ -227,7 +234,7 @@ fun GradientButton(
         modifier = modifier
             .height(height.dp)
             .clip(RoundedCornerShape((height / 2).dp))
-            .background(primaryGradient())
+            .background(primaryGradient(), alpha = if (enabled) 1f else 0.45f)
             .clickable(enabled = enabled, onClick = onClick)
             .padding(horizontal = 16.dp),
         contentAlignment = Alignment.Center
@@ -419,12 +426,12 @@ fun AppSwitch(
     modifier: Modifier = Modifier
 ) {
     val b = burgundy()
-    // The knob travels from the start edge to the end edge; the offset
-    // must flip sign in RTL or the knob would leave the track.
-    val rtl = androidx.compose.ui.platform.LocalLayoutDirection.current ==
-        androidx.compose.ui.unit.LayoutDirection.Rtl
+    // Modifier.offset follows the layout direction (absoluteOffset is
+    // the direction-blind variant), so the same positive travel works
+    // in LTR and RTL: the knob rests at the start edge when off and at
+    // the end edge when on.
     val knobTravel by animateDpAsState(
-        targetValue = if (checked) (if (rtl) (-22).dp else 22.dp) else 0.dp,
+        targetValue = if (checked) 22.dp else 0.dp,
         label = "switchKnob"
     )
     Box(
@@ -432,15 +439,18 @@ fun AppSwitch(
             .size(width = 52.dp, height = 30.dp)
             .clip(RoundedCornerShape(15.dp))
             .background(if (checked) b.accent else b.divider)
-            .clickable(
+            .toggleable(
+                value = checked,
+                role = androidx.compose.ui.semantics.Role.Switch,
                 interactionSource = remember { MutableInteractionSource() },
-                indication = null
-            ) { onCheckedChange(!checked) }
+                indication = null,
+                onValueChange = onCheckedChange
+            )
     ) {
         Box(
             modifier = Modifier
                 .align(Alignment.CenterStart)
-                .offset(x = (if (rtl) (-4).dp else 4.dp) + knobTravel)
+                .offset(x = 4.dp + knobTravel)
                 .size(22.dp)
                 .clip(CircleShape)
                 .background(Color.White)

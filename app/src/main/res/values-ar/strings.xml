@@ -208,7 +208,7 @@
     <string name="logs_last_attempt">آخر محاولة اتصال</string>
     <string name="logs_mode">الوضع</string>
     <string name="logs_account">حساب النظام</string>
-    <string name="logs_attempted">محاولة الإضافة</string>
+    <string name="logs_attempted">محاولة بدء المكالمة</string>
     <string name="logs_result">النتيجة</string>
     <string name="logs_route">المسار</string>
     <string name="logs_error">الخطأ</string>
@@ -219,7 +219,7 @@
     <string name="common_enabled">مفعّل</string>
     <string name="common_disabled">غير مفعّل</string>
     <string name="logs_result_success">ناجحة</string>
-    <string name="logs_result_failed">مرفوضة</string>
+    <string name="logs_result_failed">فاشلة</string>
     <string name="logs_route_none">لا شيء</string>
     <string name="history_schedule_cta">جدولة مكالمة</string>
     <string name="update_available_label">إصدار جديد متاح</string>

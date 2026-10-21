@@ -204,7 +204,7 @@ fun UpdateSheet(info: UpdateInfo, onDismiss: () -> Unit) {
                     enabled = state is DlState.Idle || state is DlState.Failed
                 )
                 SoftChip(
-                    text = "GitHub",
+                    text = stringResource(R.string.update_open_github),
                     selected = false,
                     onClick = {
                         context.startActivity(

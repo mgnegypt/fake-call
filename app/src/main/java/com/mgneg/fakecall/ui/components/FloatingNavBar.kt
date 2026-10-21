@@ -3,6 +3,7 @@ package com.mgneg.fakecall.ui.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -109,7 +110,10 @@ private fun NavItem(
                 .height(48.dp)
                 .clip(RoundedCornerShape(24.dp))
                 .then(if (active) Modifier.background(b.tint) else Modifier)
-                .clickable { onNavigate(slot.route) }
+                .selectable(
+                    selected = active,
+                    role = androidx.compose.ui.semantics.Role.Tab
+                ) { onNavigate(slot.route) }
                 .padding(horizontal = 12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {

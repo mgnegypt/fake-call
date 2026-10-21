@@ -119,7 +119,7 @@ fun HistoryScreen(onScheduleCall: () -> Unit) {
                         .height(44.dp)
                         .clip(RoundedCornerShape(22.dp))
                         .border(1.5.dp, b.divider, RoundedCornerShape(22.dp))
-                        .clickable(onClick = onScheduleCall)
+                        .clickable(role = androidx.compose.ui.semantics.Role.Button, onClick = onScheduleCall)
                         .padding(horizontal = 18.dp),
                     contentAlignment = Alignment.Center
                 ) {
