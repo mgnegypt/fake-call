@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsPadding
@@ -23,6 +24,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
@@ -36,6 +38,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Bolt
 import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.Contacts
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Mic
@@ -204,31 +207,18 @@ fun HomeScreen(
         }
     }
 
-    // System contact picker (phone entries): fills the same name and
-    // number fields as manual typing. The picker grants temporary
-    // access to the chosen entry, so no contacts permission is needed.
-    val contactPicker = rememberLauncherForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            val uri = result.data?.data
-            if (uri != null) {
-                runCatching {
-                    context.contentResolver.query(
-                        uri,
-                        arrayOf(
-                            android.provider.ContactsContract.CommonDataKinds.Phone.NUMBER,
-                            android.provider.ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME
-                        ),
-                        null, null, null
-                    )?.use { cursor ->
-                        if (cursor.moveToFirst()) {
-                            cursor.getString(0)?.let { number = it }
-                            cursor.getString(1)?.let { name = it }
-                        }
-                    }
-                }
-            }
+    // Contacts: the app reads the device's contacts with READ_CONTACTS
+    // (declared in the manifest, requested here at use time) and shows
+    // its own searchable list; picking an entry fills the same name
+    // and number fields as manual typing.
+    var showContacts by remember { mutableStateOf(false) }
+    val contactsPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (granted) {
+            showContacts = true
+        } else {
+            scope.launch { snackbar.showSnackbar(context.getString(R.string.contacts_permission_denied)) }
         }
     }
 
@@ -457,12 +447,14 @@ fun HomeScreen(
                     .clip(RoundedCornerShape(12.dp))
                     .background(b.tint)
                     .clickable(role = androidx.compose.ui.semantics.Role.Button) {
-                        contactPicker.launch(
-                            Intent(
-                                Intent.ACTION_PICK,
-                                android.provider.ContactsContract.CommonDataKinds.Phone.CONTENT_URI
-                            )
-                        )
+                        if (androidx.core.content.ContextCompat.checkSelfPermission(
+                                context, android.Manifest.permission.READ_CONTACTS
+                            ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+                        ) {
+                            showContacts = true
+                        } else {
+                            contactsPermissionLauncher.launch(android.Manifest.permission.READ_CONTACTS)
+                        }
                     }
                     .padding(horizontal = 14.dp, vertical = 10.dp),
                 verticalAlignment = Alignment.CenterVertically,
@@ -668,6 +660,17 @@ fun HomeScreen(
                 }
             }
         }
+    }
+
+    if (showContacts) {
+        ContactsPickerDialog(
+            onDismiss = { showContacts = false },
+            onPick = { pickedName, pickedNumber ->
+                name = pickedName
+                number = pickedNumber
+                showContacts = false
+            }
+        )
     }
 
     if (showCustomDialog) {
@@ -984,5 +987,185 @@ private fun StepperButton(
         contentAlignment = Alignment.Center
     ) {
         Icon(icon, contentDescription = contentDescription, tint = b.accentText)
+    }
+}
+
+
+private data class ContactEntry(val name: String, val number: String)
+
+/**
+ * In-app contacts list (READ_CONTACTS). Reads every phone entry from
+ * the device's contacts, deduped and sorted, with a search box;
+ * picking one fills the caller name/number fields on Home.
+ */
+@Composable
+private fun ContactsPickerDialog(
+    onDismiss: () -> Unit,
+    onPick: (name: String, number: String) -> Unit
+) {
+    val b = burgundy()
+    val context = LocalContext.current
+    var query by remember { mutableStateOf("") }
+    val contacts by produceState<List<ContactEntry>?>(initialValue = null) {
+        value = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+            runCatching {
+                val list = mutableListOf<ContactEntry>()
+                context.contentResolver.query(
+                    android.provider.ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                    arrayOf(
+                        android.provider.ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
+                        android.provider.ContactsContract.CommonDataKinds.Phone.NUMBER
+                    ),
+                    null, null,
+                    android.provider.ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME + " ASC"
+                )?.use { cursor ->
+                    val seen = mutableSetOf<String>()
+                    while (cursor.moveToNext()) {
+                        val contactName = cursor.getString(0)?.trim().orEmpty()
+                        val contactNumber = cursor.getString(1)?.trim().orEmpty()
+                        if (contactNumber.isEmpty()) continue
+                        val key = contactName.lowercase() + "|" +
+                            contactNumber.filter { it.isDigit() }
+                        if (seen.add(key)) list.add(ContactEntry(contactName, contactNumber))
+                    }
+                }
+                list
+            }.getOrDefault(emptyList())
+        }
+    }
+    val filtered = remember(contacts, query) {
+        val all = contacts ?: emptyList()
+        if (query.isBlank()) all
+        else all.filter {
+            it.name.contains(query, ignoreCase = true) ||
+                it.number.filter { c -> c.isDigit() }
+                    .contains(query.filter { c -> c.isDigit() })
+        }
+    }
+
+    Dialog(
+        onDismissRequest = onDismiss,
+        properties = DialogProperties(usePlatformDefaultWidth = false)
+    ) {
+        AppBackground {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .windowInsetsPadding(WindowInsets.systemBars)
+                    .padding(start = 20.dp, end = 20.dp, top = 22.dp, bottom = 20.dp),
+                verticalArrangement = Arrangement.spacedBy(14.dp)
+            ) {
+                com.mgneg.fakecall.ui.components.BackHeader(
+                    title = stringResource(R.string.contacts_title),
+                    onBack = onDismiss,
+                    backContentDescription = stringResource(R.string.action_back)
+                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(14.dp))
+                        .background(b.card)
+                        .padding(horizontal = 14.dp, vertical = 12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    Icon(
+                        Icons.Filled.Search,
+                        contentDescription = null,
+                        tint = b.muted,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    BasicTextField(
+                        value = query,
+                        onValueChange = { query = it },
+                        singleLine = true,
+                        textStyle = androidx.compose.ui.text.TextStyle(
+                            color = b.text,
+                            fontSize = 15.sp,
+                            fontFamily = com.mgneg.fakecall.ui.theme.CairoFamily
+                        ),
+                        modifier = Modifier.weight(1f),
+                        decorationBox = { inner ->
+                            if (query.isEmpty()) {
+                                Text(
+                                    stringResource(R.string.contacts_search),
+                                    color = b.muted,
+                                    fontSize = 15.sp
+                                )
+                            }
+                            inner()
+                        }
+                    )
+                }
+                when {
+                    contacts == null -> Box(
+                        modifier = Modifier.fillMaxWidth().padding(top = 30.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        androidx.compose.material3.CircularProgressIndicator(color = b.accent)
+                    }
+                    filtered.isEmpty() -> Text(
+                        stringResource(R.string.contacts_empty),
+                        color = b.muted,
+                        fontSize = 14.sp,
+                        modifier = Modifier.padding(top = 10.dp)
+                    )
+                    else -> LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                        items(filtered) { entry ->
+                            SoftCard(
+                                contentPadding = androidx.compose.foundation.layout.PaddingValues(12.dp),
+                                onClick = { onPick(entry.name, entry.number) }
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(44.dp)
+                                            .clip(CircleShape)
+                                            .background(b.tint),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        val initial = entry.name.trim().firstOrNull()?.uppercase()
+                                        if (initial != null) {
+                                            Text(
+                                                initial,
+                                                style = MaterialTheme.typography.titleMedium,
+                                                color = b.accentText
+                                            )
+                                        } else {
+                                            Icon(
+                                                Icons.Filled.Person,
+                                                contentDescription = null,
+                                                tint = b.accentText,
+                                                modifier = Modifier.size(22.dp)
+                                            )
+                                        }
+                                    }
+                                    Column(modifier = Modifier.weight(1f)) {
+                                        if (entry.name.isNotEmpty()) {
+                                            Text(
+                                                entry.name,
+                                                fontWeight = FontWeight.Bold,
+                                                fontSize = 15.sp,
+                                                maxLines = 1
+                                            )
+                                        }
+                                        Text(
+                                            entry.number,
+                                            color = b.muted,
+                                            fontSize = 13.sp,
+                                            modifier = Modifier.fillMaxWidth(),
+                                            textAlign = androidx.compose.ui.text.style.TextAlign.End
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }

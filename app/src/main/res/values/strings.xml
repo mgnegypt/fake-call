@@ -231,4 +231,8 @@
     <string name="unit_minutes">minutes</string>
     <string name="unit_hours">hours</string>
     <string name="contacts_pick">Pick from contacts</string>
+    <string name="contacts_title">Choose a contact</string>
+    <string name="contacts_search">Search contacts</string>
+    <string name="contacts_empty">No contacts with phone numbers</string>
+    <string name="contacts_permission_denied">Contacts permission is needed to pick the caller from your contacts</string>
 </resources>
