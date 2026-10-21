@@ -82,8 +82,8 @@
     <string name="settings_dynamic_color">الألوان الديناميكية (Monet)</string>
     <string name="settings_dynamic_color_desc">استخدام ألوان الخلفية على أندرويد 12 فأحدث.</string>
     <string name="settings_call_engine">طريقة عرض المكالمة</string>
-    <string name="call_mode_telecom">تطبيق هاتف النظام (Telecom)</string>
-    <string name="call_mode_app">شاشة المكالمة في التطبيق</string>
+    <string name="call_mode_telecom">النظام</string>
+    <string name="call_mode_app">التطبيق</string>
     <string name="call_mode_desc">وضع Telecom يعرض المكالمة في تطبيق هاتف النظام فقط ويتطلب تفعيل حساب مكالمة وهمية — وإن لم يكن مُفعَّلًا فلن ترنّ المكالمة وسيصلك إشعار بدلًا من ذلك. وضع شاشة التطبيق يستخدم دائمًا شاشة المكالمة داخل التطبيق.</string>
     <string name="settings_account_label">اسم حساب المكالمة</string>
     <string name="settings_account_label_desc">الاسم الظاهر لحساب مكالمة وهمية في إعدادات النظام. تغييره يعيد تسجيل الحساب.</string>

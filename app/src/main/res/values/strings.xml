@@ -90,8 +90,8 @@
     <string name="settings_dynamic_color">Dynamic color (Monet)</string>
     <string name="settings_dynamic_color_desc">Use colors from your wallpaper on Android 12 and above.</string>
     <string name="settings_call_engine">Call presentation</string>
-    <string name="call_mode_telecom">System dialer (Telecom)</string>
-    <string name="call_mode_app">App call screen</string>
+    <string name="call_mode_telecom">System</string>
+    <string name="call_mode_app">App</string>
     <string name="call_mode_desc">Telecom mode shows the call ONLY in the system dialer and requires the Fake Call account to be enabled — if it is not, the call does not ring and you get a notification instead. App screen mode always uses the in-app call screen.</string>
     <string name="settings_account_label">Call account label</string>
     <string name="settings_account_label_desc">The name shown for the Fake Call account in system settings. Changing it re-registers the account.</string>
