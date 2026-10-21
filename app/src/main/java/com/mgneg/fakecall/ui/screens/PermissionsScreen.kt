@@ -60,10 +60,7 @@ fun PermissionsScreen(onBack: () -> Unit) {
             backContentDescription = stringResource(R.string.action_back)
         )
 
-        HeroCard(
-            contentPadding = androidx.compose.foundation.layout.PaddingValues(16.dp),
-            minHeight = 0.dp
-        ) {
+        HeroCard(contentPadding = androidx.compose.foundation.layout.PaddingValues(16.dp)) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(14.dp)
