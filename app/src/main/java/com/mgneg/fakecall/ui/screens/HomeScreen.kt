@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
@@ -421,59 +422,64 @@ fun HomeScreen(
                         )
                     }
                 }
-                Column(
-                    modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    LabeledField(
-                        label = stringResource(R.string.caller_name_label),
-                        value = name,
-                        onValueChange = { name = it },
-                        placeholder = stringResource(R.string.caller_name_placeholder),
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    LabeledField(
-                        label = stringResource(R.string.caller_number_label),
-                        value = number,
-                        onValueChange = { number = it },
-                        placeholder = stringResource(R.string.caller_number_placeholder),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
-                        ltrValue = true,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
+                LabeledField(
+                    label = stringResource(R.string.caller_name_label),
+                    value = name,
+                    onValueChange = { name = it },
+                    placeholder = stringResource(R.string.caller_name_placeholder),
+                    modifier = Modifier.weight(1f)
+                )
             }
             Spacer(modifier = Modifier.height(10.dp))
+            // Number field with the contacts button beside it
+            // (maintainer's layout: the button moved here from a wide
+            // pill above the fields).
             Row(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(b.tint)
-                    .clickable(role = androidx.compose.ui.semantics.Role.Button) {
-                        if (androidx.core.content.ContextCompat.checkSelfPermission(
-                                context, android.Manifest.permission.READ_CONTACTS
-                            ) == android.content.pm.PackageManager.PERMISSION_GRANTED
-                        ) {
-                            showContacts = true
-                        } else {
-                            contactsPermissionLauncher.launch(android.Manifest.permission.READ_CONTACTS)
-                        }
-                    }
-                    .padding(horizontal = 14.dp, vertical = 10.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                Icon(
-                    Icons.Filled.Contacts,
-                    contentDescription = null,
-                    tint = b.accentText,
-                    modifier = Modifier.size(18.dp)
+                LabeledField(
+                    label = stringResource(R.string.caller_number_label),
+                    value = number,
+                    onValueChange = { number = it },
+                    placeholder = stringResource(R.string.caller_number_placeholder),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                    ltrValue = true,
+                    modifier = Modifier.weight(1f)
                 )
-                Text(
-                    stringResource(R.string.contacts_pick),
-                    color = b.accentText,
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Bold
-                )
+                Row(
+                    modifier = Modifier
+                        .weight(0.42f)
+                        .fillMaxHeight()
+                        .clip(RoundedCornerShape(14.dp))
+                        .background(b.tint)
+                        .clickable(role = androidx.compose.ui.semantics.Role.Button) {
+                            if (androidx.core.content.ContextCompat.checkSelfPermission(
+                                    context, android.Manifest.permission.READ_CONTACTS
+                                ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+                            ) {
+                                showContacts = true
+                            } else {
+                                contactsPermissionLauncher.launch(android.Manifest.permission.READ_CONTACTS)
+                            }
+                        }
+                        .padding(horizontal = 10.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    Icon(
+                        Icons.Filled.Contacts,
+                        contentDescription = null,
+                        tint = b.accentText,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Text(
+                        stringResource(R.string.contacts_pick),
+                        color = b.accentText,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
             }
         }
 

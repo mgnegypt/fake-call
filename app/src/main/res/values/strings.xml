@@ -120,9 +120,9 @@
     <string name="about_version">Version %1$s</string>
     <string name="about_developer_title">Who is the developer</string>
     <string name="about_developed_by">Developed by mgneg</string>
-    <string name="about_bio">mgneg is an independent developer building small, honest Android tools. This space will be updated with a fuller bio soon.</string>
+    <string name="about_bio">Builds simple tools that work exactly as described. This space will be updated with a fuller bio soon.</string>
     <string name="about_purpose_title">Purpose of the app</string>
-    <string name="about_purpose">Fake Call simulates an incoming phone call at a time you choose, with a caller name and number you set, and optional audio when you answer. People use it for privacy, entertainment, presentations, and testing.</string>
+    <string name="about_purpose">Simulates an incoming phone call at a time you choose, with a name and number you set, and optional audio when you answer.</string>
     <string name="about_disclaimer_title">Disclaimer</string>
     <string name="about_disclaimer">This app is intended for entertainment, privacy, demonstrations, and testing only. Do not use it to deceive, defraud, harass, threaten, or impersonate any person, company, or authority, or to cause harm of any kind. The developer is not responsible for any misuse or for any consequences arising from the use of this app. You are solely responsible for how you use it and for complying with the laws that apply to you.</string>
     <string name="about_contact_title">Contact the developer</string>
