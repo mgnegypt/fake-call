@@ -68,8 +68,6 @@ import com.mgneg.fakecall.R
 import com.mgneg.fakecall.ui.components.SoftCard
 import com.mgneg.fakecall.ui.components.SoftDivider
 import com.mgneg.fakecall.ui.components.burgundy
-import com.mgneg.fakecall.ui.theme.BrandEnd
-import com.mgneg.fakecall.ui.theme.BrandStart
 import com.mgneg.fakecall.util.ContactLinks
 import kotlinx.coroutines.launch
 
@@ -119,7 +117,7 @@ fun AboutScreen(onShowUpdate: () -> Unit) {
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(bottomStart = 44.dp, bottomEnd = 44.dp))
                     .background(
-                        Brush.verticalGradient(listOf(BrandStart, BrandEnd))
+                        Brush.verticalGradient(listOf(Color(0xFFA02350), Color(0xFF4F0C24)))
                     )
             ) {
                 // Decorative rings, zero-size so they never stretch the hero.
@@ -284,7 +282,7 @@ fun AboutScreen(onShowUpdate: () -> Unit) {
                                 .clip(CircleShape)
                                 .background(
                                     Brush.verticalGradient(
-                                        listOf(BrandStart, BrandEnd)
+                                        listOf(Color(0xFFA02350), Color(0xFF4F0C24))
                                     )
                                 ),
                             contentAlignment = Alignment.Center
