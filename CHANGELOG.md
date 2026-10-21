@@ -2,6 +2,34 @@
 
 ## [Unreleased]
 
+## [1.1] - 2026-10-21
+
+## English
+### Changed
+- A completely new look: the Burgundy soft-glass design replaces the Volt/Aura themes across the whole app — a pearl-and-burgundy palette for light and dark modes, Cairo typography, soft rounded cards, and a floating bottom navigation bar with the Call now button in the centre
+- Theme selection: follow the system, force light, or force dark, from Settings; the choice applies everywhere, including the in-app call screen (Monet dynamic colour remains available and unchanged)
+- Scheduling is friendlier: quick delay chips plus a custom-time picker with hour, minute, and second steppers, still driving the same delays as before
+
+### Added
+- A dedicated Permissions screen: the warning badge on Home shows how many permissions are missing and opens a screen listing each one, why the app needs it, and its enable action
+
+### Fixed
+- Custom delays longer than 99 hours can be entered again, up to the scheduler's limit
+- Switches now render and behave correctly in right-to-left layouts, text on cards keeps its contrast with dynamic colour enabled, and the update sheet's GitHub button uses its localized label
+
+## العربية
+### تم التغيير
+- شكل جديد بالكامل: تصميم «البرجندي» الزجاجي الناعم يحلّ محلّ ثيمَي Volt وAura في التطبيق كله — لوحة ألوان لؤلؤية وبرجندية للوضعين الفاتح والداكن، خط القاهرة، بطاقات مستديرة ناعمة، وشريط تنقّل سفلي عائم في وسطه زر الاتصال الآن
+- اختيار المظهر: اتباع النظام أو فرض الفاتح أو فرض الداكن من الإعدادات؛ ويُطبَّق الاختيار في كل مكان بما فيه شاشة المكالمة داخل التطبيق (وألوان Monet الديناميكية ما زالت متاحة كما هي)
+- الجدولة صارت أسهل: شرائح تأخير سريعة ومنتقي وقت مخصص بعدّادات للساعات والدقائق والثواني، يقود نفس التأخيرات كما من قبل
+
+### تمت الإضافة
+- شاشة أذونات مخصصة: شارة التحذير في الرئيسية تعرض عدد الأذونات الناقصة وتفتح شاشة تشرح كل إذن وسبب حاجة التطبيق إليه وزر تفعيله
+
+### تم الإصلاح
+- التأخيرات المخصصة الأطول من 99 ساعة عادت قابلة للإدخال حتى حدّ المجدوِل
+- المفاتيح تظهر وتتصرّف صحيحًا في التخطيطات من اليمين لليسار، وتباين النص على البطاقات ثابت مع تفعيل الألوان الديناميكية، وزر GitHub في ورقة التحديث يستخدم نصّه المترجم
+
 ## [1.0] - 2026-10-20
 
 ## English
