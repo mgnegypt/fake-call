@@ -19,6 +19,11 @@ class SettingsStore(private val context: Context) {
     private object Keys {
         val LANGUAGE = stringPreferencesKey("language") // system | en | ar
         val DYNAMIC_COLOR = booleanPreferencesKey("dynamic_color")
+        // Burgundy redesign: the one new key. system | light | dark.
+        // Absent (every install upgrading from v1.0) means "system",
+        // which is exactly the pre-redesign behaviour — no migration
+        // needed and no existing key is removed or reinterpreted.
+        val THEME_MODE = stringPreferencesKey("theme_mode")
         val CALL_MODE = stringPreferencesKey("call_mode") // telecom | app
         val ACCOUNT_LABEL = stringPreferencesKey("account_label")
         val DEFAULT_NAME = stringPreferencesKey("default_name")
@@ -50,6 +55,7 @@ class SettingsStore(private val context: Context) {
 
     val language: Flow<String> = context.dataStore.data.map { it[Keys.LANGUAGE] ?: "system" }
     val dynamicColor: Flow<Boolean> = context.dataStore.data.map { it[Keys.DYNAMIC_COLOR] ?: false }
+    val themeMode: Flow<String> = context.dataStore.data.map { it[Keys.THEME_MODE] ?: "system" }
     val callMode: Flow<String> = context.dataStore.data.map { it[Keys.CALL_MODE] ?: "telecom" }
     val accountLabel: Flow<String> = context.dataStore.data.map { it[Keys.ACCOUNT_LABEL] ?: "Fake Call" }
     val defaultName: Flow<String> = context.dataStore.data.map { it[Keys.DEFAULT_NAME] ?: "" }
@@ -116,6 +122,7 @@ class SettingsStore(private val context: Context) {
 
     suspend fun setLanguage(v: String) = edit { it[Keys.LANGUAGE] = v }
     suspend fun setDynamicColor(v: Boolean) = edit { it[Keys.DYNAMIC_COLOR] = v }
+    suspend fun setThemeMode(v: String) = edit { it[Keys.THEME_MODE] = v }
     suspend fun setCallMode(v: String) = edit { it[Keys.CALL_MODE] = v }
     suspend fun setAccountLabel(v: String) = edit { it[Keys.ACCOUNT_LABEL] = v }
     suspend fun setDefaultName(v: String) = edit { it[Keys.DEFAULT_NAME] = v }
