@@ -87,8 +87,6 @@
     <string name="language_en">English</string>
     <string name="language_ar">العربية</string>
     <string name="settings_appearance">Appearance</string>
-    <string name="settings_dynamic_color">Dynamic color (Monet)</string>
-    <string name="settings_dynamic_color_desc">Use colors from your wallpaper on Android 12 and above.</string>
     <string name="settings_call_engine">Call presentation</string>
     <string name="call_mode_telecom">System</string>
     <string name="call_mode_app">App</string>
@@ -157,7 +155,6 @@
     <string name="home_start_call">Start Fake Call</string>
     <string name="ringtone_label">Ringtone</string>
     <string name="ringtone_default">Default</string>
-    <string name="vibration_label">Vibration</string>
 
         <string name="battery_card_title">Battery optimization</string>
     <string name="battery_text">Allow unrestricted battery use so scheduled calls are not delayed or killed by battery saving.</string>
@@ -233,4 +230,5 @@
     <string name="unit_seconds">seconds</string>
     <string name="unit_minutes">minutes</string>
     <string name="unit_hours">hours</string>
+    <string name="contacts_pick">Pick from contacts</string>
 </resources>

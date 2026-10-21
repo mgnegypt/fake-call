@@ -17,7 +17,6 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.outlined.DarkMode
 import androidx.compose.material.icons.outlined.Language
-import androidx.compose.material.icons.outlined.WaterDrop
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -59,7 +58,7 @@ import kotlinx.coroutines.launch
 /**
  * Settings, burgundy layout. Sections and order follow the design board;
  * every control is wired to the exact same setting/handler as before the
- * redesign (language, theme mode, Monet, call mode, account label,
+ * redesign (language, theme mode, call mode, account label,
  * defaults, permissions, updates, automation, logs).
  */
 @Composable
@@ -70,7 +69,6 @@ fun SettingsScreen(onShowUpdate: () -> Unit, onOpenLogs: () -> Unit) {
     val b = burgundy()
 
     val language by app.settings.language.collectAsState(initial = "system")
-    val dynamicColor by app.settings.dynamicColor.collectAsState(initial = false)
     val themeMode by app.settings.themeMode.collectAsState(initial = "system")
     val callMode by app.settings.callMode.collectAsState(initial = "telecom")
     val updateNotifications by app.settings.updateNotifications.collectAsState(initial = false)
@@ -143,18 +141,6 @@ fun SettingsScreen(onShowUpdate: () -> Unit, onOpenLogs: () -> Unit) {
                                 app.settings.setThemeMode(if (on) "dark" else "light")
                             }
                         }
-                    )
-                }
-                SoftDivider()
-                SettingRow(
-                    icon = Icons.Outlined.WaterDrop,
-                    title = stringResource(R.string.settings_dynamic_color),
-                    subtitle = stringResource(R.string.settings_dynamic_color_desc),
-                    onClick = { scope.launch { app.settings.setDynamicColor(!dynamicColor) } }
-                ) {
-                    AppSwitch(
-                        checked = dynamicColor,
-                        onCheckedChange = { scope.launch { app.settings.setDynamicColor(it) } }
                     )
                 }
             }

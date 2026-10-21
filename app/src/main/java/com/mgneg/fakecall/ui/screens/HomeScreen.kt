@@ -35,6 +35,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Bolt
 import androidx.compose.material.icons.filled.Call
+import androidx.compose.material.icons.filled.Contacts
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Mic
@@ -42,7 +43,6 @@ import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Remove
-import androidx.compose.material.icons.filled.Vibration
 import androidx.compose.material.icons.filled.WarningAmber
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
@@ -170,7 +170,6 @@ fun HomeScreen(
     val b = burgundy()
     val presets by vm.presets.collectAsState()
     val ringtoneUri by app.settings.ringtoneUri.collectAsState(initial = null)
-    val vibrate by app.settings.vibrateOnRing.collectAsState(initial = true)
 
     var name by remember { mutableStateOf("") }
     var number by remember { mutableStateOf("") }
@@ -200,6 +199,34 @@ fun HomeScreen(
                 if (ok) {
                     audioPath = file.absolutePath
                     audioName = uri.lastPathSegment?.substringAfterLast('/') ?: file.name
+                }
+            }
+        }
+    }
+
+    // System contact picker (phone entries): fills the same name and
+    // number fields as manual typing. The picker grants temporary
+    // access to the chosen entry, so no contacts permission is needed.
+    val contactPicker = rememberLauncherForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val uri = result.data?.data
+            if (uri != null) {
+                runCatching {
+                    context.contentResolver.query(
+                        uri,
+                        arrayOf(
+                            android.provider.ContactsContract.CommonDataKinds.Phone.NUMBER,
+                            android.provider.ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME
+                        ),
+                        null, null, null
+                    )?.use { cursor ->
+                        if (cursor.moveToFirst()) {
+                            cursor.getString(0)?.let { number = it }
+                            cursor.getString(1)?.let { name = it }
+                        }
+                    }
                 }
             }
         }
@@ -424,9 +451,39 @@ fun HomeScreen(
                     )
                 }
             }
+            Spacer(modifier = Modifier.height(10.dp))
+            Row(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(b.tint)
+                    .clickable(role = androidx.compose.ui.semantics.Role.Button) {
+                        contactPicker.launch(
+                            Intent(
+                                Intent.ACTION_PICK,
+                                android.provider.ContactsContract.CommonDataKinds.Phone.CONTENT_URI
+                            )
+                        )
+                    }
+                    .padding(horizontal = 14.dp, vertical = 10.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Icon(
+                    Icons.Filled.Contacts,
+                    contentDescription = null,
+                    tint = b.accentText,
+                    modifier = Modifier.size(18.dp)
+                )
+                Text(
+                    stringResource(R.string.contacts_pick),
+                    color = b.accentText,
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
         }
 
-        // Three tiles: ringtone / vibration / answer audio.
+        // Two tiles: ringtone / answer audio.
         Row(
             horizontalArrangement = Arrangement.spacedBy(10.dp),
             modifier = Modifier.fillMaxWidth()
@@ -449,14 +506,6 @@ fun HomeScreen(
                     }
                     ringtonePicker.launch(intent)
                 },
-                modifier = Modifier.weight(1f)
-            )
-            HomeTile(
-                icon = Icons.Filled.Vibration,
-                title = stringResource(R.string.vibration_label),
-                value = stringResource(if (vibrate) R.string.common_on else R.string.common_off),
-                filled = vibrate,
-                onClick = { scope.launch { app.settings.setVibrateOnRing(!vibrate) } },
                 modifier = Modifier.weight(1f)
             )
             HomeTile(
@@ -733,7 +782,7 @@ private fun DelayRing(delaySec: Int) {
     }
 }
 
-/** One of the three Home tiles (ringtone / vibration / answer audio). */
+/** One of the two Home tiles (ringtone / answer audio). */
 @Composable
 private fun HomeTile(
     icon: androidx.compose.ui.graphics.vector.ImageVector,

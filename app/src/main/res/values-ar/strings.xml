@@ -79,8 +79,6 @@
     <string name="language_en">English</string>
     <string name="language_ar">العربية</string>
     <string name="settings_appearance">المظهر</string>
-    <string name="settings_dynamic_color">الألوان الديناميكية (Monet)</string>
-    <string name="settings_dynamic_color_desc">استخدام ألوان الخلفية على أندرويد 12 فأحدث.</string>
     <string name="settings_call_engine">طريقة عرض المكالمة</string>
     <string name="call_mode_telecom">النظام</string>
     <string name="call_mode_app">التطبيق</string>
@@ -145,7 +143,6 @@
     <string name="home_start_call">بدء المكالمة</string>
     <string name="ringtone_label">نغمة الرنين</string>
     <string name="ringtone_default">الافتراضية</string>
-    <string name="vibration_label">الاهتزاز</string>
 
         <string name="battery_card_title">تحسين البطارية</string>
     <string name="battery_text">اسمح باستخدام البطارية دون قيود حتى لا تتأخر المكالمات المجدولة أو تُقتل بسبب توفير الطاقة.</string>
@@ -232,4 +229,5 @@
     <string name="unit_seconds">ثانية</string>
     <string name="unit_minutes">دقيقة</string>
     <string name="unit_hours">ساعة</string>
+    <string name="contacts_pick">اختيار من جهات الاتصال</string>
 </resources>
