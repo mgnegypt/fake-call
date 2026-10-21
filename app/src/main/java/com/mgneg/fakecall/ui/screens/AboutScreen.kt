@@ -3,6 +3,7 @@ package com.mgneg.fakecall.ui.screens
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -243,10 +244,7 @@ private fun Box30Icon(drawableRes: Int) {
     androidx.compose.foundation.layout.Box(
         modifier = Modifier
             .size(30.dp)
-            .androidx.compose.foundation.background(
-                b.tint,
-                androidx.compose.foundation.shape.CircleShape
-            ),
+            .background(b.tint, androidx.compose.foundation.shape.CircleShape),
         contentAlignment = Alignment.Center
     ) {
         Image(

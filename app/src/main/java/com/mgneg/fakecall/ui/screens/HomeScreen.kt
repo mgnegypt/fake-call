@@ -30,6 +30,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Bolt
 import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
@@ -38,6 +39,7 @@ import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Remove
+import androidx.compose.material.icons.filled.Vibration
 import androidx.compose.material.icons.filled.WarningAmber
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
@@ -91,7 +93,11 @@ import com.mgneg.fakecall.ui.components.SoftChip
 import com.mgneg.fakecall.ui.components.burgundy
 import com.mgneg.fakecall.ui.components.primaryGradient
 import com.mgneg.fakecall.ui.theme.BadgeRed
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.io.File
 
@@ -100,8 +106,8 @@ class HomeViewModel(private val app: FakeCallApp) : ViewModel() {
         kotlinx.coroutines.SupervisorJob() + kotlinx.coroutines.Dispatchers.Default
     )
 
-    val presets: kotlinx.coroutines.flow.StateFlow<List<Preset>> = app.callRepository.presets
-        .stateIn(scope, kotlinx.coroutines.flow.SharingStarted.WhileSubscribed(5_000), emptyList())
+    val presets: StateFlow<List<Preset>> = app.callRepository.presets
+        .stateIn(scope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     override fun onCleared() {
         // The scope is hand-rolled (not viewModelScope), so cancel it
@@ -440,7 +446,7 @@ fun HomeScreen(
                 modifier = Modifier.weight(1f)
             )
             HomeTile(
-                icon = androidx.compose.material.icons.Icons.Filled.Vibration,
+                icon = Icons.Filled.Vibration,
                 title = stringResource(R.string.vibration_label),
                 value = stringResource(if (vibrate) R.string.common_on else R.string.common_off),
                 filled = vibrate,
@@ -557,7 +563,7 @@ fun HomeScreen(
                         horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         IconBubble(
-                            androidx.compose.material.icons.Icons.Filled.Bolt,
+                            Icons.Filled.Bolt,
                             contentDescription = null,
                             size = 46,
                             iconSize = 20
@@ -650,11 +656,6 @@ fun HomeScreen(
         )
     }
 }
-
-/** Small helper so the badge offset reads cleanly in the header. */
-private fun Modifier.offset(x = (-2).dp, y = (-2).dp): Modifier = this.then(
-    Modifier.padding(0.dp)
-)
 
 @Composable
 private fun delayChipText(sec: Int): String = when {

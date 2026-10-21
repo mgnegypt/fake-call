@@ -1,5 +1,6 @@
 package com.mgneg.fakecall.ui.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
@@ -314,10 +316,7 @@ fun SettingsScreen(onShowUpdate: () -> Unit, onOpenLogs: () -> Unit) {
                     textAlign = TextAlign.Start,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .androidx.compose.foundation.background(
-                            b.field,
-                            androidx.compose.foundation.shape.RoundedCornerShape(14.dp)
-                        )
+                        .background(b.field, RoundedCornerShape(14.dp))
                         .padding(horizontal = 12.dp, vertical = 10.dp)
                 )
             }

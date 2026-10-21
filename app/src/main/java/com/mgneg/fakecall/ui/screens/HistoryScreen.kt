@@ -1,5 +1,6 @@
 package com.mgneg.fakecall.ui.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -96,7 +97,7 @@ fun HistoryScreen(onScheduleCall: () -> Unit) {
                     modifier = Modifier
                         .size(96.dp)
                         .clip(CircleShape)
-                        .androidx.compose.foundation.background(b.tint),
+                        .background(b.tint),
                     contentAlignment = Alignment.Center
                 ) {
                     androidx.compose.material3.Icon(

@@ -21,6 +21,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.DropdownMenu
@@ -364,7 +365,7 @@ fun LabeledField(
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     valueTextStyle: TextStyle? = null,
     singleLine: Boolean = true,
-    /** Phone-number style values: force LTR with end alignment (design). */
+    /** Phone-number style values: force LTR direction inside the field. */
     ltrValue: Boolean = false
 ) {
     val b = burgundy()
@@ -382,21 +383,14 @@ fun LabeledField(
             singleLine = singleLine,
             keyboardOptions = keyboardOptions,
             textStyle = (valueTextStyle ?: MaterialTheme.typography.bodyLarge)
-                .copy(
-                    color = b.text,
-                    textAlign = if (ltrValue) TextAlign.End else TextAlign.Start
-                ),
+                .copy(color = b.text, textAlign = TextAlign.Start),
             cursorBrush = SolidColor(b.accent),
             decorationBox = { inner ->
                 Box {
                     if (value.isEmpty() && placeholder.isNotEmpty()) {
                         Text(
                             placeholder,
-                            style = (valueTextStyle ?: MaterialTheme.typography.bodyLarge)
-                                .copy(
-                                    textAlign = if (ltrValue) TextAlign.End
-                                    else TextAlign.Start
-                                ),
+                            style = valueTextStyle ?: MaterialTheme.typography.bodyLarge,
                             color = b.muted.copy(alpha = 0.7f),
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -589,7 +583,7 @@ fun BackHeader(
         ) {
             Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
                 Icon(
-                    androidx.compose.material.icons.Icons.AutoMirrored.Filled.ArrowBack,
+                    Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = backContentDescription,
                     tint = b.text,
                     modifier = Modifier.size(22.dp)
