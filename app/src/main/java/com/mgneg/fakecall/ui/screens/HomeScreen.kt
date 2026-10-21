@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -145,6 +147,9 @@ class HomeViewModel(private val app: FakeCallApp) : ViewModel() {
 }
 
 private val DELAY_OPTIONS = listOf(0, 10, 30, 60, 300, 900)
+
+/** Largest hour count whose h*3600 + 59*60 + 59 still fits an Int. */
+private const val MAX_CUSTOM_HOURS = (Int.MAX_VALUE - 3599) / 3600
 
 @Composable
 fun HomeScreen(
@@ -807,6 +812,7 @@ private fun CustomTimeDialog(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
+                    .windowInsetsPadding(WindowInsets.systemBars)
                     .padding(start = 20.dp, end = 20.dp, top = 22.dp, bottom = 20.dp),
                 verticalArrangement = Arrangement.spacedBy(14.dp)
             ) {
@@ -822,7 +828,10 @@ private fun CustomTimeDialog(
                     StepperCard(
                         label = stringResource(R.string.unit_hours),
                         value = hours,
-                        onChange = { hours = it.coerceIn(0, 99) },
+                        // Cap only where the total would overflow the
+                        // Int seconds the scheduler accepts — the old
+                        // digits field allowed any positive Int delay.
+                        onChange = { hours = it.coerceIn(0, MAX_CUSTOM_HOURS) },
                         modifier = Modifier.weight(1f)
                     )
                     StepperCard(

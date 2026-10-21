@@ -2,6 +2,8 @@ package com.mgneg.fakecall.ui.nav
 
 import android.content.Intent
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -152,7 +154,14 @@ fun FakeCallRoot(app: FakeCallApp) {
     val highlightedRoute = if (route == Routes.LOGS) Routes.SETTINGS else route
 
     AppBackground {
-        Box(modifier = Modifier.fillMaxSize()) {
+        // The pre-redesign Scaffold applied the system-bar insets; with
+        // targetSdk 37 the window is edge-to-edge, so pad the content
+        // (and the floating bar) inside the full-bleed background.
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .windowInsetsPadding(WindowInsets.systemBars)
+        ) {
             NavHost(navController = navController, startDestination = Routes.HOME) {
                 composable(Routes.HOME) {
                     HomeScreen(
