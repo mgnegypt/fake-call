@@ -436,7 +436,8 @@ fun HomeScreen(
             // pill above the fields).
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(10.dp)
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 LabeledField(
                     label = stringResource(R.string.caller_number_label),
