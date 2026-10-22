@@ -87,11 +87,9 @@
     <string name="language_en">English</string>
     <string name="language_ar">العربية</string>
     <string name="settings_appearance">Appearance</string>
-    <string name="settings_dynamic_color">Dynamic color (Monet)</string>
-    <string name="settings_dynamic_color_desc">Use colors from your wallpaper on Android 12 and above.</string>
     <string name="settings_call_engine">Call presentation</string>
-    <string name="call_mode_telecom">System dialer (Telecom)</string>
-    <string name="call_mode_app">App call screen</string>
+    <string name="call_mode_telecom">System</string>
+    <string name="call_mode_app">App</string>
     <string name="call_mode_desc">Telecom mode shows the call ONLY in the system dialer and requires the Fake Call account to be enabled — if it is not, the call does not ring and you get a notification instead. App screen mode always uses the in-app call screen.</string>
     <string name="settings_account_label">Call account label</string>
     <string name="settings_account_label_desc">The name shown for the Fake Call account in system settings. Changing it re-registers the account.</string>
@@ -122,11 +120,32 @@
     <string name="about_version">Version %1$s</string>
     <string name="about_developer_title">Who is the developer</string>
     <string name="about_developed_by">Developed by mgneg</string>
-    <string name="about_bio">mgneg is an independent developer building small, honest Android tools. This space will be updated with a fuller bio soon.</string>
-    <string name="about_purpose_title">Purpose of the app</string>
-    <string name="about_purpose">Fake Call simulates an incoming phone call at a time you choose, with a caller name and number you set, and optional audio when you answer. People use it for privacy, entertainment, presentations, and testing.</string>
+    <string name="about_bio">Passionate about programming and app development, I love turning ideas into real projects that offer practical solutions to problems we face in everyday life.
+
+I am interested in Android Development, artificial intelligence (AI), and user interface and experience design (UI/UX), and I always strive to learn new technologies and develop my skills through experimentation and building projects.
+
+I believe programming is not just writing code, but a way of thinking, solving problems, and creating ideas with real value.</string>
+    <string name="about_purpose_title">About the app</string>
+    <string name="about_purpose">Fake Call — the fake calls app
+
+An app that helps you handle awkward social situations by simulating incoming calls. You can schedule a fake call to find the right opportunity to end an uncomfortable conversation, withdraw from a situation you do not wish to continue, or leave in a smoother, more tactful way.
+
+Simple and practical, designed to give you more control over everyday social situations.
+
+Your fake call, and your way out of the situation.</string>
     <string name="about_disclaimer_title">Disclaimer</string>
-    <string name="about_disclaimer">This app is intended for entertainment, privacy, demonstrations, and testing only. Do not use it to deceive, defraud, harass, threaten, or impersonate any person, company, or authority, or to cause harm of any kind. The developer is not responsible for any misuse or for any consequences arising from the use of this app. You are solely responsible for how you use it and for complying with the laws that apply to you.</string>
+    <string name="about_disclaimer">Fake Call is designed to simulate incoming calls, to help users handle awkward or uncomfortable social situations.
+
+Please note the following:
+• The app simulates incoming calls; using it does not necessarily mean there is a real caller or that an actual phone call is taking place.
+• The app is not a substitute for emergency services, personal safety measures, or seeking help when needed.
+• The user is responsible for how they use the app and for complying with the laws and regulations in force.
+• The developer bears no responsibility for misuse of the app, for the consequences of its use, or for damages arising from reliance on simulated calls.
+• The app is provided as is, without warranties of any kind, to the extent permitted by applicable laws.
+
+By using the app, the user acknowledges responsibility for their actions and for the way they use the app.
+
+Note: Do not use the app in an attempt to deceive, or to simulate real numbers, government numbers, or numbers belonging to a real organization. Doing so may expose you to legal liability. The app must be used in accordance with the laws of the country in which it operates.</string>
     <string name="about_contact_title">Contact the developer</string>
     <string name="contact_facebook">Facebook</string>
     <string name="contact_whatsapp">WhatsApp</string>
@@ -157,7 +176,6 @@
     <string name="home_start_call">Start Fake Call</string>
     <string name="ringtone_label">Ringtone</string>
     <string name="ringtone_default">Default</string>
-    <string name="vibration_label">Vibration</string>
 
         <string name="battery_card_title">Battery optimization</string>
     <string name="battery_text">Allow unrestricted battery use so scheduled calls are not delayed or killed by battery saving.</string>
@@ -233,4 +251,20 @@
     <string name="unit_seconds">seconds</string>
     <string name="unit_minutes">minutes</string>
     <string name="unit_hours">hours</string>
+    <string name="contacts_pick">Pick from contacts</string>
+    <string name="about_dev_name">Mahmoud Nassar</string>
+    <string name="about_dev_tagline">A programmer and technology enthusiast.</string>
+    <string name="about_stat_opensource">Open source</string>
+    <string name="about_stat_bilingual">Arabic &amp; English</string>
+    <string name="about_stat_material3">Material 3</string>
+    <string name="about_tag_privacy">Privacy</string>
+    <string name="about_tag_fun">Entertainment</string>
+    <string name="about_tag_demos">Presentations</string>
+    <string name="about_tag_testing">Testing</string>
+    <string name="about_disclaimer_more">Read the full disclaimer</string>
+    <string name="about_footer">© mgneg · MIT</string>
+    <string name="contacts_title">Choose a contact</string>
+    <string name="contacts_search">Search contacts</string>
+    <string name="contacts_empty">No contacts with phone numbers</string>
+    <string name="contacts_permission_denied">Contacts permission is needed to pick the caller from your contacts</string>
 </resources>

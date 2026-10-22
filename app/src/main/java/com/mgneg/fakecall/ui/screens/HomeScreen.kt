@@ -14,15 +14,19 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
@@ -35,6 +39,8 @@ import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Bolt
 import androidx.compose.material.icons.filled.Call
+import androidx.compose.material.icons.filled.Contacts
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Mic
@@ -42,7 +48,6 @@ import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Remove
-import androidx.compose.material.icons.filled.Vibration
 import androidx.compose.material.icons.filled.WarningAmber
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
@@ -56,6 +61,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -170,7 +176,6 @@ fun HomeScreen(
     val b = burgundy()
     val presets by vm.presets.collectAsState()
     val ringtoneUri by app.settings.ringtoneUri.collectAsState(initial = null)
-    val vibrate by app.settings.vibrateOnRing.collectAsState(initial = true)
 
     var name by remember { mutableStateOf("") }
     var number by remember { mutableStateOf("") }
@@ -202,6 +207,21 @@ fun HomeScreen(
                     audioName = uri.lastPathSegment?.substringAfterLast('/') ?: file.name
                 }
             }
+        }
+    }
+
+    // Contacts: the app reads the device's contacts with READ_CONTACTS
+    // (declared in the manifest, requested here at use time) and shows
+    // its own searchable list; picking an entry fills the same name
+    // and number fields as manual typing.
+    var showContacts by remember { mutableStateOf(false) }
+    val contactsPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (granted) {
+            showContacts = true
+        } else {
+            scope.launch { snackbar.showSnackbar(context.getString(R.string.contacts_permission_denied)) }
         }
     }
 
@@ -377,6 +397,7 @@ fun HomeScreen(
         SoftCard(contentPadding = androidx.compose.foundation.layout.PaddingValues(14.dp)) {
             Row(
                 horizontalArrangement = Arrangement.spacedBy(14.dp),
+                verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Box(
@@ -402,31 +423,74 @@ fun HomeScreen(
                         )
                     }
                 }
+                LabeledField(
+                    label = stringResource(R.string.caller_name_label),
+                    value = name,
+                    onValueChange = { name = it },
+                    placeholder = stringResource(R.string.caller_name_placeholder),
+                    modifier = Modifier.weight(1f)
+                )
+            }
+            Spacer(modifier = Modifier.height(10.dp))
+            // Number field with the contacts button beside it
+            // (maintainer's layout: the button moved here from a wide
+            // pill above the fields).
+            // IntrinsicSize.Max pins the row to the field's own height:
+            // a plain fillMaxHeight on the button stretched the whole
+            // row to the card's full height and broke the layout.
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(androidx.compose.foundation.layout.IntrinsicSize.Max),
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                LabeledField(
+                    label = stringResource(R.string.caller_number_label),
+                    value = number,
+                    onValueChange = { number = it },
+                    placeholder = stringResource(R.string.caller_number_placeholder),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                    ltrValue = true,
+                    modifier = Modifier.weight(1f)
+                )
                 Column(
-                    modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                    modifier = Modifier
+                        .weight(0.5f)
+                        .fillMaxHeight()
+                        .clip(RoundedCornerShape(14.dp))
+                        .background(b.tint)
+                        .clickable(role = androidx.compose.ui.semantics.Role.Button) {
+                            if (androidx.core.content.ContextCompat.checkSelfPermission(
+                                    context, android.Manifest.permission.READ_CONTACTS
+                                ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+                            ) {
+                                showContacts = true
+                            } else {
+                                contactsPermissionLauncher.launch(android.Manifest.permission.READ_CONTACTS)
+                            }
+                        }
+                        .padding(horizontal = 8.dp, vertical = 6.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
                 ) {
-                    LabeledField(
-                        label = stringResource(R.string.caller_name_label),
-                        value = name,
-                        onValueChange = { name = it },
-                        placeholder = stringResource(R.string.caller_name_placeholder),
-                        modifier = Modifier.fillMaxWidth()
+                    Icon(
+                        Icons.Filled.Contacts,
+                        contentDescription = null,
+                        tint = b.accentText,
+                        modifier = Modifier.size(19.dp)
                     )
-                    LabeledField(
-                        label = stringResource(R.string.caller_number_label),
-                        value = number,
-                        onValueChange = { number = it },
-                        placeholder = stringResource(R.string.caller_number_placeholder),
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
-                        ltrValue = true,
-                        modifier = Modifier.fillMaxWidth()
+                    Text(
+                        stringResource(R.string.contacts_pick),
+                        color = b.accentText,
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = androidx.compose.ui.text.style.TextAlign.Center
                     )
                 }
             }
         }
 
-        // Three tiles: ringtone / vibration / answer audio.
+        // Two tiles: ringtone / answer audio.
         Row(
             horizontalArrangement = Arrangement.spacedBy(10.dp),
             modifier = Modifier.fillMaxWidth()
@@ -449,14 +513,6 @@ fun HomeScreen(
                     }
                     ringtonePicker.launch(intent)
                 },
-                modifier = Modifier.weight(1f)
-            )
-            HomeTile(
-                icon = Icons.Filled.Vibration,
-                title = stringResource(R.string.vibration_label),
-                value = stringResource(if (vibrate) R.string.common_on else R.string.common_off),
-                filled = vibrate,
-                onClick = { scope.launch { app.settings.setVibrateOnRing(!vibrate) } },
                 modifier = Modifier.weight(1f)
             )
             HomeTile(
@@ -621,6 +677,17 @@ fun HomeScreen(
         }
     }
 
+    if (showContacts) {
+        ContactsPickerDialog(
+            onDismiss = { showContacts = false },
+            onPick = { pickedName, pickedNumber ->
+                name = pickedName
+                number = pickedNumber
+                showContacts = false
+            }
+        )
+    }
+
     if (showCustomDialog) {
         CustomTimeDialog(
             initialSeconds = customDelay.toIntOrNull() ?: 0,
@@ -733,7 +800,7 @@ private fun DelayRing(delaySec: Int) {
     }
 }
 
-/** One of the three Home tiles (ringtone / vibration / answer audio). */
+/** One of the two Home tiles (ringtone / answer audio). */
 @Composable
 private fun HomeTile(
     icon: androidx.compose.ui.graphics.vector.ImageVector,
@@ -935,5 +1002,188 @@ private fun StepperButton(
         contentAlignment = Alignment.Center
     ) {
         Icon(icon, contentDescription = contentDescription, tint = b.accentText)
+    }
+}
+
+
+private data class ContactEntry(val name: String, val number: String)
+
+/**
+ * In-app contacts list (READ_CONTACTS). Reads every phone entry from
+ * the device's contacts, deduped and sorted, with a search box;
+ * picking one fills the caller name/number fields on Home.
+ */
+@Composable
+private fun ContactsPickerDialog(
+    onDismiss: () -> Unit,
+    onPick: (name: String, number: String) -> Unit
+) {
+    val b = burgundy()
+    val context = LocalContext.current
+    var query by remember { mutableStateOf("") }
+    val contacts by produceState<List<ContactEntry>?>(initialValue = null) {
+        value = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+            runCatching {
+                val list = mutableListOf<ContactEntry>()
+                context.contentResolver.query(
+                    android.provider.ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+                    arrayOf(
+                        android.provider.ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
+                        android.provider.ContactsContract.CommonDataKinds.Phone.NUMBER
+                    ),
+                    null, null,
+                    android.provider.ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME + " ASC"
+                )?.use { cursor ->
+                    val seen = mutableSetOf<String>()
+                    while (cursor.moveToNext()) {
+                        val contactName = cursor.getString(0)?.trim().orEmpty()
+                        val contactNumber = cursor.getString(1)?.trim().orEmpty()
+                        if (contactNumber.isEmpty()) continue
+                        val key = contactName.lowercase() + "|" +
+                            contactNumber.filter { it.isDigit() }
+                        if (seen.add(key)) list.add(ContactEntry(contactName, contactNumber))
+                    }
+                }
+                list
+            }.getOrDefault(emptyList())
+        }
+    }
+    val filtered = remember(contacts, query) {
+        val all = contacts ?: emptyList()
+        if (query.isBlank()) all
+        else {
+            val queryDigits = query.filter { c -> c.isDigit() }
+            all.filter {
+                it.name.contains(query, ignoreCase = true) ||
+                    (queryDigits.isNotEmpty() &&
+                        it.number.filter { c -> c.isDigit() }.contains(queryDigits))
+            }
+        }
+    }
+
+    Dialog(
+        onDismissRequest = onDismiss,
+        properties = DialogProperties(usePlatformDefaultWidth = false)
+    ) {
+        AppBackground {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .windowInsetsPadding(WindowInsets.systemBars)
+                    .padding(start = 20.dp, end = 20.dp, top = 22.dp, bottom = 20.dp),
+                verticalArrangement = Arrangement.spacedBy(14.dp)
+            ) {
+                com.mgneg.fakecall.ui.components.BackHeader(
+                    title = stringResource(R.string.contacts_title),
+                    onBack = onDismiss,
+                    backContentDescription = stringResource(R.string.action_back)
+                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(14.dp))
+                        .background(b.card)
+                        .padding(horizontal = 14.dp, vertical = 12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    Icon(
+                        Icons.Filled.Search,
+                        contentDescription = null,
+                        tint = b.muted,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    BasicTextField(
+                        value = query,
+                        onValueChange = { query = it },
+                        singleLine = true,
+                        textStyle = androidx.compose.ui.text.TextStyle(
+                            color = b.text,
+                            fontSize = 15.sp,
+                            fontFamily = com.mgneg.fakecall.ui.theme.CairoFamily
+                        ),
+                        modifier = Modifier.weight(1f),
+                        decorationBox = { inner ->
+                            if (query.isEmpty()) {
+                                Text(
+                                    stringResource(R.string.contacts_search),
+                                    color = b.muted,
+                                    fontSize = 15.sp
+                                )
+                            }
+                            inner()
+                        }
+                    )
+                }
+                when {
+                    contacts == null -> Box(
+                        modifier = Modifier.fillMaxWidth().padding(top = 30.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        androidx.compose.material3.CircularProgressIndicator(color = b.accent)
+                    }
+                    filtered.isEmpty() -> Text(
+                        stringResource(R.string.contacts_empty),
+                        color = b.muted,
+                        fontSize = 14.sp,
+                        modifier = Modifier.padding(top = 10.dp)
+                    )
+                    else -> LazyColumn(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                        items(filtered) { entry ->
+                            SoftCard(
+                                contentPadding = androidx.compose.foundation.layout.PaddingValues(12.dp),
+                                onClick = { onPick(entry.name, entry.number) }
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(44.dp)
+                                            .clip(CircleShape)
+                                            .background(b.tint),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        val initial = entry.name.trim().firstOrNull()?.uppercase()
+                                        if (initial != null) {
+                                            Text(
+                                                initial,
+                                                style = MaterialTheme.typography.titleMedium,
+                                                color = b.accentText
+                                            )
+                                        } else {
+                                            Icon(
+                                                Icons.Filled.Person,
+                                                contentDescription = null,
+                                                tint = b.accentText,
+                                                modifier = Modifier.size(22.dp)
+                                            )
+                                        }
+                                    }
+                                    Column(modifier = Modifier.weight(1f)) {
+                                        if (entry.name.isNotEmpty()) {
+                                            Text(
+                                                entry.name,
+                                                fontWeight = FontWeight.Bold,
+                                                fontSize = 15.sp,
+                                                maxLines = 1
+                                            )
+                                        }
+                                        Text(
+                                            entry.number,
+                                            color = b.muted,
+                                            fontSize = 13.sp,
+                                            modifier = Modifier.fillMaxWidth(),
+                                            textAlign = androidx.compose.ui.text.style.TextAlign.End
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }

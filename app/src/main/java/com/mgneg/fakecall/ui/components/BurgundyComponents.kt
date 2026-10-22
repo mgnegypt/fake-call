@@ -41,6 +41,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.TextStyle
@@ -123,6 +124,14 @@ fun HeroCard(
         Box(
             modifier = Modifier
                 .align(Alignment.TopStart)
+                // Decorative glow: measured and placed, but reports a
+                // zero size so it never forces the card taller than its
+                // content (the Permissions summary hero was ~220dp of
+                // mostly-empty gradient because of this child).
+                .layout { measurable, constraints ->
+                    val placeable = measurable.measure(constraints)
+                    layout(0, 0) { placeable.place(0, 0) }
+                }
                 .size(220.dp)
                 .offset(x = (-60).dp, y = (-80).dp)
                 .background(

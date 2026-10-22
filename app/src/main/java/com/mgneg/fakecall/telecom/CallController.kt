@@ -138,8 +138,7 @@ class CallController(private val context: Context) {
                         callerName, callerNumber, audioUri, historyId, CallPath.APP_SCREEN
                     )
                     val ringtoneUri = app.settings.ringtoneUri.first()
-                    val vibrate = app.settings.vibrateOnRing.first()
-                    ringtonePlayer = RingtonePlayer(context, ringtoneUri, vibrate).also { it.start() }
+                    ringtonePlayer = RingtonePlayer(context, ringtoneUri).also { it.start() }
                     IncomingCallNotifier.show(context, callerName, callerNumber)
                 }
                 IncomingRoute.TELECOM_UNAVAILABLE -> {

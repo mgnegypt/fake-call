@@ -18,7 +18,6 @@ class SettingsStore(private val context: Context) {
 
     private object Keys {
         val LANGUAGE = stringPreferencesKey("language") // system | en | ar
-        val DYNAMIC_COLOR = booleanPreferencesKey("dynamic_color")
         // Burgundy redesign: the one new key. system | light | dark.
         // Absent (every install upgrading from v1.0) means "system",
         // which is exactly the pre-redesign behaviour — no migration
@@ -40,7 +39,6 @@ class SettingsStore(private val context: Context) {
         val LAST_SEEN_VERSION = stringPreferencesKey("last_seen_version")
         val INTRO_SHOWN = booleanPreferencesKey("intro_shown")
         val RINGTONE_URI = stringPreferencesKey("ringtone_uri")
-        val VIBRATE_ON_RING = booleanPreferencesKey("vibrate_on_ring")
         // Last-call-attempt diagnostics (see telecom/CallDiagnostics.kt).
         val DIAG_TIMESTAMP = longPreferencesKey("diag_timestamp")
         val DIAG_MODE = stringPreferencesKey("diag_mode")
@@ -54,7 +52,6 @@ class SettingsStore(private val context: Context) {
     }
 
     val language: Flow<String> = context.dataStore.data.map { it[Keys.LANGUAGE] ?: "system" }
-    val dynamicColor: Flow<Boolean> = context.dataStore.data.map { it[Keys.DYNAMIC_COLOR] ?: false }
     val themeMode: Flow<String> = context.dataStore.data.map { it[Keys.THEME_MODE] ?: "system" }
     val callMode: Flow<String> = context.dataStore.data.map { it[Keys.CALL_MODE] ?: "telecom" }
     val accountLabel: Flow<String> = context.dataStore.data.map { it[Keys.ACCOUNT_LABEL] ?: "Fake Call" }
@@ -66,7 +63,6 @@ class SettingsStore(private val context: Context) {
         context.dataStore.data.map { it[Keys.LAST_SEEN_VERSION] ?: "" }
     val introShown: Flow<Boolean> = context.dataStore.data.map { it[Keys.INTRO_SHOWN] ?: false }
     val ringtoneUri: Flow<String?> = context.dataStore.data.map { it[Keys.RINGTONE_URI] }
-    val vibrateOnRing: Flow<Boolean> = context.dataStore.data.map { it[Keys.VIBRATE_ON_RING] ?: true }
 
     /** The most recent trigger attempt's diagnostics; timestamp 0 means none recorded yet. */
     val lastCallAttempt: Flow<CallAttemptDiagnostics> = context.dataStore.data.map { p ->
@@ -121,7 +117,6 @@ class SettingsStore(private val context: Context) {
     }
 
     suspend fun setLanguage(v: String) = edit { it[Keys.LANGUAGE] = v }
-    suspend fun setDynamicColor(v: Boolean) = edit { it[Keys.DYNAMIC_COLOR] = v }
     suspend fun setThemeMode(v: String) = edit { it[Keys.THEME_MODE] = v }
     suspend fun setCallMode(v: String) = edit { it[Keys.CALL_MODE] = v }
     suspend fun setAccountLabel(v: String) = edit { it[Keys.ACCOUNT_LABEL] = v }
@@ -133,7 +128,6 @@ class SettingsStore(private val context: Context) {
     suspend fun setRingtoneUri(v: String?) = edit { p ->
         if (v == null) p.remove(Keys.RINGTONE_URI) else p[Keys.RINGTONE_URI] = v
     }
-    suspend fun setVibrateOnRing(v: Boolean) = edit { it[Keys.VIBRATE_ON_RING] = v }
 
     suspend fun saveUpdateCache(c: UpdateCache) = edit { p ->
         p[Keys.LAST_CHECK] = c.lastCheck

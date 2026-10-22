@@ -4,8 +4,8 @@ Manual verification targets (record results per release):
 
 | API | Device/emulator | Areas |
 |---|---|---|
-| 30 (Android 11) | emulator | static theme (no Monet), exact alarm, fallback call UI, RTL/LTR |
-| 31 (Android 12) | emulator | dynamic color, exact-alarm permission flow, splash animation |
+| 30 (Android 11) | emulator | static theme, exact alarm, fallback call UI, RTL/LTR |
+| 31 (Android 12) | emulator | exact-alarm permission flow, splash animation |
 | 33 (Android 13) | emulator | POST_NOTIFICATIONS flow, per-app language switch |
 | 34 (Android 14) | emulator | full-screen intent permission, Telecom account enable flow |
 | 35 (Android 15) | device | edge-to-edge, lock-screen call, reboot persistence |

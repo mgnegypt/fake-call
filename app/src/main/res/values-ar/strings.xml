@@ -79,11 +79,9 @@
     <string name="language_en">English</string>
     <string name="language_ar">العربية</string>
     <string name="settings_appearance">المظهر</string>
-    <string name="settings_dynamic_color">الألوان الديناميكية (Monet)</string>
-    <string name="settings_dynamic_color_desc">استخدام ألوان الخلفية على أندرويد 12 فأحدث.</string>
     <string name="settings_call_engine">طريقة عرض المكالمة</string>
-    <string name="call_mode_telecom">تطبيق هاتف النظام (Telecom)</string>
-    <string name="call_mode_app">شاشة المكالمة في التطبيق</string>
+    <string name="call_mode_telecom">النظام</string>
+    <string name="call_mode_app">التطبيق</string>
     <string name="call_mode_desc">وضع Telecom يعرض المكالمة في تطبيق هاتف النظام فقط ويتطلب تفعيل حساب مكالمة وهمية — وإن لم يكن مُفعَّلًا فلن ترنّ المكالمة وسيصلك إشعار بدلًا من ذلك. وضع شاشة التطبيق يستخدم دائمًا شاشة المكالمة داخل التطبيق.</string>
     <string name="settings_account_label">اسم حساب المكالمة</string>
     <string name="settings_account_label_desc">الاسم الظاهر لحساب مكالمة وهمية في إعدادات النظام. تغييره يعيد تسجيل الحساب.</string>
@@ -112,11 +110,32 @@
     <string name="about_version">الإصدار %1$s</string>
     <string name="about_developer_title">من هو المطوّر</string>
     <string name="about_developed_by">من تطوير mgneg</string>
-    <string name="about_bio">mgneg مطوّر مستقل يبني أدوات أندرويد صغيرة وصادقة. سيتم تحديث هذه المساحة بنبذة أكمل قريبًا.</string>
-    <string name="about_purpose_title">الغرض من التطبيق</string>
-    <string name="about_purpose">يحاكي تطبيق مكالمة وهمية مكالمة هاتفية واردة في وقت تختاره، باسم ورقم متصل تحددهما، مع صوت اختياري عند الرد. يستخدمه الناس للخصوصية والترفيه والعروض التوضيحية والاختبار.</string>
+    <string name="about_bio">شغوف بالبرمجة وتطوير التطبيقات، وبحب أحوّل الأفكار إلى مشاريع حقيقية بتقدّم حلولًا عملية لمشاكل بنقابلها في حياتنا اليومية.
+
+مهتم بعالم Android Development والذكاء الاصطناعي (AI) وتصميم واجهات المستخدم (UI/UX)، وبسعى دايمًا إني أتعلم تقنيات جديدة وأطوّر مهاراتي من خلال التجربة وبناء المشاريع.
+
+مؤمن إن البرمجة مش مجرد كتابة أكواد، لكنها طريقة للتفكير وحل المشكلات وصناعة أفكار ليها قيمة حقيقية.</string>
+    <string name="about_purpose_title">نبذة عن التطبيق</string>
+    <string name="about_purpose">Fake Call، المكالمات الوهمية
+
+تطبيق يساعدك على التعامل مع المواقف الاجتماعية المحرجة من خلال محاكاة المكالمات الواردة. يمكنك جدولة مكالمة وهمية لتجد فرصة مناسبة لإنهاء محادثة غير مريحة، أو الانسحاب من موقف لا ترغب في الاستمرار فيه، أو المغادرة بطريقة أكثر سلاسة ولباقة.
+
+بسيط وعملي، صُمم ليمنحك مزيدًا من التحكم في المواقف الاجتماعية اليومية.
+
+مكالمتك الوهمية، ومخرجك من الموقف.</string>
     <string name="about_disclaimer_title">إخلاء المسؤولية</string>
-    <string name="about_disclaimer">هذا التطبيق مخصص للترفيه والخصوصية والعروض التوضيحية والاختبار فقط. لا تستخدمه في الخداع أو الاحتيال أو المضايقة أو التهديد أو انتحال شخصية أي فرد أو جهة أو سلطة، أو في إلحاق أي ضرر. المطوّر غير مسؤول عن أي إساءة استخدام أو عن أي عواقب تنتج عن استخدام التطبيق. أنت وحدك المسؤول عن طريقة استخدامك له وعن الالتزام بالقوانين المعمول بها.</string>
+    <string name="about_disclaimer">صُمم تطبيق Fake Call لمحاكاة المكالمات الواردة، بهدف مساعدة المستخدمين على التعامل مع المواقف الاجتماعية المحرجة أو غير المريحة.
+
+يرجى مراعاة ما يلي:
+• يحاكي التطبيق المكالمات الواردة، ولا يعني استخدامه بالضرورة وجود متصل حقيقي أو إجراء اتصال هاتفي فعلي.
+• التطبيق ليس بديلًا عن خدمات الطوارئ أو إجراءات السلامة الشخصية أو طلب المساعدة عند الحاجة.
+• يتحمل المستخدم مسؤولية كيفية استخدام التطبيق والالتزام بالقوانين واللوائح المعمول بها.
+• لا يتحمل المطوّر مسؤولية إساءة استخدام التطبيق أو العواقب الناتجة عن استخدامه، أو الأضرار المترتبة على الاعتماد على المكالمات المحاكاة.
+• يُقدَّم التطبيق كما هو، دون ضمانات من أي نوع، بالقدر الذي تسمح به القوانين المعمول بها.
+
+باستخدام التطبيق، يقر المستخدم بمسؤوليته عن تصرفاته وعن طريقة استخدامه للتطبيق.
+
+تنويه: لا تستخدم التطبيق في محاولة للخداع أو محاولة محاكاة أرقام حقيقية أو حكومية أو تابعة لمؤسسة حقيقية. قد يعرّضك ذلك للمسؤولية القانونية. يجب استخدام التطبيق وفقًا لقوانين الدولة التي يعمل بها التطبيق.</string>
     <string name="about_contact_title">تواصل مع المطوّر</string>
     <string name="contact_facebook">فيسبوك</string>
     <string name="contact_whatsapp">واتساب</string>
@@ -145,7 +164,6 @@
     <string name="home_start_call">بدء المكالمة</string>
     <string name="ringtone_label">نغمة الرنين</string>
     <string name="ringtone_default">الافتراضية</string>
-    <string name="vibration_label">الاهتزاز</string>
 
         <string name="battery_card_title">تحسين البطارية</string>
     <string name="battery_text">اسمح باستخدام البطارية دون قيود حتى لا تتأخر المكالمات المجدولة أو تُقتل بسبب توفير الطاقة.</string>
@@ -232,4 +250,20 @@
     <string name="unit_seconds">ثانية</string>
     <string name="unit_minutes">دقيقة</string>
     <string name="unit_hours">ساعة</string>
+    <string name="contacts_pick">اختيار من جهات الاتصال</string>
+    <string name="about_dev_name">محمود نصار</string>
+    <string name="about_dev_tagline">مبرمج ومهتم بالتكنولوجيا.</string>
+    <string name="about_stat_opensource">مفتوح المصدر</string>
+    <string name="about_stat_bilingual">عربي وإنجليزي</string>
+    <string name="about_stat_material3">Material 3</string>
+    <string name="about_tag_privacy">الخصوصية</string>
+    <string name="about_tag_fun">الترفيه</string>
+    <string name="about_tag_demos">العروض التوضيحية</string>
+    <string name="about_tag_testing">الاختبار</string>
+    <string name="about_disclaimer_more">اقرأ إخلاء المسؤولية كاملًا</string>
+    <string name="about_footer">© mgneg · MIT</string>
+    <string name="contacts_title">اختر جهة اتصال</string>
+    <string name="contacts_search">ابحث في جهات الاتصال</string>
+    <string name="contacts_empty">لا توجد جهات اتصال بأرقام هاتف</string>
+    <string name="contacts_permission_denied">يلزم إذن جهات الاتصال لاختيار المتصل من جهات اتصالك</string>
 </resources>

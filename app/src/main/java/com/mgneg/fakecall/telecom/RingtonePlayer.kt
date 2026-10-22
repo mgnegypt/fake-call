@@ -5,16 +5,14 @@ import android.media.AudioAttributes
 import android.media.Ringtone
 import android.media.RingtoneManager
 import android.net.Uri
-import android.os.Build
-import android.os.VibrationEffect
-import android.os.Vibrator
-import android.os.VibratorManager
-
-/** Ringtone (user-selected or system default) + optional vibration. */
+/**
+ * Ringtone playback for the in-app call screen (user-selected or
+ * system default). Vibration is deliberately not driven by the app:
+ * it follows the device's own settings.
+ */
 class RingtonePlayer(
     private val context: Context,
-    ringtoneUri: String? = null,
-    private val vibrate: Boolean = true
+    ringtoneUri: String? = null
 ) {
 
     private val ringtone: Ringtone? = runCatching {
@@ -24,8 +22,6 @@ class RingtonePlayer(
                 ?: RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE)
         )
     }.getOrNull()
-    private var vibrator: Vibrator? = null
-
     fun start() {
         ringtone?.audioAttributes = AudioAttributes.Builder()
             .setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE)
@@ -33,18 +29,9 @@ class RingtonePlayer(
             .build()
         ringtone?.isLooping = true
         ringtone?.play()
-        if (!vibrate) return
-        vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            context.getSystemService(VibratorManager::class.java)?.defaultVibrator
-        } else {
-            @Suppress("DEPRECATION")
-            context.getSystemService(Vibrator::class.java)
-        }
-        vibrator?.vibrate(VibrationEffect.createWaveform(longArrayOf(0, 800, 600), 0))
     }
 
     fun stop() {
         ringtone?.stop()
-        vibrator?.cancel()
     }
 }

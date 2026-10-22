@@ -41,7 +41,6 @@ class MainActivity : AppCompatActivity() {
         }
 
         setContent {
-            val dynamicColor by app.settings.dynamicColor.collectAsState(initial = false)
             val themeMode by app.settings.themeMode.collectAsState(initial = "system")
             val systemDark = androidx.compose.foundation.isSystemInDarkTheme()
             // Stored choice wins once set; "system" (and any legacy or
@@ -63,7 +62,7 @@ class MainActivity : AppCompatActivity() {
             androidx.compose.runtime.LaunchedEffect(Unit) {
                 showIntro = !app.settings.introShown.first()
             }
-            FakeCallTheme(darkTheme = darkTheme, dynamicColor = dynamicColor) {
+            FakeCallTheme(darkTheme = darkTheme) {
                 when (showIntro) {
                     null -> Unit // splash still visible
                     true -> IntroScreen(onDone = {
