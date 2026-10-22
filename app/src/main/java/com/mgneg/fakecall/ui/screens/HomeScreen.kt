@@ -397,6 +397,7 @@ fun HomeScreen(
         SoftCard(contentPadding = androidx.compose.foundation.layout.PaddingValues(14.dp)) {
             Row(
                 horizontalArrangement = Arrangement.spacedBy(14.dp),
+                verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Box(
@@ -434,10 +435,14 @@ fun HomeScreen(
             // Number field with the contacts button beside it
             // (maintainer's layout: the button moved here from a wide
             // pill above the fields).
+            // IntrinsicSize.Max pins the row to the field's own height:
+            // a plain fillMaxHeight on the button stretched the whole
+            // row to the card's full height and broke the layout.
             Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
-                verticalAlignment = Alignment.CenterVertically
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(androidx.compose.foundation.layout.IntrinsicSize.Max),
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 LabeledField(
                     label = stringResource(R.string.caller_number_label),
@@ -448,9 +453,9 @@ fun HomeScreen(
                     ltrValue = true,
                     modifier = Modifier.weight(1f)
                 )
-                Row(
+                Column(
                     modifier = Modifier
-                        .weight(0.42f)
+                        .weight(0.5f)
                         .fillMaxHeight()
                         .clip(RoundedCornerShape(14.dp))
                         .background(b.tint)
@@ -464,21 +469,22 @@ fun HomeScreen(
                                 contactsPermissionLauncher.launch(android.Manifest.permission.READ_CONTACTS)
                             }
                         }
-                        .padding(horizontal = 10.dp, vertical = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                        .padding(horizontal = 8.dp, vertical = 6.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
                 ) {
                     Icon(
                         Icons.Filled.Contacts,
                         contentDescription = null,
                         tint = b.accentText,
-                        modifier = Modifier.size(20.dp)
+                        modifier = Modifier.size(19.dp)
                     )
                     Text(
                         stringResource(R.string.contacts_pick),
                         color = b.accentText,
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = androidx.compose.ui.text.style.TextAlign.Center
                     )
                 }
             }
