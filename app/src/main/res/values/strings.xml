@@ -120,32 +120,11 @@
     <string name="about_version">Version %1$s</string>
     <string name="about_developer_title">Who is the developer</string>
     <string name="about_developed_by">Developed by mgneg</string>
-    <string name="about_bio">Passionate about programming and app development, I love turning ideas into real projects that offer practical solutions to problems we face in everyday life.
-
-I am interested in Android Development, artificial intelligence (AI), and user interface and experience design (UI/UX), and I always strive to learn new technologies and develop my skills through experimentation and building projects.
-
-I believe programming is not just writing code, but a way of thinking, solving problems, and creating ideas with real value.</string>
+    <string name="about_bio">• Passionate about programming and app development, I love turning ideas into real projects that offer practical solutions to problems we face in everyday life.\n• I am interested in Android Development, artificial intelligence (AI), and user interface and experience design (UI/UX), and I always strive to learn new technologies and develop my skills through experimentation and building projects.\n• I believe programming is not just writing code, but a way of thinking, solving problems, and creating ideas with real value.</string>
     <string name="about_purpose_title">About the app</string>
-    <string name="about_purpose">Fake Call — the fake calls app
-
-An app that helps you handle awkward social situations by simulating incoming calls. You can schedule a fake call to find the right opportunity to end an uncomfortable conversation, withdraw from a situation you do not wish to continue, or leave in a smoother, more tactful way.
-
-Simple and practical, designed to give you more control over everyday social situations.
-
-Your fake call, and your way out of the situation.</string>
+    <string name="about_purpose">• An app that helps you handle awkward social situations by simulating incoming calls.\n• You can schedule a fake call to find the right opportunity to end an uncomfortable conversation, withdraw from a situation you do not wish to continue, or leave in a smoother, more tactful way.\n• Simple and practical, designed to give you more control over everyday social situations.\n• Your fake call, and your way out of the situation.</string>
     <string name="about_disclaimer_title">Disclaimer</string>
-    <string name="about_disclaimer">Fake Call is designed to simulate incoming calls, to help users handle awkward or uncomfortable social situations.
-
-Please note the following:
-• The app simulates incoming calls; using it does not necessarily mean there is a real caller or that an actual phone call is taking place.
-• The app is not a substitute for emergency services, personal safety measures, or seeking help when needed.
-• The user is responsible for how they use the app and for complying with the laws and regulations in force.
-• The developer bears no responsibility for misuse of the app, for the consequences of its use, or for damages arising from reliance on simulated calls.
-• The app is provided as is, without warranties of any kind, to the extent permitted by applicable laws.
-
-By using the app, the user acknowledges responsibility for their actions and for the way they use the app.
-
-Note: Do not use the app in an attempt to deceive, or to simulate real numbers, government numbers, or numbers belonging to a real organization. Doing so may expose you to legal liability. The app must be used in accordance with the laws of the country in which it operates.</string>
+    <string name="about_disclaimer">Fake Call is designed to simulate incoming calls, to help users handle awkward or uncomfortable social situations.\n\nPlease note the following:\n• The app simulates incoming calls; using it does not necessarily mean there is a real caller or that an actual phone call is taking place.\n• The app is not a substitute for emergency services, personal safety measures, or seeking help when needed.\n• The user is responsible for how they use the app and for complying with the laws and regulations in force.\n• The developer bears no responsibility for misuse of the app, for the consequences of its use, or for damages arising from reliance on simulated calls.\n• The app is provided as is, without warranties of any kind, to the extent permitted by applicable laws.\n\nBy using the app, the user acknowledges responsibility for their actions and for the way they use the app.\n\nNote: Do not use the app in an attempt to deceive, or to simulate real numbers, government numbers, or numbers belonging to a real organization. Doing so may expose you to legal liability. The app must be used in accordance with the laws of the country in which it operates.</string>
     <string name="about_contact_title">Contact the developer</string>
     <string name="contact_facebook">Facebook</string>
     <string name="contact_whatsapp">WhatsApp</string>
@@ -252,6 +231,22 @@ Note: Do not use the app in an attempt to deceive, or to simulate real numbers, 
     <string name="unit_minutes">minutes</string>
     <string name="unit_hours">hours</string>
     <string name="contacts_pick">Pick from contacts</string>
+    <string name="about_purpose_lead">Fake Call — the fake calls app</string>
+    <string name="about_stat_opensource_body">• The full source code is available on GitHub\n• Licensed under the MIT License — use, study and modify it freely\n• Developed in the open; feedback and contributions are welcome</string>
+    <string name="about_stat_bilingual_body">• A complete Arabic interface with a right-to-left layout\n• A complete English interface\n• The app follows your device language automatically</string>
+    <string name="about_stat_material3_body">• Built on Google\'s Material 3 design system\n• A burgundy soft-glass theme set in the Cairo typeface\n• Light and dark modes, following your system or your choice</string>
+    <string name="about_lic_permissions_title">Permissions</string>
+    <string name="about_lic_permissions">• Use, copy, modify and merge the software\n• Publish, distribute and sublicense it\n• Sell copies of it</string>
+    <string name="about_lic_conditions_title">Conditions</string>
+    <string name="about_lic_conditions">• The copyright notice and this permission notice must be included in all copies or substantial portions of the software</string>
+    <string name="about_lic_warranty_title">Warranty and liability</string>
+    <string name="about_lic_warranty">• The software is provided as is, without warranty of any kind\n• The author is not liable for any claims or damages arising from the use of the software</string>
+    <string name="about_dep_androidx">AndroidX &amp; Jetpack Compose</string>
+    <string name="about_dep_kotlin">Kotlin &amp; kotlinx</string>
+    <string name="about_dep_material">Material Components</string>
+    <string name="about_dep_simple_icons">Simple Icons (brand logos)</string>
+    <string name="about_deps_full_list">Full list: THIRD_PARTY_NOTICES.md in the source repository.</string>
+    <string name="about_lic_copyright">Copyright © 2026 mgneg</string>
     <string name="about_dev_name">Mahmoud Nassar</string>
     <string name="about_dev_tagline">A programmer and technology enthusiast.</string>
     <string name="about_stat_opensource">Open source</string>
