@@ -5,7 +5,16 @@ import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -40,6 +49,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -53,6 +63,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -97,6 +108,15 @@ fun AboutScreen(onShowUpdate: () -> Unit) {
     var showLicense by remember { mutableStateOf(false) }
     var showDeps by remember { mutableStateOf(false) }
     var disclaimerOpen by remember { mutableStateOf(false) }
+    // Entrance: the page fades and rises once on first composition.
+    var entered by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) { entered = true }
+    val enterAlpha by animateFloatAsState(
+        if (entered) 1f else 0f, tween(420), label = "aboutEnterAlpha"
+    )
+    val enterRise by animateFloatAsState(
+        if (entered) 0f else 24f, tween(420), label = "aboutEnterRise"
+    )
 
     fun open(url: String) {
         runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url))) }
@@ -106,7 +126,11 @@ fun AboutScreen(onShowUpdate: () -> Unit) {
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
-            .padding(bottom = 110.dp),
+            .padding(bottom = 110.dp)
+            .graphicsLayer {
+                alpha = enterAlpha
+                translationY = enterRise * density
+            },
         verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
         // ---- Hero + stat trio (the trio straddles the hero's edge).
@@ -200,13 +224,27 @@ fun AboutScreen(onShowUpdate: () -> Unit) {
                         GlassChip(stringResource(R.string.about_license))
                     }
                     // White update pill (fixed burgundy ink, both themes).
+                    val pillSource = remember { MutableInteractionSource() }
+                    val pillPressed by pillSource.collectIsPressedAsState()
+                    val pillScale by animateFloatAsState(
+                        if (pillPressed) 0.96f else 1f, tween(120),
+                        label = "pillScale"
+                    )
                     Row(
                         modifier = Modifier
                             .padding(top = 10.dp)
+                            .graphicsLayer {
+                                scaleX = pillScale
+                                scaleY = pillScale
+                            }
                             .shadow(10.dp, RoundedCornerShape(24.dp))
                             .clip(RoundedCornerShape(24.dp))
                             .background(Color.White)
-                            .clickable(role = Role.Button) {
+                            .clickable(
+                                interactionSource = pillSource,
+                                indication = null,
+                                role = Role.Button
+                            ) {
                                 scope.launch {
                                     val info = app.updateRepository
                                         .checkNow(manual = true)
@@ -276,27 +314,28 @@ fun AboutScreen(onShowUpdate: () -> Unit) {
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
+                        // The developer's MGN STUDIO logo in a circle
+                        // (replaces the old "mg" monogram tile).
                         Box(
                             modifier = Modifier
                                 .size(56.dp)
                                 .clip(CircleShape)
-                                .background(
-                                    Brush.verticalGradient(
-                                        listOf(Color(0xFFA02350), Color(0xFF4F0C24))
-                                    )
-                                ),
+                                .background(Color.Black),
                             contentAlignment = Alignment.Center
                         ) {
-                            Text(
-                                "mg",
-                                color = Color.White,
-                                fontWeight = FontWeight.Black,
-                                fontSize = 20.sp
+                            Image(
+                                painter = painterResource(R.drawable.dev_logo),
+                                contentDescription = null,
+                                contentScale =
+                                    androidx.compose.ui.layout.ContentScale.Fit,
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(6.dp)
                             )
                         }
                         Column {
                             Text(
-                                "mgneg",
+                                stringResource(R.string.about_dev_name),
                                 fontSize = 18.sp,
                                 fontWeight = FontWeight.Black
                             )
@@ -318,36 +357,11 @@ fun AboutScreen(onShowUpdate: () -> Unit) {
                         horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
                         contacts.forEach { (url, icon, label) ->
-                            Column(
-                                horizontalAlignment =
-                                    Alignment.CenterHorizontally,
-                                verticalArrangement =
-                                    Arrangement.spacedBy(6.dp),
-                                modifier = Modifier.clickable(
-                                    role = Role.Button
-                                ) { open(url) }
-                            ) {
-                                Box(
-                                    modifier = Modifier
-                                        .size(46.dp)
-                                        .clip(CircleShape)
-                                        .background(SocialBubble),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Image(
-                                        painter = painterResource(icon),
-                                        contentDescription = null,
-                                        modifier = Modifier.size(22.dp),
-                                        colorFilter =
-                                            ColorFilter.tint(SocialInk)
-                                    )
-                                }
-                                Text(
-                                    stringResource(label),
-                                    fontSize = 11.sp,
-                                    color = b.text
-                                )
-                            }
+                            SocialButton(
+                                iconRes = icon,
+                                labelRes = label,
+                                onClick = { open(url) }
+                            )
                         }
                     }
                 }
@@ -365,15 +379,6 @@ fun AboutScreen(onShowUpdate: () -> Unit) {
                         fontSize = 13.sp,
                         color = b.muted
                     )
-                    FlowRow(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        TagPill(R.string.about_tag_privacy)
-                        TagPill(R.string.about_tag_fun)
-                        TagPill(R.string.about_tag_demos)
-                        TagPill(R.string.about_tag_testing)
-                    }
                 }
             }
 
@@ -414,16 +419,24 @@ fun AboutScreen(onShowUpdate: () -> Unit) {
                                 color = b.muted
                             )
                         }
+                        val chevRot by animateFloatAsState(
+                            if (disclaimerOpen) 180f else 0f, tween(220),
+                            label = "disclaimerChevron"
+                        )
                         Icon(
                             Icons.Filled.KeyboardArrowDown,
                             contentDescription = null,
                             tint = b.muted,
                             modifier = Modifier
                                 .size(22.dp)
-                                .rotate(if (disclaimerOpen) 180f else 0f)
+                                .rotate(chevRot)
                         )
                     }
-                    if (disclaimerOpen) {
+                    AnimatedVisibility(
+                        visible = disclaimerOpen,
+                        enter = expandVertically() + fadeIn(),
+                        exit = shrinkVertically() + fadeOut()
+                    ) {
                         Text(
                             stringResource(R.string.about_disclaimer),
                             fontSize = 13.sp,
@@ -621,6 +634,52 @@ private fun LinkRow(
             contentDescription = null,
             tint = b.muted,
             modifier = Modifier.size(20.dp)
+        )
+    }
+}
+
+/**
+ * One social contact: fixed-burgundy glyph on the pale bubble, with a
+ * gentle press scale. The ink and bubble never follow the theme.
+ */
+@Composable
+private fun SocialButton(iconRes: Int, labelRes: Int, onClick: () -> Unit) {
+    val b = burgundy()
+    val source = remember { MutableInteractionSource() }
+    val pressed by source.collectIsPressedAsState()
+    val scale by animateFloatAsState(
+        if (pressed) 0.92f else 1f, tween(120), label = "socialScale"
+    )
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(6.dp),
+        modifier = Modifier
+            .graphicsLayer { scaleX = scale; scaleY = scale }
+            .clickable(
+                interactionSource = source,
+                indication = null,
+                role = Role.Button,
+                onClick = onClick
+            )
+    ) {
+        Box(
+            modifier = Modifier
+                .size(46.dp)
+                .clip(CircleShape)
+                .background(SocialBubble),
+            contentAlignment = Alignment.Center
+        ) {
+            Image(
+                painter = painterResource(iconRes),
+                contentDescription = null,
+                modifier = Modifier.size(22.dp),
+                colorFilter = ColorFilter.tint(SocialInk)
+            )
+        }
+        Text(
+            stringResource(labelRes),
+            fontSize = 11.sp,
+            color = b.text
         )
     }
 }
