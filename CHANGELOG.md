@@ -2,6 +2,55 @@
 
 ## [Unreleased]
 
+## [1.2] - 2026-10-22
+
+## English
+### Added
+- Contacts picker on Home: tap the button beside the number field, grant READ_CONTACTS once, and pick from a searchable in-app list of your saved contacts (name + number) to fill the caller fields. The permission is only used for this feature and is not part of the call-readiness set
+- The About screen's stat cards (Open source, Arabic & English, Material 3) are now tappable and open a short bullet description of each
+- Gentle animations on the About screen: the page fades in, buttons respond when pressed, and the disclaimer expands smoothly
+
+### Changed
+- About screen rebuilt and rewritten: official app and developer texts (developer: Mahmoud Nassar), the MGN STUDIO logo replaces the "mg" monogram, and the full new disclaimer
+- About texts, the licence popups and release notes are now formatted as readable bullet points and sections instead of solid text; the MIT licence and open-source licences open as structured popups
+- The check-for-updates button on About now shows its progress and confirms when you are on the latest version
+- New launcher icon with the burgundy gradient artwork
+- Bottom navigation bar is icon-only (labels remain for screen readers), so labels no longer wrap or clip on narrow screens
+- Call-mode segment now uses short labels: System / App
+
+### Removed
+- Monet dynamic colour: removed end to end; the burgundy palette is the single identity in both themes
+- Vibration as an app feature (including the VIBRATE permission) — vibration is left to the system, as on any normal call
+
+### Fixed
+- Permissions summary hero no longer renders as a tall mostly-empty card; heroes now hug their content
+- Home caller card no longer breaks on narrow screens: the contacts button beside the number field keeps the number field's height and stacks its icon over centred text, so its Arabic label no longer wraps word-by-word
+- Long release notes in the update sheet could push the download buttons out of view; notes now scroll inside a height-capped card
+
+## العربية
+### تمت الإضافة
+- منتقي جهات اتصال في الرئيسية: اضغط الزر بجانب حقل الرقم، وامنح إذن READ_CONTACTS مرة واحدة، واختر من قائمة قابلة للبحث داخل التطبيق بجهات اتصالك المحفوظة (الاسم + الرقم) لملء حقول المتصل. الإذن يُستخدم لهذه الميزة فقط وليس جزءًا من مجموعة أذونات جاهزية المكالمات
+- بطاقات شاشة «حول» (مفتوح المصدر، عربي وإنجليزي، Material 3) صارت قابلة للضغط وتفتح شرحًا مختصرًا عن كل واحدة في نقاط
+- حركات لطيفة في شاشة «حول»: الصفحة تظهر تدريجيًا، والأزرار تستجيب عند الضغط، وإخلاء المسؤولية يتمدد بسلاسة
+
+### تم التغيير
+- إعادة بناء وكتابة شاشة «حول»: النصوص الرسمية الجديدة للتطبيق والمطوّر (المطوّر: محمود نصار)، وشعار MGN STUDIO يحل محل دائرة «mg»، ونص إخلاء المسؤولية الكامل الجديد
+- نصوص «حول» ونوافذ الرخص وملاحظات الإصدار صارت منسّقة كنقاط وأقسام مقروءة بدل النصوص المتصلة؛ ورخصة MIT وتراخيص المصادر المفتوحة تفتح كنوافذ منظمة
+- زر «البحث عن تحديثات» في «حول» صار يعرض تقدّم البحث ويؤكد لك أنك على أحدث إصدار
+- أيقونة تشغيل جديدة بتصميم التدرّج البرجندي
+- شريط التنقّل السفلي صار بالأيقونات فقط (الأسماء باقية لقارئات الشاشة)، فلا تلتفّ الأسماء أو تُقصّ على الشاشات الضيقة
+- شريط وضع المكالمة صار بتسميات قصيرة: النظام / التطبيق
+
+### تمت الإزالة
+- ألوان Monet الديناميكية: أُزيلت بالكامل؛ اللوحة البرجندية هي الهوية الوحيدة في الوضعين
+- الاهتزاز كميزة داخل التطبيق (بما فيه إذن VIBRATE) — الاهتزاز متروك للنظام كما في أي مكالمة عادية
+
+### تم الإصلاح
+- بطاقة ملخص الأذونات لم تعد تظهر كبطاقة طويلة شبه فارغة؛ البطاقات الآن على قد محتواها
+- بطاقة المتصل في الرئيسية لم تعد تنكسر على الشاشات الضيقة: زر جهات الاتصال بجانب حقل الرقم صار بنفس ارتفاع الحقل ومحتواه مكدّس (الأيقونة فوق نص متوسّط)، فلا يلتفّ اسمه العربي كلمة كلمة بعد الآن
+- ملاحظات الإصدار الطويلة في ورقة التحديث كانت تدفع أزرار التنزيل خارج الشاشة؛ الملاحظات الآن تمرّر داخل بطاقة محددة الارتفاع
+
+
 ## [1.1] - 2026-10-21
 
 ## English
