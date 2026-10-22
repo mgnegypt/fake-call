@@ -261,14 +261,21 @@ fun AboutScreen(onShowUpdate: () -> Unit) {
                             ) {
                                 scope.launch {
                                     checkState = 1
-                                    val info = app.updateRepository
-                                        .checkNow(manual = true)
-                                    if (info != null) {
-                                        checkState = 0
-                                        onShowUpdate()
-                                    } else {
-                                        checkState = 2
-                                        kotlinx.coroutines.delay(2600)
+                                    try {
+                                        val info = app.updateRepository
+                                            .checkNow(manual = true)
+                                        if (info != null) {
+                                            onShowUpdate()
+                                        } else {
+                                            checkState = 2
+                                            kotlinx.coroutines.delay(2600)
+                                        }
+                                    } catch (e: Exception) {
+                                        // A failed check must never
+                                        // wedge the pill: fall through
+                                        // to the finally reset.
+                                        if (e is kotlinx.coroutines.CancellationException) throw e
+                                    } finally {
                                         checkState = 0
                                     }
                                 }
@@ -569,12 +576,12 @@ fun AboutScreen(onShowUpdate: () -> Unit) {
             title = stringResource(R.string.about_licenses),
             onDismiss = { showDeps = false }
         ) {
-            DepRow("AndroidX & Jetpack Compose", "Apache-2.0")
-            DepRow("Kotlin & kotlinx", "Apache-2.0")
-            DepRow("Material Components", "Apache-2.0")
-            DepRow("Simple Icons (brand logos)", "CC0")
+            DepRow(R.string.about_dep_androidx, "Apache-2.0")
+            DepRow(R.string.about_dep_kotlin, "Apache-2.0")
+            DepRow(R.string.about_dep_material, "Apache-2.0")
+            DepRow(R.string.about_dep_simple_icons, "CC0")
             Text(
-                "Full list: THIRD_PARTY_NOTICES.md in the source repository.",
+                stringResource(R.string.about_deps_full_list),
                 fontSize = 12.sp,
                 color = burgundy().muted,
                 modifier = Modifier.padding(top = 4.dp)
@@ -848,7 +855,7 @@ private fun DialogSection(titleRes: Int) {
 
 /** One library row in the open-source licences popup. */
 @Composable
-private fun DepRow(name: String, license: String) {
+private fun DepRow(nameRes: Int, license: String) {
     val b = burgundy()
     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
         Row(
@@ -862,7 +869,7 @@ private fun DepRow(name: String, license: String) {
                     .background(b.accent)
             )
             Text(
-                name,
+                stringResource(nameRes),
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.weight(1f)
