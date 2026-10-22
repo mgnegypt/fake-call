@@ -34,6 +34,10 @@ import androidx.compose.ui.unit.sp
 import com.mgneg.fakecall.BuildConfig
 import com.mgneg.fakecall.R
 import com.mgneg.fakecall.i18n.LanguageManager
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import com.mgneg.fakecall.ui.components.FormattedNotes
 import com.mgneg.fakecall.ui.components.GradientButton
 import com.mgneg.fakecall.ui.components.HeroCard
 import com.mgneg.fakecall.ui.components.SoftCard
@@ -155,7 +159,12 @@ fun UpdateSheet(info: UpdateInfo, onDismiss: () -> Unit) {
 
             if (notes.isNotBlank()) {
                 SoftCard(contentPadding = androidx.compose.foundation.layout.PaddingValues(14.dp)) {
-                    Text(notes, fontSize = 13.sp, color = b.muted)
+                    FormattedNotes(
+                        notes,
+                        modifier = Modifier
+                            .heightIn(max = 230.dp)
+                            .verticalScroll(rememberScrollState())
+                    )
                 }
             }
             if (!Permissions.canInstallUnknownApps(context)) {
@@ -243,7 +252,12 @@ fun WhatsNewSheet(version: String, notesBody: String, onDismiss: () -> Unit) {
             )
             if (notes.isNotBlank()) {
                 SoftCard(contentPadding = androidx.compose.foundation.layout.PaddingValues(14.dp)) {
-                    Text(notes, fontSize = 13.sp, color = b.muted)
+                    FormattedNotes(
+                        notes,
+                        modifier = Modifier
+                            .heightIn(max = 300.dp)
+                            .verticalScroll(rememberScrollState())
+                    )
                 }
             }
             GradientButton(

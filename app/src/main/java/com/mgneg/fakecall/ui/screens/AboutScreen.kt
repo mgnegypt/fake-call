@@ -12,6 +12,7 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
@@ -26,6 +27,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -35,6 +37,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Code
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Download
@@ -76,6 +79,8 @@ import androidx.compose.ui.unit.sp
 import com.mgneg.fakecall.BuildConfig
 import com.mgneg.fakecall.FakeCallApp
 import com.mgneg.fakecall.R
+import com.mgneg.fakecall.ui.components.FormattedNotes
+import com.mgneg.fakecall.ui.components.GradientButton
 import com.mgneg.fakecall.ui.components.SoftCard
 import com.mgneg.fakecall.ui.components.SoftDivider
 import com.mgneg.fakecall.ui.components.burgundy
@@ -107,6 +112,10 @@ fun AboutScreen(onShowUpdate: () -> Unit) {
     val b = burgundy()
     var showLicense by remember { mutableStateOf(false) }
     var showDeps by remember { mutableStateOf(false) }
+    // Stat-card popup: (icon, title res, body res) of the tapped card.
+    var statInfo by remember {
+        mutableStateOf<Triple<androidx.compose.ui.graphics.vector.ImageVector, Int, Int>?>(null)
+    }
     var disclaimerOpen by remember { mutableStateOf(false) }
     // Entrance: the page fades and rises once on first composition.
     var entered by remember { mutableStateOf(false) }
@@ -117,6 +126,10 @@ fun AboutScreen(onShowUpdate: () -> Unit) {
     val enterRise by animateFloatAsState(
         if (entered) 0f else 24f, tween(420), label = "aboutEnterRise"
     )
+
+    // Check-for-updates feedback: idle → checking (spinner) → up to
+    // date (brief confirmation), or the update sheet when one is found.
+    var checkState by remember { mutableStateOf(0) } // 0 idle, 1 checking, 2 up-to-date
 
     fun open(url: String) {
         runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url))) }
@@ -243,30 +256,74 @@ fun AboutScreen(onShowUpdate: () -> Unit) {
                             .clickable(
                                 interactionSource = pillSource,
                                 indication = null,
-                                role = Role.Button
+                                role = Role.Button,
+                                enabled = checkState != 1
                             ) {
                                 scope.launch {
+                                    checkState = 1
                                     val info = app.updateRepository
                                         .checkNow(manual = true)
-                                    if (info != null) onShowUpdate()
+                                    if (info != null) {
+                                        checkState = 0
+                                        onShowUpdate()
+                                    } else {
+                                        checkState = 2
+                                        kotlinx.coroutines.delay(2600)
+                                        checkState = 0
+                                    }
                                 }
                             }
+                            .animateContentSize()
                             .padding(horizontal = 26.dp, vertical = 13.dp),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Icon(
-                            Icons.Filled.Download,
-                            contentDescription = null,
-                            tint = SocialInk,
-                            modifier = Modifier.size(20.dp)
-                        )
-                        Text(
-                            stringResource(R.string.settings_check_updates),
-                            color = SocialInk,
-                            fontSize = 15.sp,
-                            fontWeight = FontWeight.Black
-                        )
+                        when (checkState) {
+                            1 -> {
+                                androidx.compose.material3.CircularProgressIndicator(
+                                    color = SocialInk,
+                                    strokeWidth = 2.5.dp,
+                                    modifier = Modifier.size(19.dp)
+                                )
+                                Text(
+                                    stringResource(R.string.settings_checking),
+                                    color = SocialInk,
+                                    fontSize = 15.sp,
+                                    fontWeight = FontWeight.Black
+                                )
+                            }
+                            2 -> {
+                                Icon(
+                                    Icons.Filled.Check,
+                                    contentDescription = null,
+                                    tint = SocialInk,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                                Text(
+                                    stringResource(
+                                        R.string.settings_up_to_date,
+                                        BuildConfig.VERSION_NAME
+                                    ),
+                                    color = SocialInk,
+                                    fontSize = 15.sp,
+                                    fontWeight = FontWeight.Black
+                                )
+                            }
+                            else -> {
+                                Icon(
+                                    Icons.Filled.Download,
+                                    contentDescription = null,
+                                    tint = SocialInk,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                                Text(
+                                    stringResource(R.string.settings_check_updates),
+                                    color = SocialInk,
+                                    fontSize = 15.sp,
+                                    fontWeight = FontWeight.Black
+                                )
+                            }
+                        }
                     }
                 }
             }
@@ -278,9 +335,24 @@ fun AboutScreen(onShowUpdate: () -> Unit) {
                     .padding(horizontal = 20.dp),
                 horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                StatCard(Icons.Filled.Code, R.string.about_stat_opensource)
-                StatCard(Icons.Filled.Language, R.string.about_stat_bilingual)
-                StatCard(Icons.Filled.WaterDrop, R.string.about_stat_material3)
+                StatCard(Icons.Filled.Code, R.string.about_stat_opensource) {
+                    statInfo = Triple(
+                        Icons.Filled.Code, R.string.about_stat_opensource,
+                        R.string.about_stat_opensource_body
+                    )
+                }
+                StatCard(Icons.Filled.Language, R.string.about_stat_bilingual) {
+                    statInfo = Triple(
+                        Icons.Filled.Language, R.string.about_stat_bilingual,
+                        R.string.about_stat_bilingual_body
+                    )
+                }
+                StatCard(Icons.Filled.WaterDrop, R.string.about_stat_material3) {
+                    statInfo = Triple(
+                        Icons.Filled.WaterDrop, R.string.about_stat_material3,
+                        R.string.about_stat_material3_body
+                    )
+                }
             }
         }
         Spacer(Modifier.height(26.dp))
@@ -346,11 +418,7 @@ fun AboutScreen(onShowUpdate: () -> Unit) {
                             )
                         }
                     }
-                    Text(
-                        stringResource(R.string.about_bio),
-                        fontSize = 13.sp,
-                        color = b.muted
-                    )
+                    FormattedNotes(stringResource(R.string.about_bio))
                     SoftDivider()
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -375,10 +443,11 @@ fun AboutScreen(onShowUpdate: () -> Unit) {
                         style = MaterialTheme.typography.titleMedium
                     )
                     Text(
-                        stringResource(R.string.about_purpose),
-                        fontSize = 13.sp,
-                        color = b.muted
+                        stringResource(R.string.about_purpose_lead),
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold
                     )
+                    FormattedNotes(stringResource(R.string.about_purpose))
                 }
             }
 
@@ -437,10 +506,8 @@ fun AboutScreen(onShowUpdate: () -> Unit) {
                         enter = expandVertically() + fadeIn(),
                         exit = shrinkVertically() + fadeOut()
                     ) {
-                        Text(
-                            stringResource(R.string.about_disclaimer),
-                            fontSize = 13.sp,
-                            color = b.muted
+                        FormattedNotes(
+                            stringResource(R.string.about_disclaimer)
                         )
                     }
                 }
@@ -478,46 +545,50 @@ fun AboutScreen(onShowUpdate: () -> Unit) {
     }
 
     if (showLicense) {
-        AlertDialog(
-            onDismissRequest = { showLicense = false },
-            title = { Text(stringResource(R.string.about_license)) },
-            text = {
-                Text(
-                    "MIT License\n\nCopyright (c) 2026 mgneg\n\n" +
-                        "Permission is hereby granted, free of charge, to any person obtaining a copy " +
-                        "of this software and associated documentation files (the \"Software\"), to deal " +
-                        "in the Software without restriction, subject to the conditions in the LICENSE " +
-                        "file shipped with the source code.",
-                    style = MaterialTheme.typography.bodySmall
-                )
-            },
-            confirmButton = {
-                TextButton(onClick = { showLicense = false }) {
-                    Text(stringResource(R.string.action_dismiss))
-                }
-            }
-        )
+        AboutInfoDialog(
+            icon = Icons.Filled.Shield,
+            title = stringResource(R.string.about_license),
+            onDismiss = { showLicense = false }
+        ) {
+            Text(
+                stringResource(R.string.about_lic_copyright),
+                fontSize = 13.sp,
+                fontWeight = FontWeight.Bold
+            )
+            DialogSection(R.string.about_lic_permissions_title)
+            FormattedNotes(stringResource(R.string.about_lic_permissions))
+            DialogSection(R.string.about_lic_conditions_title)
+            FormattedNotes(stringResource(R.string.about_lic_conditions))
+            DialogSection(R.string.about_lic_warranty_title)
+            FormattedNotes(stringResource(R.string.about_lic_warranty))
+        }
     }
     if (showDeps) {
-        AlertDialog(
-            onDismissRequest = { showDeps = false },
-            title = { Text(stringResource(R.string.about_licenses)) },
-            text = {
-                Text(
-                    "AndroidX & Jetpack Compose — Apache-2.0\n" +
-                        "Kotlin & kotlinx — Apache-2.0\n" +
-                        "Material Components — Apache-2.0\n" +
-                        "Simple Icons (brand logos) — CC0\n\n" +
-                        "Full list: THIRD_PARTY_NOTICES.md in the source repository.",
-                    style = MaterialTheme.typography.bodySmall
-                )
-            },
-            confirmButton = {
-                TextButton(onClick = { showDeps = false }) {
-                    Text(stringResource(R.string.action_dismiss))
-                }
-            }
-        )
+        AboutInfoDialog(
+            icon = Icons.Filled.Description,
+            title = stringResource(R.string.about_licenses),
+            onDismiss = { showDeps = false }
+        ) {
+            DepRow("AndroidX & Jetpack Compose", "Apache-2.0")
+            DepRow("Kotlin & kotlinx", "Apache-2.0")
+            DepRow("Material Components", "Apache-2.0")
+            DepRow("Simple Icons (brand logos)", "CC0")
+            Text(
+                "Full list: THIRD_PARTY_NOTICES.md in the source repository.",
+                fontSize = 12.sp,
+                color = burgundy().muted,
+                modifier = Modifier.padding(top = 4.dp)
+            )
+        }
+    }
+    statInfo?.let { (icon, titleRes, bodyRes) ->
+        AboutInfoDialog(
+            icon = icon,
+            title = stringResource(titleRes),
+            onDismiss = { statInfo = null }
+        ) {
+            FormattedNotes(stringResource(bodyRes), fontSize = 14)
+        }
     }
 }
 
@@ -557,12 +628,30 @@ private fun TagPill(textRes: Int) {
 @Composable
 private fun androidx.compose.foundation.layout.RowScope.StatCard(
     icon: androidx.compose.ui.graphics.vector.ImageVector,
-    textRes: Int
+    textRes: Int,
+    onClick: () -> Unit
 ) {
     val b = burgundy()
-    SoftCard(
-        modifier = Modifier.weight(1f),
-        contentPadding = PaddingValues(vertical = 12.dp, horizontal = 6.dp)
+    val source = remember { MutableInteractionSource() }
+    val pressed by source.collectIsPressedAsState()
+    val scale by animateFloatAsState(
+        if (pressed) 0.94f else 1f, tween(120), label = "statScale"
+    )
+    val shape = RoundedCornerShape(24.dp)
+    Box(
+        modifier = Modifier
+            .weight(1f)
+            .graphicsLayer { scaleX = scale; scaleY = scale }
+            .shadow(10.dp, shape, ambientColor = b.shadowSoft, spotColor = b.shadowSoft)
+            .clip(shape)
+            .background(b.card)
+            .clickable(
+                interactionSource = source,
+                indication = null,
+                role = Role.Button,
+                onClick = onClick
+            )
+            .padding(vertical = 12.dp, horizontal = 6.dp)
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -681,5 +770,114 @@ private fun SocialButton(iconRes: Int, labelRes: Int, onClick: () -> Unit) {
             fontSize = 11.sp,
             color = b.text
         )
+    }
+}
+
+/**
+ * The About popups' shared shell: a soft card dialog with an icon
+ * header, a scrollable structured body and a gradient dismiss
+ * button. Used by the licence, libraries and stat-card popups.
+ */
+@Composable
+private fun AboutInfoDialog(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    title: String,
+    onDismiss: () -> Unit,
+    content: @Composable () -> Unit
+) {
+    val b = burgundy()
+    androidx.compose.ui.window.Dialog(onDismissRequest = onDismiss) {
+        SoftCard(
+            radius = 28,
+            contentPadding = PaddingValues(20.dp)
+        ) {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(42.dp)
+                            .clip(CircleShape)
+                            .background(b.tint),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            icon,
+                            contentDescription = null,
+                            tint = b.accentText,
+                            modifier = Modifier.size(22.dp)
+                        )
+                    }
+                    Text(
+                        title,
+                        fontSize = 17.sp,
+                        fontWeight = FontWeight.Black
+                    )
+                }
+                Column(
+                    modifier = Modifier
+                        .heightIn(max = 380.dp)
+                        .verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.spacedBy(7.dp)
+                ) {
+                    content()
+                }
+                GradientButton(
+                    text = stringResource(R.string.action_dismiss),
+                    onClick = onDismiss,
+                    modifier = Modifier.fillMaxWidth(),
+                    height = 48
+                )
+            }
+        }
+    }
+}
+
+/** Small bold section heading inside the info dialogs. */
+@Composable
+private fun DialogSection(titleRes: Int) {
+    Text(
+        stringResource(titleRes),
+        fontSize = 14.sp,
+        fontWeight = FontWeight.Bold,
+        modifier = Modifier.padding(top = 6.dp)
+    )
+}
+
+/** One library row in the open-source licences popup. */
+@Composable
+private fun DepRow(name: String, license: String) {
+    val b = burgundy()
+    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(10.dp)
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(6.dp)
+                    .clip(CircleShape)
+                    .background(b.accent)
+            )
+            Text(
+                name,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.weight(1f)
+            )
+            Text(
+                license,
+                fontSize = 11.sp,
+                fontWeight = FontWeight.Bold,
+                color = b.accentText,
+                modifier = Modifier
+                    .clip(RoundedCornerShape(50))
+                    .background(b.tint)
+                    .padding(horizontal = 9.dp, vertical = 4.dp)
+            )
+        }
+        SoftDivider()
     }
 }

@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -643,4 +644,60 @@ fun SoftDivider(modifier: Modifier = Modifier) {
             .height(1.dp)
             .background(burgundy().divider)
     )
+}
+
+/**
+ * Renders multi-line copy as stacked, readable blocks instead of one
+ * text blob: lines starting with "• ", "- " or "* " become bullet rows
+ * with a burgundy dot, markdown-style "##"/"###" lines become section
+ * headings, and every other line is a paragraph. Blank lines separate
+ * blocks. Used by the About cards, the licence dialogs and the
+ * update / what's-new sheets.
+ */
+@Composable
+fun FormattedNotes(
+    text: String,
+    modifier: Modifier = Modifier,
+    fontSize: Int = 13,
+    color: Color? = null
+) {
+    val b = burgundy()
+    val ink = color ?: b.muted
+    val lines = remember(text) { text.lines().map { it.trim() } }
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(7.dp)
+    ) {
+        for (line in lines) {
+            when {
+                line.isEmpty() -> Spacer(Modifier.height(2.dp))
+                line.startsWith("### ") || line.startsWith("## ") -> Text(
+                    line.trimStart('#').trim(),
+                    fontSize = (fontSize + 2).sp,
+                    fontWeight = FontWeight.Bold,
+                    color = b.text,
+                    modifier = Modifier.padding(top = 4.dp)
+                )
+                line.startsWith("• ") || line.startsWith("- ") ||
+                    line.startsWith("* ") -> Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .padding(top = 6.dp)
+                                .size(6.dp)
+                                .clip(CircleShape)
+                                .background(b.accent)
+                        )
+                        Text(
+                            line.drop(2),
+                            fontSize = fontSize.sp,
+                            color = ink,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                else -> Text(line, fontSize = fontSize.sp, color = ink)
+            }
+        }
+    }
 }
