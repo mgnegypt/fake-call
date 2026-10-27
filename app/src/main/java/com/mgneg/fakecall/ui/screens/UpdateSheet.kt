@@ -122,23 +122,22 @@ fun UpdateSheet(info: UpdateInfo, onDismiss: () -> Unit) {
                         fontSize = 13.sp,
                         color = Color.White.copy(alpha = 0.85f)
                     )
-                    Row(
-                        verticalAlignment = Alignment.Bottom,
-                        horizontalArrangement = Arrangement.spacedBy(10.dp)
-                    ) {
-                        Text(
-                            rememberLtr("v" + info.version.toString()),
-                            color = Color.White,
-                            fontSize = 60.sp,
-                            fontWeight = FontWeight.Black
-                        )
-                        Text(
-                            stringResource(R.string.update_current, BuildConfig.VERSION_NAME),
-                            fontSize = 14.sp,
-                            color = Color.White.copy(alpha = 0.85f),
-                            modifier = Modifier.padding(bottom = 10.dp)
-                        )
-                    }
+                    // Version on its own line at full size (48sp for
+                    // long versions like v1.10.2), "Current" beneath it:
+                    // side-by-side they squeezed and wrapped (U9).
+                    val versionLabel = rememberLtr("v" + info.version.toString())
+                    Text(
+                        versionLabel,
+                        color = Color.White,
+                        fontSize = if (versionLabel.length > 6) 48.sp else 60.sp,
+                        fontWeight = FontWeight.Black,
+                        maxLines = 1
+                    )
+                    Text(
+                        stringResource(R.string.update_current, BuildConfig.VERSION_NAME),
+                        fontSize = 14.sp,
+                        color = Color.White.copy(alpha = 0.85f)
+                    )
                     Text(
                         rememberLtr(info.date),
                         fontSize = 12.sp,
@@ -254,25 +253,29 @@ fun UpdateSheet(info: UpdateInfo, onDismiss: () -> Unit) {
                     color = b.muted
                 )
             }
+            // Primary action full width; GitHub + Dismiss/Cancel share
+            // a second row, so 360dp screens and large fonts never
+            // squeeze "Download and install" word-by-word (U9).
+            GradientButton(
+                text = stringResource(R.string.update_download_install),
+                onClick = {
+                    if (!canInstall) {
+                        pendingStart = true
+                        context.startActivity(Permissions.installPermissionIntent(context))
+                        return@GradientButton
+                    }
+                    controller.start(info)
+                },
+                modifier = Modifier.fillMaxWidth(),
+                height = 56,
+                textSize = 17,
+                enabled = state is UpdateState.Idle || state is UpdateState.Failed
+            )
             Row(
                 horizontalArrangement = Arrangement.spacedBy(10.dp),
+                verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                GradientButton(
-                    text = stringResource(R.string.update_download_install),
-                    onClick = {
-                        if (!canInstall) {
-                            pendingStart = true
-                            context.startActivity(Permissions.installPermissionIntent(context))
-                            return@GradientButton
-                        }
-                        controller.start(info)
-                    },
-                    modifier = Modifier.weight(1f),
-                    height = 56,
-                    textSize = 17,
-                    enabled = state is UpdateState.Idle || state is UpdateState.Failed
-                )
                 SoftChip(
                     text = stringResource(R.string.update_open_github),
                     selected = false,
@@ -283,17 +286,17 @@ fun UpdateSheet(info: UpdateInfo, onDismiss: () -> Unit) {
                     },
                     height = 56
                 )
-            }
-            if (busy) {
-                TextButton(
-                    onClick = { controller.cancel(); onDismiss() },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(stringResource(R.string.action_cancel), color = b.accentText)
-                }
-            } else {
-                TextButton(onClick = onDismiss, modifier = Modifier.fillMaxWidth()) {
-                    Text(stringResource(R.string.action_dismiss), color = b.accentText)
+                if (busy) {
+                    TextButton(
+                        onClick = { controller.cancel(); onDismiss() },
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text(stringResource(R.string.action_cancel), color = b.accentText)
+                    }
+                } else {
+                    TextButton(onClick = onDismiss, modifier = Modifier.weight(1f)) {
+                        Text(stringResource(R.string.action_dismiss), color = b.accentText)
+                    }
                 }
             }
         }

@@ -7,6 +7,7 @@
 - Theme is now a three-way choice (Follow system / Light / Dark) in Settings — before, once you picked light or dark there was no way back to following the system
 
 ### Fixed
+- The update sheet fits narrow screens and large fonts: the new version stands on its own line (smaller when long), the current version sits beneath it, and the download button takes the full width with GitHub/Dismiss on their own row.
 - The "allow installs" hint in the update sheet now disappears as soon as you return from granting the permission, and a download you started before granting continues automatically.
 - Install results are no longer silent: the sheet stays open while installing, a failed install (for example a signature mismatch) shows the install-failed message — and a notification if the app is in the background — and cancelling the system prompt returns the sheet to its idle state.
 - Update failures now say what actually went wrong (network, not enough storage, checksum unavailable, checksum mismatch, install failed) instead of one generic message; the storage case is detected before downloading, install errors are reported instead of crashing, and cancelling a download is no longer treated as a failure.
@@ -38,6 +39,7 @@
 - المظهر أصبح اختيارًا ثلاثيًا (حسب النظام / فاتح / داكن) في الإعدادات — قبل ذلك، متى اخترت الفاتح أو الداكن لم تكن هناك طريقة للعودة إلى إعداد النظام
 
 ### تم الإصلاح
+- شاشة التحديث تناسب الشاشات الضيقة والخطوط الكبيرة: الإصدار الجديد على سطر مستقل (أصغر عندما يطول)، والإصدار الحالي تحته، وزر التنزيل بعرض الشاشة كاملًا مع GitHub و«إغلاق» على سطر خاص بهما.
 - تلميح «السماح بالتثبيت» في شاشة التحديث يختفي الآن فور رجوعك من منح الإذن، والتنزيل الذي بدأته قبل المنح يكمل تلقائيًا.
 - نتائج التثبيت لم تعد صامتة: تبقى الشاشة مفتوحة أثناء التثبيت، والفشل (كاختلاف التوقيع) يعرض رسالة فشل التثبيت — وإشعارًا لو كان التطبيق في الخلفية — وإلغاء نافذة النظام يعيد الشاشة لحالتها الأولى.
 - إخفاقات التحديث أصبحت تقول ما حدث فعلًا (شبكة، مساحة غير كافية، بصمة تحقق غير متاحة، بصمة غير مطابقة، فشل التثبيت) بدل رسالة عامة واحدة؛ وحالة المساحة تُكتشف قبل التنزيل، وأخطاء التثبيت تُبلَّغ بدل أن تسبب انهيارًا، وإلغاء التنزيل لم يعد يُعامل كفشل.
