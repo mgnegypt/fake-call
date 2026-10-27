@@ -34,7 +34,7 @@ class UpdateRepository(
         UpdateController(
             scope = app.appScope,
             downloader = UpdateDownloader(context),
-            install = { file -> Installer.install(context, file) }
+            installer = ApkInstaller { file -> Installer.install(context, file) }
         )
     }
 

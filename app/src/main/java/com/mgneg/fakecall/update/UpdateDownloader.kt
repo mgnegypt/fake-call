@@ -10,25 +10,37 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 /** Downloads the release APK (and its checksum) into the app cache. */
-class UpdateDownloader(context: Context) {
+class UpdateDownloader(context: Context) : ApkSource {
 
     private val dir = File(context.cacheDir, "updates").apply { mkdirs() }
 
     @Volatile
     private var cancelled = false
 
-    fun cancel() {
+    override fun cancel() {
         cancelled = true
     }
 
-    suspend fun downloadApk(info: UpdateInfo, onProgress: (Int?) -> Unit): File? {
+    override suspend fun downloadApk(info: UpdateInfo, onProgress: (Int?) -> Unit): File? {
         cancelled = false
         val target = File(dir, ReleaseParser.apkName(info.version))
-        val ok = download(info.apkUrl, target, onProgress)
-        return if (ok) target else null
+        // Download to a .part file and rename only when complete, so a
+        // cancelled or failed download can never leave a corrupt file
+        // under the final APK name (addendum U5).
+        val part = File(dir, target.name + ".part")
+        val ok = download(info.apkUrl, part, onProgress)
+        if (!ok) {
+            part.delete()
+            return null
+        }
+        if (target.exists()) target.delete()
+        return if (part.renameTo(target)) target else {
+            part.delete()
+            null
+        }
     }
 
-    suspend fun fetchExpectedSha(info: UpdateInfo): String? = withContext(Dispatchers.IO) {
+    override suspend fun fetchExpectedSha(info: UpdateInfo): String? = withContext(Dispatchers.IO) {
         if (info.shaUrl.isBlank()) return@withContext null
         runCatching {
             val conn = URL(info.shaUrl).openConnection() as HttpURLConnection

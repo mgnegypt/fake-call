@@ -25,6 +25,18 @@ sealed interface UpdateState {
     data class Failed(val reason: UpdateFailReason) : UpdateState
 }
 
+/** Where the controller gets its APK + checksum from (faked in tests). */
+interface ApkSource {
+    suspend fun downloadApk(info: UpdateInfo, onProgress: (Int?) -> Unit): File?
+    suspend fun fetchExpectedSha(info: UpdateInfo): String?
+    fun cancel()
+}
+
+/** Hands a verified APK to the installer (faked in tests). */
+fun interface ApkInstaller {
+    fun install(apk: File)
+}
+
 /**
  * Owns the whole update flow (download → checksum → verify → install)
  * outside any composable, on the app scope: closing the update sheet no
@@ -35,8 +47,8 @@ sealed interface UpdateState {
  */
 class UpdateController(
     private val scope: CoroutineScope,
-    private val downloader: UpdateDownloader,
-    private val install: (File) -> Unit
+    private val downloader: ApkSource,
+    private val installer: ApkInstaller
 ) {
     private val _state = MutableStateFlow<UpdateState>(UpdateState.Idle)
     val state: StateFlow<UpdateState> = _state.asStateFlow()
@@ -91,7 +103,7 @@ class UpdateController(
             return
         }
         _state.value = UpdateState.Installing
-        withContext(Dispatchers.IO) { install(file) }
+        withContext(Dispatchers.IO) { installer.install(file) }
         currentFile = null
         _state.value = UpdateState.Idle
     }
