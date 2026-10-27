@@ -6,8 +6,12 @@ import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
 import java.io.File
+import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URL
+
+/** Thrown when the cache volume cannot hold the APK (plus a margin). */
+class NotEnoughStorageException : IOException("not enough storage for the update")
 
 /** Downloads the release APK (and its checksum) into the app cache. */
 class UpdateDownloader(context: Context) : ApkSource {
@@ -42,29 +46,36 @@ class UpdateDownloader(context: Context) : ApkSource {
 
     override suspend fun fetchExpectedSha(info: UpdateInfo): String? = withContext(Dispatchers.IO) {
         if (info.shaUrl.isBlank()) return@withContext null
-        runCatching {
+        try {
             val conn = URL(info.shaUrl).openConnection() as HttpURLConnection
             try {
                 conn.connectTimeout = 15_000
                 conn.readTimeout = 15_000
-                if (conn.responseCode != HttpURLConnection.HTTP_OK) return@runCatching null
+                if (conn.responseCode != HttpURLConnection.HTTP_OK) return@withContext null
                 val text = conn.inputStream.bufferedReader().readText()
                 Sha256.expectedFromFileContent(text)
             } finally {
                 conn.disconnect()
             }
-        }.getOrNull()
+        } catch (e: IOException) {
+            null // unreachable checksum = fail closed upstream (item 6)
+        }
     }
 
     private suspend fun download(url: String, target: File, onProgress: (Int?) -> Unit): Boolean =
         withContext(Dispatchers.IO) {
-            runCatching {
+            try {
                 val conn = URL(url).openConnection() as HttpURLConnection
                 try {
                     conn.connectTimeout = 20_000
                     conn.readTimeout = 30_000
-                    if (conn.responseCode != HttpURLConnection.HTTP_OK) return@runCatching false
+                    if (conn.responseCode != HttpURLConnection.HTTP_OK) return@withContext false
                     val total = conn.contentLengthLong
+                    // Fail early, before writing a byte, when the cache
+                    // volume cannot hold the APK plus a margin (U6).
+                    if (total > 0 && dir.usableSpace < total + total / 10) {
+                        throw NotEnoughStorageException()
+                    }
                     // Unknown size: report null once so the UI shows
                     // an indeterminate bar instead of sitting at 0%.
                     if (total <= 0) onProgress(null)
@@ -74,7 +85,7 @@ class UpdateDownloader(context: Context) : ApkSource {
                             val buffer = ByteArray(64 * 1024)
                             var done = 0L
                             while (true) {
-                                if (cancelled) return@runCatching false
+                                if (cancelled) return@withContext false
                                 currentCoroutineContext().ensureActive()
                                 val read = input.read(buffer)
                                 if (read < 0) break
@@ -96,6 +107,12 @@ class UpdateDownloader(context: Context) : ApkSource {
                 } finally {
                     conn.disconnect()
                 }
-            }.getOrDefault(false)
+            } catch (e: NotEnoughStorageException) {
+                throw e // the controller maps this to its own message
+            } catch (e: IOException) {
+                false
+            }
+            // CancellationException is NOT caught here: it propagates
+            // and cancels the flow instead of reading as a failure (U6).
         }
 }

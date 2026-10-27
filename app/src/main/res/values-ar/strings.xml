@@ -108,7 +108,10 @@
     <string name="update_checking_checksum">جارٍ جلب بصمة التحقق…</string>
     <string name="update_verifying">جارٍ التحقق من البصمة…</string>
     <string name="update_installing">جارٍ التثبيت…</string>
-    <string name="update_failed">فشل التحديث. يمكنك تنزيله من GitHub بدلًا من ذلك.</string>
+    <string name="update_failed_network">فشل التنزيل. تحقق من الاتصال وحاول مجددًا، أو نزّله من GitHub.</string>
+    <string name="update_failed_storage">لا توجد مساحة تخزين كافية لتنزيل التحديث. حرّر بعض المساحة، أو نزّله من GitHub.</string>
+    <string name="update_failed_checksum_unavailable">تعذّر جلب بصمة التحقق من التنزيل، لذا لم يتم التثبيت. يمكنك تنزيله من GitHub بدلًا من ذلك.</string>
+    <string name="update_failed_install">فشل التثبيت. يمكنك تنزيل التحديث من GitHub بدلًا من ذلك.</string>
     <string name="update_verify_failed">تعذّر التحقق من التنزيل، لذا لم يتم التثبيت. يمكنك تنزيله من GitHub بدلًا من ذلك.</string>
     <string name="update_install_permission">لتثبيت التحديثات داخل التطبيق، اسمح بالتثبيت من هذا المصدر في إعدادات النظام.</string>
     <string name="whats_new_title">ما الجديد في v%1$s</string>

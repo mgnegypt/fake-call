@@ -7,6 +7,7 @@
 - Theme is now a three-way choice (Follow system / Light / Dark) in Settings — before, once you picked light or dark there was no way back to following the system
 
 ### Fixed
+- Update failures now say what actually went wrong (network, not enough storage, checksum unavailable, checksum mismatch, install failed) instead of one generic message; the storage case is detected before downloading, install errors are reported instead of crashing, and cancelling a download is no longer treated as a failure.
 - Two quick taps on "Download and install" can no longer start two downloads writing the same file: starting is atomic, and the APK downloads to a temporary ".part" file that is renamed only when complete.
 - The update no longer freezes the UI: fetching the checksum, verifying it and writing the install session all run off the main thread, and each phase is labelled in the sheet (fetching / verifying / installing).
 - Update progress is smooth and honest: the bar animates between percents, and when the server does not report the APK size the sheet shows an indeterminate bar instead of sitting at 0%.
@@ -35,6 +36,7 @@
 - المظهر أصبح اختيارًا ثلاثيًا (حسب النظام / فاتح / داكن) في الإعدادات — قبل ذلك، متى اخترت الفاتح أو الداكن لم تكن هناك طريقة للعودة إلى إعداد النظام
 
 ### تم الإصلاح
+- إخفاقات التحديث أصبحت تقول ما حدث فعلًا (شبكة، مساحة غير كافية، بصمة تحقق غير متاحة، بصمة غير مطابقة، فشل التثبيت) بدل رسالة عامة واحدة؛ وحالة المساحة تُكتشف قبل التنزيل، وأخطاء التثبيت تُبلَّغ بدل أن تسبب انهيارًا، وإلغاء التنزيل لم يعد يُعامل كفشل.
 - نقرتان سريعتان على «تنزيل وتثبيت» لم تعودا تستطيعان بدء تنزيلين يكتبان في نفس الملف: البدء ذرّي، والـAPK يُنزَّل إلى ملف مؤقت «.part» يُعاد تسميته فقط عند اكتمال التنزيل.
 - التحديث لم يعد يجمّد الواجهة: جلب بصمة التحقق والتحقق منها وكتابة جلسة التثبيت كلها تجري خارج الخيط الرئيسي، وكل مرحلة موسومة في الشاشة (جلب / تحقق / تثبيت).
 - تقدم التحديث أصبح سلسًا وصادقًا: الشريط يتحرك بسلاسة بين النسب، وعندما لا يعلن الخادم حجم الـAPK تعرض الشاشة شريطًا غير محدد بدل الوقوف عند 0%.

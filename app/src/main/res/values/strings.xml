@@ -117,7 +117,10 @@
     <string name="update_checking_checksum">Fetching checksum…</string>
     <string name="update_verifying">Verifying checksum…</string>
     <string name="update_installing">Installing…</string>
-    <string name="update_failed">Update failed. You can download it from GitHub instead.</string>
+    <string name="update_failed_network">Download failed. Check your connection and try again, or get it from GitHub.</string>
+    <string name="update_failed_storage">Not enough storage space to download the update. Free up some space, or get it from GitHub.</string>
+    <string name="update_failed_checksum_unavailable">Could not fetch the checksum to verify the download, so it was not installed. You can download it from GitHub instead.</string>
+    <string name="update_failed_install">The install failed. You can download the update from GitHub instead.</string>
     <string name="update_verify_failed">Could not verify the download, so it was not installed. You can download it from GitHub instead.</string>
     <string name="update_install_permission">To install updates in the app, allow installs from this source in system settings.</string>
     <string name="whats_new_title">What\'s new in v%1$s</string>

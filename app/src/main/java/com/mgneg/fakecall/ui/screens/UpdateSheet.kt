@@ -203,10 +203,17 @@ fun UpdateSheet(info: UpdateInfo, onDismiss: () -> Unit) {
                         }
                         is UpdateState.Failed -> Text(
                             stringResource(
-                                if (s.reason == UpdateFailReason.CHECKSUM) {
-                                    R.string.update_verify_failed
-                                } else {
-                                    R.string.update_failed
+                                when (s.reason) {
+                                    UpdateFailReason.NETWORK ->
+                                        R.string.update_failed_network
+                                    UpdateFailReason.NOT_ENOUGH_STORAGE ->
+                                        R.string.update_failed_storage
+                                    UpdateFailReason.CHECKSUM_UNAVAILABLE ->
+                                        R.string.update_failed_checksum_unavailable
+                                    UpdateFailReason.CHECKSUM_MISMATCH ->
+                                        R.string.update_verify_failed
+                                    UpdateFailReason.INSTALL_FAILED ->
+                                        R.string.update_failed_install
                                 }
                             ),
                             fontSize = 13.sp,

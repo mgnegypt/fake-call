@@ -1,5 +1,6 @@
 package com.mgneg.fakecall.update
 
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -9,9 +10,12 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.io.File
+import java.io.IOException
 
 /** Why an update flow failed. Mapped to user-facing strings by the UI. */
-enum class UpdateFailReason { NETWORK, CHECKSUM, INSTALL }
+enum class UpdateFailReason {
+    NETWORK, NOT_ENOUGH_STORAGE, CHECKSUM_UNAVAILABLE, CHECKSUM_MISMATCH, INSTALL_FAILED
+}
 
 sealed interface UpdateState {
     data object Idle : UpdateState
@@ -79,32 +83,59 @@ class UpdateController(
     }
 
     private suspend fun runFlow(info: UpdateInfo) {
-        val file = downloader.downloadApk(info) { pct ->
-            _state.value = UpdateState.Downloading(pct)
-        }
-        if (file == null) {
-            _state.value = UpdateState.Failed(UpdateFailReason.NETWORK)
-            return
-        }
-        currentFile = file
-        // Visible phases, all heavy work off the main thread (U4): the
-        // checksum fetch can take up to 15 s, the verify reads the whole
-        // APK, and the install copies + fsyncs it.
-        _state.value = UpdateState.CheckingChecksum
-        val expected = downloader.fetchExpectedSha(info)
-        _state.value = UpdateState.Verifying
-        val verified = withContext(Dispatchers.IO) {
-            UpdateGate.shouldInstall(expected, file)
-        }
-        if (!verified) {
-            file.delete()
+        try {
+            val file = downloader.downloadApk(info) { pct ->
+                _state.value = UpdateState.Downloading(pct)
+            }
+            if (file == null) {
+                _state.value = UpdateState.Failed(UpdateFailReason.NETWORK)
+                return
+            }
+            currentFile = file
+            // Visible phases, all heavy work off the main thread (U4): the
+            // checksum fetch can take up to 15 s, the verify reads the
+            // whole APK, and the install copies + fsyncs it.
+            _state.value = UpdateState.CheckingChecksum
+            val expected = downloader.fetchExpectedSha(info)
+            // Fail CLOSED with a specific reason (plan item 6 + U6): no
+            // checksum at all is a different failure from a mismatch.
+            if (expected.isNullOrBlank()) {
+                file.delete()
+                currentFile = null
+                _state.value = UpdateState.Failed(UpdateFailReason.CHECKSUM_UNAVAILABLE)
+                return
+            }
+            _state.value = UpdateState.Verifying
+            val verified = withContext(Dispatchers.IO) {
+                UpdateGate.shouldInstall(expected, file)
+            }
+            if (!verified) {
+                file.delete()
+                currentFile = null
+                _state.value = UpdateState.Failed(UpdateFailReason.CHECKSUM_MISMATCH)
+                return
+            }
+            _state.value = UpdateState.Installing
+            try {
+                withContext(Dispatchers.IO) { installer.install(file) }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                // Installer failures (IO, SecurityException, session
+                // errors) are reported, never a crash (U6).
+                _state.value = UpdateState.Failed(UpdateFailReason.INSTALL_FAILED)
+                return
+            }
             currentFile = null
-            _state.value = UpdateState.Failed(UpdateFailReason.CHECKSUM)
-            return
+            _state.value = UpdateState.Idle
+        } catch (e: CancellationException) {
+            throw e // cancellation is not a failure (U6)
+        } catch (e: NotEnoughStorageException) {
+            _state.value = UpdateState.Failed(UpdateFailReason.NOT_ENOUGH_STORAGE)
+        } catch (e: IOException) {
+            _state.value = UpdateState.Failed(UpdateFailReason.NETWORK)
+        } catch (e: Exception) {
+            _state.value = UpdateState.Failed(UpdateFailReason.NETWORK)
         }
-        _state.value = UpdateState.Installing
-        withContext(Dispatchers.IO) { installer.install(file) }
-        currentFile = null
-        _state.value = UpdateState.Idle
     }
 }
