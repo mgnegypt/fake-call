@@ -5,7 +5,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -27,6 +30,26 @@ sealed interface UpdateState {
     data object Installing : UpdateState
     data object AwaitingConfirm : UpdateState
     data class Failed(val reason: UpdateFailReason) : UpdateState
+}
+
+/** Outcomes reported by InstallResultReceiver back into the flow. */
+sealed interface InstallOutcome {
+    data object AwaitingConfirm : InstallOutcome
+    data object Aborted : InstallOutcome
+    data object Succeeded : InstallOutcome
+    data class Failed(val statusMessage: String?) : InstallOutcome
+}
+
+/**
+ * Bridge from the manifest-registered [InstallResultReceiver] (created
+ * by the system, so it cannot reference the controller) to the flow.
+ */
+object InstallResults {
+    private val _flow = MutableSharedFlow<InstallOutcome>(extraBufferCapacity = 4)
+    val flow: SharedFlow<InstallOutcome> = _flow.asSharedFlow()
+    fun report(outcome: InstallOutcome) {
+        _flow.tryEmit(outcome)
+    }
 }
 
 /** Where the controller gets its APK + checksum from (faked in tests). */
@@ -59,6 +82,26 @@ class UpdateController(
 
     private var job: Job? = null
     @Volatile private var currentFile: File? = null
+
+    init {
+        // Install outcomes arrive asynchronously from the receiver and
+        // drive the terminal states (addendum U7): the flow no longer
+        // pretends success the moment the session commits.
+        scope.launch {
+            InstallResults.flow.collect { outcome ->
+                when (outcome) {
+                    InstallOutcome.AwaitingConfirm ->
+                        _state.value = UpdateState.AwaitingConfirm
+                    InstallOutcome.Aborted, InstallOutcome.Succeeded -> {
+                        currentFile = null
+                        _state.value = UpdateState.Idle
+                    }
+                    is InstallOutcome.Failed ->
+                        _state.value = UpdateState.Failed(UpdateFailReason.INSTALL_FAILED)
+                }
+            }
+        }
+    }
 
     /**
      * Starts the flow from Idle/Failed. The compare-and-set is the
@@ -126,8 +169,9 @@ class UpdateController(
                 _state.value = UpdateState.Failed(UpdateFailReason.INSTALL_FAILED)
                 return
             }
-            currentFile = null
-            _state.value = UpdateState.Idle
+            // Stay in Installing: InstallResultReceiver reports the
+            // real outcome (confirm prompt, abort, failure, success)
+            // through InstallResults and settles the state (U7).
         } catch (e: CancellationException) {
             throw e // cancellation is not a failure (U6)
         } catch (e: NotEnoughStorageException) {

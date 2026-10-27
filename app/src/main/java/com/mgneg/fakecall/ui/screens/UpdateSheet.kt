@@ -26,7 +26,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -83,10 +82,6 @@ fun UpdateSheet(info: UpdateInfo, onDismiss: () -> Unit) {
     )
     val lang = LanguageManager.effectiveLanguage(context)
     val notes = remember(info) { ReleaseParser.notesFor(info.notesBody, lang) }
-
-    LaunchedEffect(state) {
-        if (state is UpdateState.Installing) onDismiss()
-    }
 
     ModalBottomSheet(
         onDismissRequest = { if (!busy) onDismiss() },
@@ -183,7 +178,7 @@ fun UpdateSheet(info: UpdateInfo, onDismiss: () -> Unit) {
                                 color = Color.White.copy(alpha = 0.85f)
                             )
                         }
-                        is UpdateState.Verifying, is UpdateState.Installing -> {
+                        is UpdateState.Verifying, is UpdateState.Installing, is UpdateState.AwaitingConfirm -> {
                             LinearProgressIndicator(
                                 color = Color.White,
                                 trackColor = Color.White.copy(alpha = 0.22f),
@@ -191,7 +186,7 @@ fun UpdateSheet(info: UpdateInfo, onDismiss: () -> Unit) {
                             )
                             Text(
                                 stringResource(
-                                    if (s is UpdateState.Installing) {
+                                    if (s is UpdateState.Installing || s is UpdateState.AwaitingConfirm) {
                                         R.string.update_installing
                                     } else {
                                         R.string.update_verifying

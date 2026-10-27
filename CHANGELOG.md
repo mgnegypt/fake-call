@@ -7,6 +7,7 @@
 - Theme is now a three-way choice (Follow system / Light / Dark) in Settings — before, once you picked light or dark there was no way back to following the system
 
 ### Fixed
+- Install results are no longer silent: the sheet stays open while installing, a failed install (for example a signature mismatch) shows the install-failed message — and a notification if the app is in the background — and cancelling the system prompt returns the sheet to its idle state.
 - Update failures now say what actually went wrong (network, not enough storage, checksum unavailable, checksum mismatch, install failed) instead of one generic message; the storage case is detected before downloading, install errors are reported instead of crashing, and cancelling a download is no longer treated as a failure.
 - Two quick taps on "Download and install" can no longer start two downloads writing the same file: starting is atomic, and the APK downloads to a temporary ".part" file that is renamed only when complete.
 - The update no longer freezes the UI: fetching the checksum, verifying it and writing the install session all run off the main thread, and each phase is labelled in the sheet (fetching / verifying / installing).
@@ -36,6 +37,7 @@
 - المظهر أصبح اختيارًا ثلاثيًا (حسب النظام / فاتح / داكن) في الإعدادات — قبل ذلك، متى اخترت الفاتح أو الداكن لم تكن هناك طريقة للعودة إلى إعداد النظام
 
 ### تم الإصلاح
+- نتائج التثبيت لم تعد صامتة: تبقى الشاشة مفتوحة أثناء التثبيت، والفشل (كاختلاف التوقيع) يعرض رسالة فشل التثبيت — وإشعارًا لو كان التطبيق في الخلفية — وإلغاء نافذة النظام يعيد الشاشة لحالتها الأولى.
 - إخفاقات التحديث أصبحت تقول ما حدث فعلًا (شبكة، مساحة غير كافية، بصمة تحقق غير متاحة، بصمة غير مطابقة، فشل التثبيت) بدل رسالة عامة واحدة؛ وحالة المساحة تُكتشف قبل التنزيل، وأخطاء التثبيت تُبلَّغ بدل أن تسبب انهيارًا، وإلغاء التنزيل لم يعد يُعامل كفشل.
 - نقرتان سريعتان على «تنزيل وتثبيت» لم تعودا تستطيعان بدء تنزيلين يكتبان في نفس الملف: البدء ذرّي، والـAPK يُنزَّل إلى ملف مؤقت «.part» يُعاد تسميته فقط عند اكتمال التنزيل.
 - التحديث لم يعد يجمّد الواجهة: جلب بصمة التحقق والتحقق منها وكتابة جلسة التثبيت كلها تجري خارج الخيط الرئيسي، وكل مرحلة موسومة في الشاشة (جلب / تحقق / تثبيت).
