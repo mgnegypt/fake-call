@@ -29,7 +29,11 @@ class AlarmReceiver : BroadcastReceiver() {
 
 class BootReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
-        if (intent.action != Intent.ACTION_BOOT_COMPLETED) return
+        // Package replace matters as much as boot: AlarmManager alarms are
+        // cleared when the app is updated, and this app updates itself.
+        if (intent.action != Intent.ACTION_BOOT_COMPLETED &&
+            intent.action != Intent.ACTION_MY_PACKAGE_REPLACED
+        ) return
         val app = context.applicationContext as FakeCallApp
         val pending = goAsync()
         app.appScope.launch {
