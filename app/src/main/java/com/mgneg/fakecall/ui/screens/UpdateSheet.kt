@@ -290,8 +290,7 @@ fun WhatsNewSheet(version: String, notesBody: String, onDismiss: () -> Unit) {
     val lang = LanguageManager.effectiveLanguage(context)
     val notes = remember(notesBody) { ReleaseParser.notesFor(notesBody, lang) }
     ModalBottomSheet(
-        onDismissRequest = { if (!busy) onDismiss() },
-        sheetState = sheetState,
+        onDismissRequest = onDismiss,
         containerColor = b.card2,
         shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp)
     ) {
