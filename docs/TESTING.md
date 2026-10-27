@@ -59,3 +59,20 @@ these need a real device and are the owner's checks):
 | Release | Date | Checked by | Notes |
 |---|---|---|---|
 | 1.3 | — | — | pending owner verification |
+
+## Update sheet & updater (addendum U1–U11, owner device checks)
+
+| Scenario | Expected |
+|---|---|
+| Open sheet, start download | Sheet height constant across all states; no jump |
+| Throttled network | Smooth bar (no stepping); indeterminate bar if size unknown |
+| Tap Download twice quickly | One download only |
+| Swipe down / Back during download | Blocked; Cancel button works and cleans the partial file |
+| Airplane mode mid-download | NETWORK message, retry works |
+| Almost-full storage | NOT_ENOUGH_STORAGE before downloading |
+| .sha256 asset missing | Refuses to install (CHECKSUM_UNAVAILABLE) |
+| Wrong checksum | Refuses, file deleted |
+| Install a build signed with a different key | Sheet shows INSTALL_FAILED, no silent close |
+| Deny then grant "install unknown apps" | Hint disappears on return |
+| Arabic + largest font + 360 dp width | Nothing clipped; buttons reachable; no word-by-word wrapping |
+| Full flow 1.x → newer | Installs; app restarts on the new version |

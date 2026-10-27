@@ -7,6 +7,7 @@
 - Theme is now a three-way choice (Follow system / Light / Dark) in Settings — before, once you picked light or dark there was no way back to following the system
 
 ### Fixed
+- The update flow is covered by unit tests for its state machine: happy path, missing/mismatched checksum, double-start, cancel, install failure and unknown-size progress.
 - Downloaded update files clean up after themselves: the cached APK is deleted once the install session takes it, and stale downloads or partial files from older versions are cleared on app start.
 - The update sheet fits narrow screens and large fonts: the new version stands on its own line (smaller when long), the current version sits beneath it, and the download button takes the full width with GitHub/Dismiss on their own row.
 - The "allow installs" hint in the update sheet now disappears as soon as you return from granting the permission, and a download you started before granting continues automatically.
@@ -40,6 +41,7 @@
 - المظهر أصبح اختيارًا ثلاثيًا (حسب النظام / فاتح / داكن) في الإعدادات — قبل ذلك، متى اخترت الفاتح أو الداكن لم تكن هناك طريقة للعودة إلى إعداد النظام
 
 ### تم الإصلاح
+- عملية التحديث أصبحت مغطاة باختبارات وحدة لآلة حالاتها: المسار الناجح، البصمة المفقودة/غير المطابقة، البدء المزدوج، الإلغاء، فشل التثبيت، والتقدم عند حجم مجهول.
 - ملفات التحديث المنزّلة تنظف وراءها: يُحذف الـAPK من الكاش بمجرد أن تتسلمه جلسة التثبيت، والتنزيلات القديمة أو الملفات الناقصة من إصدارات أقدم تُمسح عند بدء التطبيق.
 - شاشة التحديث تناسب الشاشات الضيقة والخطوط الكبيرة: الإصدار الجديد على سطر مستقل (أصغر عندما يطول)، والإصدار الحالي تحته، وزر التنزيل بعرض الشاشة كاملًا مع GitHub و«إغلاق» على سطر خاص بهما.
 - تلميح «السماح بالتثبيت» في شاشة التحديث يختفي الآن فور رجوعك من منح الإذن، والتنزيل الذي بدأته قبل المنح يكمل تلقائيًا.
