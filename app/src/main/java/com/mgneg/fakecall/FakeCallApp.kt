@@ -9,6 +9,7 @@ import com.mgneg.fakecall.data.settings.SettingsStore
 import com.mgneg.fakecall.scheduling.CallScheduler
 import com.mgneg.fakecall.telecom.CallController
 import com.mgneg.fakecall.telecom.TelecomAccounts
+import com.mgneg.fakecall.update.UpdateDownloader
 import com.mgneg.fakecall.update.UpdateRepository
 import com.mgneg.fakecall.update.UpdateWorker
 import kotlinx.coroutines.CoroutineScope
@@ -59,6 +60,8 @@ class FakeCallApp : Application() {
             runCatching {
                 com.mgneg.fakecall.util.AudioFiles.cleanupUnreferenced(this@FakeCallApp)
             }
+            // Drop stale update downloads and .part leftovers (U10).
+            runCatching { UpdateDownloader.cleanupStale(this@FakeCallApp) }
             initialized = true
         }
         UpdateWorker.schedulePeriodic(this)

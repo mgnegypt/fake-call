@@ -21,6 +21,21 @@ class UpdateDownloader(context: Context) : ApkSource {
     @Volatile
     private var cancelled = false
 
+    companion object {
+        /**
+         * App-start hygiene (addendum U10): drop every cached update
+         * file that is not the current version's own APK name — stale
+         * downloads, .part leftovers and older versions never linger.
+         */
+        fun cleanupStale(context: Context) {
+            val keep = Version.parse(com.mgneg.fakecall.BuildConfig.VERSION_NAME)
+                ?.let { ReleaseParser.apkName(it) }
+            File(context.cacheDir, "updates").listFiles()?.forEach { f ->
+                if (f.name != keep) f.delete()
+            }
+        }
+    }
+
     override fun cancel() {
         cancelled = true
     }

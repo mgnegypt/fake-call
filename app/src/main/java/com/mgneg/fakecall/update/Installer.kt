@@ -38,6 +38,9 @@ object Installer {
             )
             session.commit(pending.intentSender)
         }
+        // The session owns its copy now; the cache file is dead
+        // weight and is deleted on successful commit (addendum U10).
+        apk.delete()
     }
 
     const val ACTION_INSTALL_RESULT = "com.mgneg.fakecall.action.INSTALL_RESULT"
