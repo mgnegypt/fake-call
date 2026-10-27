@@ -22,6 +22,7 @@
 - Android backup is disabled for the app (call history contains phone numbers and is never backed up), and the database no longer wipes itself on schema changes — future versions must migrate it properly
 - Release safety: the release workflow now refuses a tag that does not match the app version, requires every release to raise the version code, and runs the unit tests and lint before building
 - Removed the READ_PHONE_STATE permission: registering and using the app's own call account never required it, so it is gone from the manifest and from the permissions checklist
+- Internals: history status changes now follow one tested rule set (a settled call can never be rewritten), and docs/TESTING.md records the release verification checklist
 
 ## العربية
 ### تم التغيير
@@ -43,6 +44,7 @@
 - النسخ الاحتياطي من Android أصبح معطّلًا للتطبيق (سجل المكالمات يحتوي أرقام هواتف ولا يُنسخ أبدًا)، وقاعدة البيانات لم تعد تمسح نفسها عند تغيّر مخططها — الإصدارات القادمة يجب أن ترحّلها ترحيلًا صحيحًا
 - أمان الإصدارات: سير عمل الإصدار أصبح يرفض وسمًا لا يطابق إصدار التطبيق، ويشترط رفع رمز الإصدار في كل إصدار، ويشغّل اختبارات الوحدة والفحص قبل البناء
 - أُزيل إذن حالة الهاتف (READ_PHONE_STATE): تسجيل حساب اتصال التطبيق واستخدامه لم يتطلباه أبدًا، فحُذف من البيان ومن قائمة الأذونات
+- داخليًا: تغييرات حالة السجل أصبحت تتبع مجموعة قواعد واحدة مختبَرة (المكالمة المستقرة لا تُعاد كتابتها أبدًا)، وdocs/TESTING.md يوثّق قائمة تحقق الإصدار
 
 ## [1.2] - 2026-10-22
 

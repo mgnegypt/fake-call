@@ -73,53 +73,40 @@ class CallRepository(
     }
 
     /** Presentation started: SCHEDULED → RINGING. */
-    suspend fun markRinging(historyId: Long) {
-        val dao = db.callHistoryDao()
-        val entry = dao.getById(historyId) ?: return
-        if (entry.status == CallStatus.SCHEDULED) {
-            dao.update(entry.copy(status = CallStatus.RINGING))
-        }
-    }
+    suspend fun markRinging(historyId: Long) =
+        transition(historyId, CallStatus.RINGING, keepDuration = true)
 
     /** The call was answered: RINGING → ANSWERED (duration comes at the end). */
-    suspend fun markAnswered(historyId: Long) {
-        val dao = db.callHistoryDao()
-        val entry = dao.getById(historyId) ?: return
-        if (entry.status == CallStatus.RINGING) {
-            dao.update(entry.copy(status = CallStatus.ANSWERED))
-        }
-    }
+    suspend fun markAnswered(historyId: Long) =
+        transition(historyId, CallStatus.ANSWERED, keepDuration = true)
 
     /** The call rang out unanswered: SCHEDULED/RINGING → MISSED. */
-    suspend fun markMissed(historyId: Long) {
-        transition(
-            historyId, CallStatus.MISSED, 0,
-            from = setOf(CallStatus.SCHEDULED, CallStatus.RINGING)
-        )
-    }
+    suspend fun markMissed(historyId: Long) =
+        transition(historyId, CallStatus.MISSED, durationSec = 0)
 
     /**
-     * Guarded status write shared by the finish paths: a row may only be
-     * finished while it is still in a live (non-terminal) status, so a
-     * late or duplicate finish can never rewrite a settled row.
+     * Guarded status write shared by every status change: the move must
+     * be legal per [CallStatusRules], so a late or duplicate update can
+     * never rewrite a settled row.
      */
-    private suspend fun updateStatus(historyId: Long, status: String, durationSec: Int) {
-        transition(
-            historyId, status, durationSec,
-            from = setOf(CallStatus.SCHEDULED, CallStatus.RINGING, CallStatus.ANSWERED)
-        )
-    }
+    private suspend fun updateStatus(historyId: Long, status: String, durationSec: Int) =
+        transition(historyId, status, durationSec)
 
     private suspend fun transition(
         historyId: Long,
         status: String,
-        durationSec: Int,
-        from: Set<String>
+        durationSec: Int = 0,
+        keepDuration: Boolean = false
     ) {
         val dao = db.callHistoryDao()
         val entry = dao.getById(historyId) ?: return
-        if (entry.status in from) {
-            dao.update(entry.copy(status = status, durationSec = durationSec))
+        if (CallStatusRules.allowed(entry.status, status)) {
+            dao.update(
+                entry.copy(
+                    status = status,
+                    durationSec = if (keepDuration) entry.durationSec else durationSec
+                )
+            )
         }
     }
 
@@ -172,6 +159,26 @@ class CallRepository(
      */
     suspend fun sweepStaleRinging() {
         db.callHistoryDao().ringing().forEach { entry -> markMissed(entry.id) }
+    }
+}
+
+/**
+ * The legal CallStatus transitions of a history row. Pure and
+ * unit-tested; every status write in [CallRepository] goes through it.
+ *
+ *  SCHEDULED → RINGING → ANSWERED → COMPLETED
+ *  SCHEDULED/RINGING → MISSED · RINGING → DECLINED/FAILED ·
+ *  ANSWERED → COMPLETED/DECLINED · terminal rows never move again.
+ */
+object CallStatusRules {
+    fun allowed(from: String, to: String): Boolean = when (to) {
+        CallStatus.RINGING -> from == CallStatus.SCHEDULED
+        CallStatus.ANSWERED -> from == CallStatus.RINGING
+        CallStatus.MISSED ->
+            from == CallStatus.SCHEDULED || from == CallStatus.RINGING
+        else -> from == CallStatus.SCHEDULED ||
+            from == CallStatus.RINGING ||
+            from == CallStatus.ANSWERED
     }
 }
 

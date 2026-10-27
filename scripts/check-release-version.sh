@@ -11,6 +11,11 @@ tag="${1:?usage: check-release-version.sh <tag> <gradle-file> [previous-versionC
 gradle_file="${2:?usage: check-release-version.sh <tag> <gradle-file> [previous-versionCode]}"
 prev_code="${3:-0}"
 
+if [ ! -f "$gradle_file" ]; then
+  echo "::error::build file not found: $gradle_file"
+  exit 1
+fi
+
 version_name="$(grep -E 'versionName[[:space:]]*=' "$gradle_file" | head -1 | sed -E 's/.*"([^"]+)".*/\1/')"
 version_code="$(grep -E 'versionCode[[:space:]]*=' "$gradle_file" | head -1 | sed -E 's/[^0-9]*([0-9]+).*/\1/')"
 

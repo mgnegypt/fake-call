@@ -25,3 +25,37 @@ Scenarios that must pass on every level:
 Automated: JVM unit tests under `app/src/test` cover the version comparator,
 the release-notes parser (both languages, missing/malformed sections), asset
 selection, and SHA-256 verification. They run in CI on every push.
+
+## v1.3 additions
+
+Automated, new in 1.3:
+
+- `update/UpdateGateTest` — the update install gate fails closed: a
+  missing, blank or mismatching SHA-256 never installs.
+- `data/ReschedulePolicyTest` — boot/package-replace policy for pending
+  scheduled calls: future → reschedule, just-missed (≤ 60 s) → fire,
+  older → settle as MISSED.
+- `data/CallStatusRulesTest` — history status transitions:
+  `SCHEDULED → RINGING → ANSWERED → COMPLETED`, `RINGING → MISSED`,
+  terminal rows never move again.
+- Shell: `bash scripts/check-release-version.test.sh` covers the release
+  tag/version gate used by `.github/workflows/release.yml`.
+
+Manual verification checklist for 1.3 (record the result per release —
+these need a real device and are the owner's checks):
+
+| Check | API |
+|---|---|
+| Each QS tile starts its preset, no crash | 34+ |
+| Answer from notification opens the in-call screen | 31+ |
+| Unanswered call ends as Missed after 45s (both modes) | any |
+| Reboot with a past-due unanswered call: nothing rings | any |
+| App update with a pending scheduled call: it still rings | any |
+| Cancel a scheduled call; "Clear history" cancels pending alarms | any |
+| Update with `.sha256` missing/unreachable is refused | any |
+| Speaker toggle works and resets after the call | 31+ |
+| Theme: System/Light/Dark all selectable | any |
+
+| Release | Date | Checked by | Notes |
+|---|---|---|---|
+| 1.3 | — | — | pending owner verification |
