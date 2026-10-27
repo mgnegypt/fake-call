@@ -52,6 +52,9 @@ class FakeCallApp : Application() {
         appScope.launch {
             val label = settings.accountLabel.first()
             TelecomAccounts.register(this@FakeCallApp, label)
+            // A fresh process has no live call: any row still RINGING
+            // belonged to a call that died with the previous process.
+            callRepository.sweepStaleRinging()
             initialized = true
         }
         UpdateWorker.schedulePeriodic(this)

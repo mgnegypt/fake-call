@@ -20,6 +20,13 @@ class FakeConnection(
     private var answeredAt: Long = 0L
     private var finished = false
 
+    private val timeoutHandler = android.os.Handler(android.os.Looper.getMainLooper())
+    private val ringTimeout = Runnable {
+        if (!finished && answeredAt == 0L) {
+            finish(CallStatus.MISSED, DisconnectCause(DisconnectCause.MISSED))
+        }
+    }
+
     init {
         // Construction aligned with how call-provider connections are
         // expected to present themselves to the system InCallService:
@@ -38,6 +45,7 @@ class FakeConnection(
         setAudioModeIsVoip(true)
         setInitializing()
         setRinging()
+        timeoutHandler.postDelayed(ringTimeout, CallController.RING_TIMEOUT_MS)
     }
 
     private val controller get() = (appContext as FakeCallApp).callController
@@ -51,11 +59,13 @@ class FakeConnection(
 
     override fun onAnswer() {
         if (answeredAt > 0) return
+        timeoutHandler.removeCallbacks(ringTimeout)
         answeredAt = System.currentTimeMillis()
         setActive()
         controller.onTelecomStateChanged(
             CallState.InCall(callerName, callerNumber, historyId, CallPath.TELECOM, answeredAt)
         )
+        if (historyId > 0) controller.markAnswered(historyId)
         audioUri?.let { audioPlayer.play(it) }
     }
 
@@ -78,14 +88,15 @@ class FakeConnection(
 
     override fun onAbort() = finish(CallStatus.DECLINED)
 
-    private fun finish(status: String) {
+    private fun finish(status: String, cause: DisconnectCause = DisconnectCause(DisconnectCause.LOCAL)) {
         if (finished) return
         finished = true
+        timeoutHandler.removeCallbacks(ringTimeout)
         audioPlayer.stop()
         val duration = if (answeredAt > 0)
             ((System.currentTimeMillis() - answeredAt) / 1000).toInt() else 0
         runCatching {
-            setDisconnected(DisconnectCause(DisconnectCause.LOCAL))
+            setDisconnected(cause)
             destroy()
         }
         controller.onTelecomStateChanged(CallState.Idle)

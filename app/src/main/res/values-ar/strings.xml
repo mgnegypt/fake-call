@@ -60,6 +60,8 @@
     <string name="history_completed">اكتملت</string>
     <string name="history_scheduled">مجدولة</string>
     <string name="history_failed">فشلت</string>
+    <string name="history_missed">فائتة</string>
+    <string name="history_ringing">يرن الآن</string>
     <string name="history_clear">مسح السجل</string>
     <string name="history_clear_confirm">حذف كل عناصر السجل؟</string>
     <string name="duration_seconds">%1$d ثانية</string>

@@ -16,6 +16,12 @@ interface CallHistoryDao {
     @Query("SELECT * FROM call_history WHERE status = 'SCHEDULED'")
     suspend fun pendingScheduled(): List<CallHistoryEntry>
 
+    @Query("SELECT * FROM call_history WHERE status = 'RINGING'")
+    suspend fun ringing(): List<CallHistoryEntry>
+
+    @Query("SELECT * FROM call_history WHERE id = :id")
+    suspend fun getById(id: Long): CallHistoryEntry?
+
     @Insert
     suspend fun insert(entry: CallHistoryEntry): Long
 

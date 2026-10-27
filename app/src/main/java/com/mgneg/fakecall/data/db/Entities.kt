@@ -6,6 +6,13 @@ import androidx.room.PrimaryKey
 
 object CallStatus {
     const val SCHEDULED = "SCHEDULED"
+
+    /** The call is being presented right now (ringing). Set the moment
+     * presentation starts, so SCHEDULED strictly means "not fired yet". */
+    const val RINGING = "RINGING"
+
+    /** The call rang for the full ring timeout with no answer. */
+    const val MISSED = "MISSED"
     const val ANSWERED = "ANSWERED"
     const val DECLINED = "DECLINED"
     const val COMPLETED = "COMPLETED"

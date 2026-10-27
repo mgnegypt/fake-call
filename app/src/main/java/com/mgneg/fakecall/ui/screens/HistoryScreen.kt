@@ -145,6 +145,10 @@ fun HistoryScreen(onScheduleCall: () -> Unit) {
                             Triple(Icons.Filled.Close, R.string.history_declined, PillKind.Danger)
                         CallStatus.FAILED ->
                             Triple(Icons.Filled.CallMissed, R.string.history_failed, PillKind.Danger)
+                        CallStatus.MISSED ->
+                            Triple(Icons.Filled.CallMissed, R.string.history_missed, PillKind.Danger)
+                        CallStatus.RINGING ->
+                            Triple(Icons.Filled.Call, R.string.history_ringing, PillKind.Tint)
                         else ->
                             Triple(Icons.Filled.Schedule, R.string.history_scheduled, PillKind.Muted)
                     }

@@ -47,6 +47,7 @@ class CallController(private val context: Context) {
 
     private val audioPlayer = CallAudioPlayer(context)
     private var ringtonePlayer: RingtonePlayer? = null
+    private var ringTimeoutJob: kotlinx.coroutines.Job? = null
 
     /**
      * Entry points for OUR call screen. That screen only ever serves the
@@ -127,6 +128,12 @@ class CallController(private val context: Context) {
                     )
                 )
             }.onFailure { Log.w(TAG, "failed to persist call diagnostics", it) }
+            // Presentation is starting: the history row leaves SCHEDULED
+            // and becomes RINGING, so a later reschedule pass will never
+            // re-fire a call that already rang.
+            if (route != IncomingRoute.TELECOM_UNAVAILABLE && historyId > 0) {
+                markRinging(historyId)
+            }
             when (route) {
                 IncomingRoute.TELECOM -> {
                     _state.value = CallState.Ringing(
@@ -140,6 +147,16 @@ class CallController(private val context: Context) {
                     val ringtoneUri = app.settings.ringtoneUri.first()
                     ringtonePlayer = RingtonePlayer(context, ringtoneUri).also { it.start() }
                     IncomingCallNotifier.show(context, callerName, callerNumber)
+                    ringTimeoutJob?.cancel()
+                    ringTimeoutJob = app.appScope.launch {
+                        kotlinx.coroutines.delay(RING_TIMEOUT_MS)
+                        val s = _state.value as? CallState.Ringing ?: return@launch
+                        if (s.historyId != historyId || s.path != CallPath.APP_SCREEN) return@launch
+                        ringtonePlayer?.stop(); ringtonePlayer = null
+                        IncomingCallNotifier.dismiss(context)
+                        _state.value = CallState.Idle
+                        if (historyId > 0) finishHistory(historyId, CallStatus.MISSED, 0)
+                    }
                 }
                 IncomingRoute.TELECOM_UNAVAILABLE -> {
                     Log.w(
@@ -162,9 +179,11 @@ class CallController(private val context: Context) {
     fun answerFromAppScreen() {
         val s = _state.value as? CallState.Ringing ?: return
         if (s.path != CallPath.APP_SCREEN) return
+        ringTimeoutJob?.cancel(); ringTimeoutJob = null
         ringtonePlayer?.stop(); ringtonePlayer = null
         IncomingCallNotifier.dismiss(context)
         _state.value = CallState.InCall(s.callerName, s.callerNumber, s.historyId, s.path)
+        if (s.historyId > 0) markAnswered(s.historyId)
         s.audioUri?.let { audioPlayer.play(it) }
     }
 
@@ -172,6 +191,7 @@ class CallController(private val context: Context) {
     fun declineFromAppScreen() {
         val s = _state.value as? CallState.Ringing ?: return
         if (s.path != CallPath.APP_SCREEN) return
+        ringTimeoutJob?.cancel(); ringTimeoutJob = null
         ringtonePlayer?.stop(); ringtonePlayer = null
         IncomingCallNotifier.dismiss(context)
         _state.value = CallState.Idle
@@ -210,8 +230,19 @@ class CallController(private val context: Context) {
         app.appScope.launch { app.callRepository.markFinished(historyId, status, durationSec) }
     }
 
+    fun markRinging(historyId: Long) {
+        app.appScope.launch { app.callRepository.markRinging(historyId) }
+    }
+
+    fun markAnswered(historyId: Long) {
+        app.appScope.launch { app.callRepository.markAnswered(historyId) }
+    }
+
     companion object {
         /** Logcat tag for the Telecom routing trail; filter on this when debugging on-device. */
         const val TAG = "FakeCallTelecom"
+
+        /** How long a call rings before it settles as MISSED (both paths). */
+        const val RING_TIMEOUT_MS = 45_000L
     }
 }
