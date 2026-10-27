@@ -222,6 +222,9 @@ class CallController(private val context: Context) {
     fun setMuted(muted: Boolean) {
         val s = _state.value as? CallState.InCall ?: return
         _state.value = s.copy(muted = muted)
+        // The toggle must silence the answer clip, not just flip the icon —
+        // the same wiring the Telecom path has via onCallAudioStateChanged.
+        audioPlayer.setMuted(muted)
     }
 
     @Suppress("DEPRECATION")

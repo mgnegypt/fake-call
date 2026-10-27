@@ -11,6 +11,7 @@
 - Scheduled calls can now be cancelled from History, and clearing history cancels their alarms too, so a deleted schedule never rings
 - Security: an update whose checksum is missing or cannot be fetched is now refused instead of being installed unverified; a failed verification deletes the download and says why
 - A second call triggered while one is already ringing or in progress no longer leaves an orphaned looping ringtone: it settles as Missed and leaves the active call untouched
+- The mute button in the app's call screen now actually silences the answer audio (before, it only changed the icon)
 
 ## العربية
 ### تم الإصلاح
@@ -21,6 +22,7 @@
 - أصبح بالإمكان إلغاء المكالمة المجدولة من شاشة السجل، ومسح السجل يلغي منبهاتها أيضًا فلا ترن مكالمة محذوفة أبدًا
 - أمان: التحديث الذي تتعذر بصمته أو يستحيل جلبها أصبح يُرفض الآن بدل تثبيته دون تحقق؛ وفشل التحقق يحذف التنزيل ويوضح السبب
 - مكالمة ثانية تُستدعى أثناء رنين أو سير مكالمة أخرى لم تعد تترك نغمة رنين يتيمة تدور بلا نهاية: تُسوّى كـ«فائتة» وتترك المكالمة الجارية دون مساس
+- زر كتم الصوت في شاشة مكالمة التطبيق أصبح يُسكت صوت الرد فعليًا (قبل ذلك كان يغيّر الأيقونة فقط)
 
 ## [1.2] - 2026-10-22
 
