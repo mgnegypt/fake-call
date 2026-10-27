@@ -5,10 +5,12 @@
 ## English
 ### Fixed
 - Quick Settings preset tiles no longer crash on Android 14+ (the tile now launches through a PendingIntent, as required for apps targeting API 34+) and no longer read the database on the main thread
+- The Answer button on the incoming-call notification now opens the call screen already in-call on Android 12+ (it launches the call activity directly instead of going through a broadcast receiver, whose activity start is blocked)
 
 ## العربية
 ### تم الإصلاح
 - بلاطات الإعدادات السريعة للسيناريوهات لم تعد تنهار على Android 14+ (أصبح التشغيل يتم عبر PendingIntent كما هو مطلوب للتطبيقات المستهدفة API 34+) ولم تعد تقرأ قاعدة البيانات على الخيط الرئيسي
+- زر «الرد» في إشعار المكالمة الواردة أصبح يفتح شاشة المكالمة وهي في حالة اتصال فعلي على Android 12+ (يشغّل شاشة المكالمة مباشرة بدل المرور عبر مستقبل بثّ ممنوع من بدء الشاشات)
 
 ## [1.2] - 2026-10-22
 

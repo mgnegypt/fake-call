@@ -21,7 +21,15 @@ object IncomingCallNotifier {
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
-        val answer = actionIntent(context, CallActionReceiver.ACTION_ANSWER, 1)
+        // Answer must launch the activity directly: a broadcast receiver may
+        // not start an activity from a notification action on Android 12+.
+        val answer = PendingIntent.getActivity(
+            context, 1,
+            Intent(context, IncomingCallActivity::class.java)
+                .putExtra(IncomingCallActivity.EXTRA_ANSWER, true)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP),
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
         val decline = actionIntent(context, CallActionReceiver.ACTION_DECLINE, 2)
         val notification = NotificationCompat.Builder(context, FakeCallApp.CHANNEL_CALLS)
             .setSmallIcon(R.drawable.ic_tile_phone)
@@ -88,19 +96,11 @@ class CallActionReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         val controller = (context.applicationContext as FakeCallApp).callController
         when (intent.action) {
-            ACTION_ANSWER -> {
-                controller.answerFromAppScreen()
-                context.startActivity(
-                    Intent(context, IncomingCallActivity::class.java)
-                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
-                )
-            }
             ACTION_DECLINE -> controller.declineFromAppScreen()
         }
     }
 
     companion object {
-        const val ACTION_ANSWER = "com.mgneg.fakecall.action.ANSWER"
         const val ACTION_DECLINE = "com.mgneg.fakecall.action.DECLINE"
     }
 }

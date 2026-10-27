@@ -1,5 +1,6 @@
 package com.mgneg.fakecall.telecom
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -12,9 +13,24 @@ import com.mgneg.fakecall.ui.theme.FakeCallTheme
 /** Lock-screen-capable host for the app's own incoming / in-call UI. */
 class IncomingCallActivity : ComponentActivity() {
 
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        if (intent.getBooleanExtra(EXTRA_ANSWER, false)) {
+            (application as FakeCallApp).callController.answerCurrent()
+        }
+    }
+
+    companion object {
+        const val EXTRA_ANSWER = "com.mgneg.fakecall.extra.ANSWER"
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val app = application as FakeCallApp
+        if (intent?.getBooleanExtra(EXTRA_ANSWER, false) == true) {
+            app.callController.answerCurrent()
+        }
         setContent {
             // Collected, never block the main thread on a DataStore read:
             // this activity must appear the instant a call fires.
