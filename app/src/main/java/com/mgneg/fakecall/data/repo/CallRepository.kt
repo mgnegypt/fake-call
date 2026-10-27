@@ -123,7 +123,18 @@ class CallRepository(
         }
     }
 
-    suspend fun clearHistory() = db.callHistoryDao().clearAll()
+    /** Cancel one scheduled call: drop its alarm, then delete the row. */
+    suspend fun cancelScheduledCall(id: Long) {
+        scheduler.cancel(id)
+        db.callHistoryDao().deleteById(id)
+    }
+
+    /** Clearing history also cancels every pending alarm, so a wiped
+     * schedule can never ring afterwards. */
+    suspend fun clearHistory() {
+        db.callHistoryDao().pendingScheduled().forEach { scheduler.cancel(it.id) }
+        db.callHistoryDao().clearAll()
+    }
 
     suspend fun savePreset(preset: Preset): Boolean {
         val dao = db.presetDao()

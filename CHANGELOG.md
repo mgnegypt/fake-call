@@ -8,6 +8,7 @@
 - The Answer button on the incoming-call notification now opens the call screen already in-call on Android 12+ (it launches the call activity directly instead of going through a broadcast receiver, whose activity start is blocked)
 - Unanswered calls now end as Missed after 45 seconds of ringing in both call modes, instead of ringing forever; a call that already rang is never re-fired after a reboot, and long-past scheduled calls settle as Missed instead of ringing hours late
 - Scheduled calls now survive an app update: pending alarms are re-registered when the package is replaced, not only at boot
+- Scheduled calls can now be cancelled from History, and clearing history cancels their alarms too, so a deleted schedule never rings
 
 ## العربية
 ### تم الإصلاح
@@ -15,6 +16,7 @@
 - زر «الرد» في إشعار المكالمة الواردة أصبح يفتح شاشة المكالمة وهي في حالة اتصال فعلي على Android 12+ (يشغّل شاشة المكالمة مباشرة بدل المرور عبر مستقبل بثّ ممنوع من بدء الشاشات)
 - المكالمات التي لا يُردّ عليها تنتهي الآن كـ«فائتة» بعد 45 ثانية من الرنين في كلا وضعي الاتصال بدل الرنين بلا نهاية؛ والمكالمة التي رنّت لا تُعاد أبدًا بعد إعادة التشغيل، والمكالمات المجدولة التي فات وقتها منذ زمن تُسوّى كـ«فائتة» بدل أن ترن متأخرة بساعات
 - المكالمات المجدولة أصبحت تنجو من تحديث التطبيق: تُعاد تسجيل المنبهات المعلقة عند استبدال الحزمة، وليس عند الإقلاع فقط
+- أصبح بالإمكان إلغاء المكالمة المجدولة من شاشة السجل، ومسح السجل يلغي منبهاتها أيضًا فلا ترن مكالمة محذوفة أبدًا
 
 ## [1.2] - 2026-10-22
 
