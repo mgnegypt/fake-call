@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+## English
+### Fixed
+- Quick Settings preset tiles no longer crash on Android 14+ (the tile now launches through a PendingIntent, as required for apps targeting API 34+) and no longer read the database on the main thread
+
+## العربية
+### تم الإصلاح
+- بلاطات الإعدادات السريعة للسيناريوهات لم تعد تنهار على Android 14+ (أصبح التشغيل يتم عبر PendingIntent كما هو مطلوب للتطبيقات المستهدفة API 34+) ولم تعد تقرأ قاعدة البيانات على الخيط الرئيسي
+
 ## [1.2] - 2026-10-22
 
 ## English
