@@ -14,6 +14,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.SheetValue
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -68,6 +70,14 @@ fun UpdateSheet(info: UpdateInfo, onDismiss: () -> Unit) {
     // only observes it, so closing the sheet never kills a download.
     val controller = app.updateRepository.controller
     val state by controller.state.collectAsState()
+    val busy = state is UpdateState.Downloading || state is UpdateState.CheckingChecksum ||
+        state is UpdateState.Verifying || state is UpdateState.Installing
+    // Fully expanded only, and while an update is busy the sheet cannot
+    // be swiped/backed away — Cancel is the way out (addendum U2).
+    val sheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true,
+        confirmValueChange = { it != SheetValue.Hidden || !busy }
+    )
     val lang = LanguageManager.effectiveLanguage(context)
     val notes = remember(info) { ReleaseParser.notesFor(info.notesBody, lang) }
 
@@ -76,12 +86,15 @@ fun UpdateSheet(info: UpdateInfo, onDismiss: () -> Unit) {
     }
 
     ModalBottomSheet(
-        onDismissRequest = onDismiss,
+        onDismissRequest = { if (!busy) onDismiss() },
+        sheetState = sheetState,
         containerColor = b.card2,
         shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp)
     ) {
         Column(
-            modifier = Modifier.padding(start = 20.dp, end = 20.dp, bottom = 24.dp),
+            modifier = Modifier
+                .padding(start = 20.dp, end = 20.dp, bottom = 24.dp)
+                .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Text(
@@ -118,6 +131,11 @@ fun UpdateSheet(info: UpdateInfo, onDismiss: () -> Unit) {
                         fontSize = 12.sp,
                         color = Color.White.copy(alpha = 0.8f)
                     )
+                    // Fixed-height status slot: the card is the same
+                    // height in every state, so the sheet never jumps
+                    // when the progress UI appears or leaves (U2).
+                    Box(modifier = Modifier.heightIn(min = 44.dp)) {
+                        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     when (val s = state) {
                         is UpdateState.Downloading -> {
                             Box(
@@ -159,6 +177,8 @@ fun UpdateSheet(info: UpdateInfo, onDismiss: () -> Unit) {
                             color = Color.White
                         )
                         else -> Unit
+                    }
+                        }
                     }
                 }
             }
@@ -209,8 +229,17 @@ fun UpdateSheet(info: UpdateInfo, onDismiss: () -> Unit) {
                     height = 56
                 )
             }
-            TextButton(onClick = onDismiss, modifier = Modifier.fillMaxWidth()) {
-                Text(stringResource(R.string.action_dismiss), color = b.accentText)
+            if (busy) {
+                TextButton(
+                    onClick = { controller.cancel(); onDismiss() },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(stringResource(R.string.action_cancel), color = b.accentText)
+                }
+            } else {
+                TextButton(onClick = onDismiss, modifier = Modifier.fillMaxWidth()) {
+                    Text(stringResource(R.string.action_dismiss), color = b.accentText)
+                }
             }
         }
     }
@@ -224,7 +253,8 @@ fun WhatsNewSheet(version: String, notesBody: String, onDismiss: () -> Unit) {
     val lang = LanguageManager.effectiveLanguage(context)
     val notes = remember(notesBody) { ReleaseParser.notesFor(notesBody, lang) }
     ModalBottomSheet(
-        onDismissRequest = onDismiss,
+        onDismissRequest = { if (!busy) onDismiss() },
+        sheetState = sheetState,
         containerColor = b.card2,
         shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp)
     ) {

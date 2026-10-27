@@ -7,6 +7,7 @@
 - Theme is now a three-way choice (Follow system / Light / Dark) in Settings — before, once you picked light or dark there was no way back to following the system
 
 ### Fixed
+- The update sheet no longer jumps while updating: it opens fully expanded with a fixed-height status area, cannot be swiped away mid-download (a Cancel button replaces Dismiss while busy), and scrolls on small screens or large fonts.
 - The update download/verify/install flow moved out of the update sheet into an app-level controller: closing the sheet no longer cancels a download, and the install-permission/download state survives the sheet being dismissed and reopened.
 - Quick Settings preset tiles no longer crash on Android 14+ (the tile now launches through a PendingIntent, as required for apps targeting API 34+) and no longer read the database on the main thread
 - The Answer button on the incoming-call notification now opens the call screen already in-call on Android 12+ (it launches the call activity directly instead of going through a broadcast receiver, whose activity start is blocked)
@@ -31,6 +32,7 @@
 - المظهر أصبح اختيارًا ثلاثيًا (حسب النظام / فاتح / داكن) في الإعدادات — قبل ذلك، متى اخترت الفاتح أو الداكن لم تكن هناك طريقة للعودة إلى إعداد النظام
 
 ### تم الإصلاح
+- شاشة التحديث لم تعد تقفز أثناء التحديث: تُفتح ممتدة بالكامل مع منطقة حالة ثابتة الارتفاع، ولا يمكن إغلاقها بالسحب أثناء التنزيل (يحل زر «إلغاء» محل «إغلاق» أثناء الانشغال)، وتتمرر على الشاشات الصغيرة أو الخطوط الكبيرة.
 - انتقلت عملية التحديث (تنزيل وتحقق وتثبيت) من شاشة التحديث إلى متحكم على مستوى التطبيق: إغلاق الشاشة لم يعد يلغي التنزيل، وحالة التحديث تبقى بعد إغلاق الشاشة وإعادة فتحها
 - بلاطات الإعدادات السريعة للسيناريوهات لم تعد تنهار على Android 14+ (أصبح التشغيل يتم عبر PendingIntent كما هو مطلوب للتطبيقات المستهدفة API 34+) ولم تعد تقرأ قاعدة البيانات على الخيط الرئيسي
 - زر «الرد» في إشعار المكالمة الواردة أصبح يفتح شاشة المكالمة وهي في حالة اتصال فعلي على Android 12+ (يشغّل شاشة المكالمة مباشرة بدل المرور عبر مستقبل بثّ ممنوع من بدء الشاشات)
