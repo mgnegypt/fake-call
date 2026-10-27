@@ -87,9 +87,6 @@ fun SettingsScreen(onShowUpdate: () -> Unit, onOpenLogs: () -> Unit) {
     var checking by remember { mutableStateOf(false) }
     var checkMessage by remember { mutableStateOf<String?>(null) }
 
-    val systemDark = androidx.compose.foundation.isSystemInDarkTheme()
-    val darkSwitchOn = themeMode == "dark" || (themeMode == "system" && systemDark)
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -127,20 +124,21 @@ fun SettingsScreen(onShowUpdate: () -> Unit, onOpenLogs: () -> Unit) {
                 SettingRow(
                     icon = Icons.Outlined.DarkMode,
                     title = stringResource(R.string.settings_dark_mode),
-                    subtitle = stringResource(R.string.settings_dark_mode_desc),
-                    onClick = {
-                        scope.launch {
-                            app.settings.setThemeMode(if (darkSwitchOn) "light" else "dark")
-                        }
-                    }
+                    subtitle = stringResource(R.string.settings_dark_mode_desc)
                 ) {
-                    AppSwitch(
-                        checked = darkSwitchOn,
-                        onCheckedChange = { on ->
-                            scope.launch {
-                                app.settings.setThemeMode(if (on) "dark" else "light")
-                            }
-                        }
+                    val themeOptions = listOf(
+                        "system" to stringResource(R.string.theme_system),
+                        "light" to stringResource(R.string.theme_light),
+                        "dark" to stringResource(R.string.theme_dark)
+                    )
+                    DropdownField(
+                        value = themeOptions.firstOrNull { it.first == themeMode }?.second
+                            ?: themeOptions[0].second,
+                        options = themeOptions.map { it.second },
+                        onSelect = { index ->
+                            scope.launch { app.settings.setThemeMode(themeOptions[index].first) }
+                        },
+                        modifier = Modifier.weight(1f)
                     )
                 }
             }

@@ -179,6 +179,9 @@
 
     <!-- Burgundy redesign (presentation only) -->
     <string name="settings_dark_mode">Dark mode</string>
+    <string name="theme_system">Follow system</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
     <string name="settings_dark_mode_desc">Switch between light and dark</string>
     <string name="field_name_label">Name</string>
     <string name="home_ready">Ready for your call</string>

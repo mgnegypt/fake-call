@@ -175,6 +175,9 @@
 
     <!-- Burgundy redesign (presentation only) -->
     <string name="settings_dark_mode">الوضع الداكن</string>
+    <string name="theme_system">حسب النظام</string>
+    <string name="theme_light">فاتح</string>
+    <string name="theme_dark">داكن</string>
     <string name="settings_dark_mode_desc">بدّل بين الفاتح والداكن</string>
     <string name="field_name_label">الاسم</string>
     <string name="home_ready">جاهز للمكالمة</string>
