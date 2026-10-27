@@ -136,6 +136,13 @@ contract when touching either one.
 Alarms do not survive reboot. `BootReceiver` (on `BOOT_COMPLETED`) re-registers
 every pending scheduled call from Room and re-registers the PhoneAccount.
 
+## Overlapping calls
+
+One live call at a time. If a new trigger arrives while a call is `Ringing`
+or `InCall`, the new history row is settled as `MISSED` and the trigger is
+dropped: it never replaces the active call's screen, ringtone or
+notification. (`CallController.startIncoming`, since 1.3.)
+
 Forensic addendum (2026-10-20, from the owner's device screenshots — our UI
 still opened over the system's and the caller showed as "Unknown"):
 

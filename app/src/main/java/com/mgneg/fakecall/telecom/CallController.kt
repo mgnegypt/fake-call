@@ -85,6 +85,16 @@ class CallController(private val context: Context) {
      */
     fun startIncoming(callerName: String, callerNumber: String, audioUri: String?, historyId: Long) {
         app.appScope.launch {
+            // Overlap policy (documented in docs/CALL_ENGINE.md): one live
+            // call at a time. A second trigger while a call is ringing or
+            // in progress is settled as MISSED and never disturbs the
+            // active call, its ringtone or its notification.
+            val current = _state.value
+            if (current is CallState.Ringing || current is CallState.InCall) {
+                Log.i(TAG, "startIncoming historyId=$historyId settled MISSED: another call is active")
+                if (historyId > 0) finishHistory(historyId, CallStatus.MISSED, 0)
+                return@launch
+            }
             val mode = app.settings.callMode.first()
             // Observed for diagnostics only; never gates routing.
             val accountEnabled = TelecomAccounts.isEnabled(context)
@@ -145,6 +155,7 @@ class CallController(private val context: Context) {
                         callerName, callerNumber, audioUri, historyId, CallPath.APP_SCREEN
                     )
                     val ringtoneUri = app.settings.ringtoneUri.first()
+                    ringtonePlayer?.stop()
                     ringtonePlayer = RingtonePlayer(context, ringtoneUri).also { it.start() }
                     IncomingCallNotifier.show(context, callerName, callerNumber)
                     ringTimeoutJob?.cancel()

@@ -10,6 +10,7 @@
 - Scheduled calls now survive an app update: pending alarms are re-registered when the package is replaced, not only at boot
 - Scheduled calls can now be cancelled from History, and clearing history cancels their alarms too, so a deleted schedule never rings
 - Security: an update whose checksum is missing or cannot be fetched is now refused instead of being installed unverified; a failed verification deletes the download and says why
+- A second call triggered while one is already ringing or in progress no longer leaves an orphaned looping ringtone: it settles as Missed and leaves the active call untouched
 
 ## العربية
 ### تم الإصلاح
@@ -19,6 +20,7 @@
 - المكالمات المجدولة أصبحت تنجو من تحديث التطبيق: تُعاد تسجيل المنبهات المعلقة عند استبدال الحزمة، وليس عند الإقلاع فقط
 - أصبح بالإمكان إلغاء المكالمة المجدولة من شاشة السجل، ومسح السجل يلغي منبهاتها أيضًا فلا ترن مكالمة محذوفة أبدًا
 - أمان: التحديث الذي تتعذر بصمته أو يستحيل جلبها أصبح يُرفض الآن بدل تثبيته دون تحقق؛ وفشل التحقق يحذف التنزيل ويوضح السبب
+- مكالمة ثانية تُستدعى أثناء رنين أو سير مكالمة أخرى لم تعد تترك نغمة رنين يتيمة تدور بلا نهاية: تُسوّى كـ«فائتة» وتترك المكالمة الجارية دون مساس
 
 ## [1.2] - 2026-10-22
 
