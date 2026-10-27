@@ -6,6 +6,7 @@ import android.media.AudioFocusRequest
 import android.media.AudioManager
 import android.media.MediaPlayer
 import android.net.Uri
+import android.util.Log
 
 /** Plays the answer audio file on the voice-communication route. */
 class CallAudioPlayer(private val context: Context) {
@@ -25,12 +26,23 @@ class CallAudioPlayer(private val context: Context) {
             .build()
         am.requestAudioFocus(focusRequest!!)
         am.mode = AudioManager.MODE_IN_COMMUNICATION
+        // prepareAsync: a slow or broken audio file must never block the
+        // calling thread (this runs on the main thread on the app path),
+        // and a failure must surface in the log instead of playing silence.
         player = MediaPlayer().apply {
             setAudioAttributes(attrs)
+            setOnPreparedListener { mp -> runCatching { mp.start() } }
+            setOnErrorListener { _, what, extra ->
+                Log.w("FakeCallTelecom", "answer audio failed: what=$what extra=$extra")
+                this@CallAudioPlayer.stop()
+                true
+            }
             runCatching {
                 setDataSource(context, Uri.parse(uriString))
-                prepare()
-                start()
+                prepareAsync()
+            }.onFailure {
+                Log.w("FakeCallTelecom", "answer audio could not be opened: $uriString", it)
+                this@CallAudioPlayer.stop()
             }
         }
     }
