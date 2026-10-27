@@ -147,7 +147,7 @@
 
         <activity
             android:name=".presets.PresetTriggerActivity"
-            android:exported="true"
+            android:exported="false"
             android:excludeFromRecents="true"
             android:noHistory="true"
             android:theme="@android:style/Theme.NoDisplay" />

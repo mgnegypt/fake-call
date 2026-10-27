@@ -287,6 +287,19 @@ fun SettingsScreen(onShowUpdate: () -> Unit, onOpenLogs: () -> Unit) {
         SoftCard(contentPadding = androidx.compose.foundation.layout.PaddingValues(14.dp)) {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 Text(stringResource(R.string.settings_automation), style = MaterialTheme.typography.titleMedium)
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        stringResource(R.string.settings_automation_enable),
+                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Medium),
+                        modifier = Modifier.weight(1f)
+                    )
+                    val automationEnabled by app.settings.automationEnabled
+                        .collectAsState(initial = false)
+                    AppSwitch(
+                        checked = automationEnabled,
+                        onCheckedChange = { scope.launch { app.settings.setAutomationEnabled(it) } }
+                    )
+                }
                 Text(
                     stringResource(R.string.settings_automation_desc),
                     fontSize = 13.sp,

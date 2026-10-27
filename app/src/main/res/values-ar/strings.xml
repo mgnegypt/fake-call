@@ -96,7 +96,8 @@
     <string name="settings_checking">جارٍ البحث…</string>
     <string name="settings_up_to_date">أنت على أحدث إصدار (v%1$s).</string>
     <string name="settings_automation">الأتمتة</string>
-    <string name="settings_automation_desc">يمكن للتطبيقات الأخرى (Tasker وMacroDroid) أو ADB تشغيل مكالمة عبر إجراء البث com.mgneg.fakecall.action.TRIGGER مع الإضافات caller_name وcaller_number وdelay (بالثواني).</string>
+    <string name="settings_automation_desc">يمكن للتطبيقات الأخرى (Tasker وMacroDroid) أو ADB تشغيل مكالمة عبر إجراء البث com.mgneg.fakecall.action.TRIGGER مع الإضافات caller_name وcaller_number وdelay (بالثواني). مغلق افتراضيًا: فعّله فقط إذا كنت تستخدم تطبيقًا آخر أو ADB لتشغيل المكالمات؛ وأثناء إغلاقه تُتجاهل المشغلات.</string>
+    <string name="settings_automation_enable">السماح بمشغلات الأتمتة</string>
 
     <string name="update_title">يوجد تحديث جديد</string>
     <string name="update_new_version">الإصدار v%1$s</string>

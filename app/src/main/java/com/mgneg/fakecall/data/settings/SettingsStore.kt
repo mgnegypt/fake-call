@@ -28,6 +28,7 @@ class SettingsStore(private val context: Context) {
         val DEFAULT_NAME = stringPreferencesKey("default_name")
         val DEFAULT_NUMBER = stringPreferencesKey("default_number")
         val UPDATE_NOTIFICATIONS = booleanPreferencesKey("update_notifications")
+        val AUTOMATION_ENABLED = booleanPreferencesKey("automation_enabled")
         val LAST_CHECK = longPreferencesKey("update_last_check")
         val ETAG = stringPreferencesKey("update_etag")
         val LATEST_VERSION = stringPreferencesKey("update_latest_version")
@@ -59,6 +60,10 @@ class SettingsStore(private val context: Context) {
     val defaultNumber: Flow<String> = context.dataStore.data.map { it[Keys.DEFAULT_NUMBER] ?: "" }
     val updateNotifications: Flow<Boolean> =
         context.dataStore.data.map { it[Keys.UPDATE_NOTIFICATIONS] ?: false }
+
+    /** External automation triggers are OFF until the owner opts in. */
+    val automationEnabled: Flow<Boolean> =
+        context.dataStore.data.map { it[Keys.AUTOMATION_ENABLED] ?: false }
     val lastSeenVersion: Flow<String> =
         context.dataStore.data.map { it[Keys.LAST_SEEN_VERSION] ?: "" }
     val introShown: Flow<Boolean> = context.dataStore.data.map { it[Keys.INTRO_SHOWN] ?: false }
@@ -123,6 +128,7 @@ class SettingsStore(private val context: Context) {
     suspend fun setDefaultName(v: String) = edit { it[Keys.DEFAULT_NAME] = v }
     suspend fun setDefaultNumber(v: String) = edit { it[Keys.DEFAULT_NUMBER] = v }
     suspend fun setUpdateNotifications(v: Boolean) = edit { it[Keys.UPDATE_NOTIFICATIONS] = v }
+    suspend fun setAutomationEnabled(v: Boolean) = edit { it[Keys.AUTOMATION_ENABLED] = v }
     suspend fun setLastSeenVersion(v: String) = edit { it[Keys.LAST_SEEN_VERSION] = v }
     suspend fun setIntroShown(v: Boolean) = edit { it[Keys.INTRO_SHOWN] = v }
     suspend fun setRingtoneUri(v: String?) = edit { p ->

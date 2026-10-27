@@ -104,7 +104,8 @@
     <string name="settings_checking">Checking…</string>
     <string name="settings_up_to_date">You are on the latest version (v%1$s).</string>
     <string name="settings_automation">Automation</string>
-    <string name="settings_automation_desc">Other apps (Tasker, MacroDroid) or ADB can trigger a call with the broadcast action com.mgneg.fakecall.action.TRIGGER and the extras caller_name, caller_number, delay (seconds).</string>
+    <string name="settings_automation_desc">Other apps (Tasker, MacroDroid) or ADB can trigger a call with the broadcast action com.mgneg.fakecall.action.TRIGGER and the extras caller_name, caller_number, delay (seconds). Off by default: turn it on only if you use another app or ADB to trigger calls; while it is off, triggers are ignored.</string>
+    <string name="settings_automation_enable">Allow automation triggers</string>
 
     <!-- Updates -->
     <string name="update_title">Update available</string>
