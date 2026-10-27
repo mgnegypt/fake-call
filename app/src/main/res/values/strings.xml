@@ -165,7 +165,6 @@
     <string name="settings_permissions">Permissions</string>
     <string name="perm_granted">Granted</string>
     <string name="perm_missing">Not granted</string>
-    <string name="perm_phone_state">Phone state</string>
     <string name="perm_battery">Battery (unrestricted)</string>
     <string name="perm_install_updates">Install updates</string>
 
@@ -204,7 +203,6 @@
         <item quantity="other">%1$d permissions need enabling</item>
     </plurals>
     <string name="perm_reason_account">So calls ring in the phone app.</string>
-    <string name="perm_reason_phone_state">To read the call state and present the call correctly.</string>
     <string name="perm_reason_exact">So scheduled calls ring exactly on time.</string>
     <string name="perm_reason_notifications">So the call can appear full-screen while the device is locked.</string>
     <string name="perm_reason_fullscreen">So the call can show over the lock screen.</string>

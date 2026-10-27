@@ -2,7 +2,6 @@ package com.mgneg.fakecall.ui.screens
 
 import android.Manifest
 import android.app.Activity
-import android.content.pm.PackageManager
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -12,7 +11,6 @@ import androidx.compose.material.icons.outlined.BatteryChargingFull
 import androidx.compose.material.icons.outlined.Call
 import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material.icons.outlined.Notifications
-import androidx.compose.material.icons.outlined.Smartphone
 import androidx.compose.material.icons.outlined.StayCurrentPortrait
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -22,7 +20,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import com.mgneg.fakecall.FakeCallApp
@@ -40,11 +37,15 @@ data class PermissionEntry(
 )
 
 /**
- * The app's single permission set (7 items) with live state, re-checked
+ * The app's single permission set (6 items) with live state, re-checked
  * on ON_RESUME. Shared by the Settings checklist, the Permissions screen
  * and the Home header badge so all three always agree. The checks and
  * grant actions are the exact ones the pre-redesign Settings checklist
  * and Home readiness cards used.
+ *
+ * READ_PHONE_STATE is deliberately NOT part of the set (removed in 1.3):
+ * registering and querying our own phone account and placing calls on it
+ * never required it — nothing in the app calls an API that does.
  */
 @Composable
 fun rememberPermissionEntries(app: FakeCallApp): List<PermissionEntry> {
@@ -52,7 +53,6 @@ fun rememberPermissionEntries(app: FakeCallApp): List<PermissionEntry> {
     val activity = context as? Activity
 
     var accountEnabled by remember { mutableStateOf(false) }
-    var phoneState by remember { mutableStateOf(false) }
     var exactOk by remember { mutableStateOf(true) }
     var notifOk by remember { mutableStateOf(true) }
     var fsOk by remember { mutableStateOf(true) }
@@ -61,9 +61,6 @@ fun rememberPermissionEntries(app: FakeCallApp): List<PermissionEntry> {
 
     fun refresh() {
         accountEnabled = TelecomAccounts.isEnabled(context)
-        phoneState = ContextCompat.checkSelfPermission(
-            context, Manifest.permission.READ_PHONE_STATE
-        ) == PackageManager.PERMISSION_GRANTED
         exactOk = Permissions.canScheduleExact(context)
         notifOk = Permissions.notificationsEnabled(context)
         fsOk = Permissions.canFullScreenIntent(context)
@@ -73,9 +70,6 @@ fun rememberPermissionEntries(app: FakeCallApp): List<PermissionEntry> {
     LaunchedEffect(Unit) { refresh() }
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { refresh() }
 
-    val phoneStateLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { refresh() }
     val notifLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { refresh() }
@@ -87,19 +81,8 @@ fun rememberPermissionEntries(app: FakeCallApp): List<PermissionEntry> {
             reasonRes = R.string.perm_reason_account,
             granted = accountEnabled,
             onEnable = {
-                if (!phoneState) {
-                    phoneStateLauncher.launch(Manifest.permission.READ_PHONE_STATE)
-                } else {
-                    activity?.startActivity(TelecomAccounts.accountSettingsIntent())
-                }
+                activity?.startActivity(TelecomAccounts.accountSettingsIntent())
             }
-        ),
-        PermissionEntry(
-            icon = Icons.Outlined.Smartphone,
-            titleRes = R.string.perm_phone_state,
-            reasonRes = R.string.perm_reason_phone_state,
-            granted = phoneState,
-            onEnable = { phoneStateLauncher.launch(Manifest.permission.READ_PHONE_STATE) }
         ),
         PermissionEntry(
             icon = Icons.Outlined.Alarm,

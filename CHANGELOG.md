@@ -21,6 +21,7 @@
 - Automation triggers are now off by default: the Tasker/MacroDroid/ADB broadcast is ignored until you turn on "Allow automation triggers" in Settings, and the preset trigger screen is no longer visible to other apps
 - Android backup is disabled for the app (call history contains phone numbers and is never backed up), and the database no longer wipes itself on schema changes — future versions must migrate it properly
 - Release safety: the release workflow now refuses a tag that does not match the app version, requires every release to raise the version code, and runs the unit tests and lint before building
+- Removed the READ_PHONE_STATE permission: registering and using the app's own call account never required it, so it is gone from the manifest and from the permissions checklist
 
 ## العربية
 ### تم التغيير
@@ -41,6 +42,7 @@
 - مشغلات الأتمتة أصبحت مغلقة افتراضيًا: بث Tasker وMacroDroid وADB يُتجاهل حتى تفعّل «السماح بمشغلات الأتمتة» في الإعدادات، وشاشة تشغيل السيناريوهات لم تعد ظاهرة للتطبيقات الأخرى
 - النسخ الاحتياطي من Android أصبح معطّلًا للتطبيق (سجل المكالمات يحتوي أرقام هواتف ولا يُنسخ أبدًا)، وقاعدة البيانات لم تعد تمسح نفسها عند تغيّر مخططها — الإصدارات القادمة يجب أن ترحّلها ترحيلًا صحيحًا
 - أمان الإصدارات: سير عمل الإصدار أصبح يرفض وسمًا لا يطابق إصدار التطبيق، ويشترط رفع رمز الإصدار في كل إصدار، ويشغّل اختبارات الوحدة والفحص قبل البناء
+- أُزيل إذن حالة الهاتف (READ_PHONE_STATE): تسجيل حساب اتصال التطبيق واستخدامه لم يتطلباه أبدًا، فحُذف من البيان ومن قائمة الأذونات
 
 ## [1.2] - 2026-10-22
 

@@ -11,13 +11,15 @@ privacy, entertainment, presentations, and testing.
 
 ## Features
 
-- **Real call experience** — calls are raised through the Android Telecom
-  framework and ring in the system dialer (after you enable the Fake Call
-  account once in system settings). If the account is not enabled, the app
-  automatically falls back to its own full-screen call UI; see
+- **Real call experience** — two strict call modes, chosen in Settings.
+  *System dialer*: calls are raised through the Android Telecom framework
+  and ring in the system dialer (after you enable the Fake Call account
+  once in system settings); if the account cannot take the call, nothing
+  rings and you get an honest notice — the app never substitutes its own
+  screen. *App screen*: the app's own full-screen call UI. See
   [docs/CALL_ENGINE.md](docs/CALL_ENGINE.md) for the decision and its limits.
-- **Scheduling** — ring now, after a delay, or at an exact time, with exact
-  alarms; pending calls survive reboot.
+- **Scheduling** — ring now or after a delay (a countdown), with exact
+  alarms; pending calls survive reboot and app updates.
 - **Audio on answer** — pick any audio file; it plays on the voice route when
   the call is answered.
 - **History** — every simulated call is logged (answered / declined / completed).
@@ -65,14 +67,14 @@ adb shell am broadcast \
 
 | Permission | Why |
 |---|---|
-| Phone state (`READ_PHONE_STATE`) | Register and query the Telecom call account |
+| Contacts (`READ_CONTACTS`) | Only for the contacts picker on Home, requested when you tap it |
 | Exact alarms | Ring at the exact scheduled time |
-| Notifications (+ full-screen intent) | Show the incoming call over the lock screen (fallback UI) |
+| Notifications (+ full-screen intent) | Show the incoming call over the lock screen (app-screen mode) |
 | Install packages | Install in-app updates you explicitly confirm |
 | Internet | Update checks against GitHub Releases only |
 | Boot completed | Re-schedule pending calls after a reboot |
 | Battery optimization exemption | Keep scheduled calls from being delayed or killed by OEM battery saving (requested in the app, never forced) |
-| Vibrate / audio settings | Ring vibration and voice-route audio playback |
+| Audio settings | Voice-route audio playback (vibration is left to the system) |
 
 ## Building from source
 
@@ -96,6 +98,9 @@ stable releases and recorded in [docs/VERSIONS.md](docs/VERSIONS.md).
 Fake Call collects no data. Contacts, presets, history, and settings never
 leave the device. The only network requests are update checks to
 `api.github.com` (which you can ignore — the app works fully offline).
+Those checks run automatically about once a day (WorkManager) so the app
+can offer you new releases; the "update notifications" setting only
+controls whether you are notified, not whether the check happens.
 
 ## Inspiration
 
@@ -117,9 +122,10 @@ Third-party notices: [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
 والاختبار.
 
 - يعمل على أندرويد 11 حتى أندرويد 17، بواجهة عربية وإنجليزية كاملة الاتجاهين.
-- المكالمات ترن عبر إطار عمل Telecom في النظام (بعد تفعيل حساب «مكالمة وهمية»
-  مرة واحدة من إعدادات النظام)، مع شاشة مكالمة داخل التطبيق كبديل تلقائي.
-- جدولة دقيقة، صوت عند الرد، سجل مكالمات، وحتى 5 إعدادات سريعة مع اختصارات
+- وضعا اتصال صارمان: الاتصال عبر نظام الهاتف (إطار عمل Telecom، بعد تفعيل
+  حساب «مكالمة وهمية» مرة واحدة من إعدادات النظام) أو شاشة مكالمة داخل
+  التطبيق — دون استبدال أحدهما بالآخر تلقائيًا أبدًا.
+- جدولة بعدّاد تأخير، صوت عند الرد، سجل مكالمات، وحتى 5 إعدادات سريعة مع اختصارات
   وبلاطات إعدادات سريعة، وواجهة أتمتة لـ Tasker وMacroDroid وADB.
 - تحديثات من داخل التطبيق عبر إصدارات GitHub مع التحقق من بصمة SHA-256.
 - لا إعلانات ولا تتبع ولا جمع بيانات؛ الشبكة تُستخدم فقط للتحقق من التحديثات.

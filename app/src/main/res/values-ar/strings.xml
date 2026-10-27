@@ -153,7 +153,6 @@
     <string name="settings_permissions">الأذونات</string>
     <string name="perm_granted">ممنوح</string>
     <string name="perm_missing">غير ممنوح</string>
-    <string name="perm_phone_state">حالة الهاتف</string>
     <string name="perm_battery">البطارية (بدون قيود)</string>
     <string name="perm_install_updates">تثبيت التحديثات</string>
 
@@ -203,7 +202,6 @@
         <item quantity="other">%1$d إذن يحتاج تفعيل</item>
     </plurals>
     <string name="perm_reason_account">لترن المكالمات في تطبيق الهاتف.</string>
-    <string name="perm_reason_phone_state">لمعرفة حالة الاتصال وعرض المكالمة بشكل صحيح.</string>
     <string name="perm_reason_exact">لترن المكالمات المجدولة في وقتها.</string>
     <string name="perm_reason_notifications">لتظهر المكالمة بملء الشاشة أثناء قفل الجهاز.</string>
     <string name="perm_reason_fullscreen">لتظهر المكالمة فوق شاشة القفل.</string>
