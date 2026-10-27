@@ -12,6 +12,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Verify tag matches build version
+        run: |
+          PREV_TAG="$(git tag --list 'v*' --sort=-v:refname | grep -v "^${GITHUB_REF_NAME}$" | head -1 || true)"
+          PREV_CODE=0
+          if [ -n "$PREV_TAG" ]; then
+            PREV_CODE="$(git show "${PREV_TAG}:app/build.gradle.kts" | grep -E 'versionCode[[:space:]]*=' | head -1 | sed -E 's/[^0-9]*([0-9]+).*/\1/')"
+          fi
+          bash scripts/check-release-version.sh "${GITHUB_REF_NAME}" app/build.gradle.kts "${PREV_CODE:-0}"
 
       - name: Resolve version from tag
         id: ver
@@ -43,6 +54,9 @@ jobs:
             exit 1
           fi
           echo "$RELEASE_KEYSTORE_BASE64" | tr -d '[:space:]' | base64 -d > "$RUNNER_TEMP/release.jks"
+
+      - name: Unit tests
+        run: gradle :app:testDebugUnitTest --stacktrace
 
       - name: Build signed release APK
         env:
