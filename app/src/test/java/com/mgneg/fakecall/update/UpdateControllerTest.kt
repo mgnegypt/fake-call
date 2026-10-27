@@ -4,7 +4,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -191,23 +190,27 @@ class UpdateControllerTest {
 
     @Test
     fun progressReportsNullForUnknownSize() = runBlocking {
-        val seen = mutableListOf<Int?>()
+        // Each progress value is held for a window so the test can poll
+        // the state value directly — collecting a StateFlow here would
+        // race its conflation and flake.
         val source = FakeSource(downloadBody = { onProgress ->
             onProgress(null) // unknown size (U3)
+            delay(400)
             onProgress(50)
-            delay(10)
+            delay(400)
             null // then the download "fails" so the flow ends
         })
         val controller = controller(source, FakeInstaller())
-        val watcher = CoroutineScope(Job() + Dispatchers.Default).launch {
-            controller.state.collect { s ->
-                if (s is UpdateState.Downloading) seen += s.pct
-            }
-        }
+
         controller.start(info)
+        val unknown = awaitState(controller) {
+            it is UpdateState.Downloading && it.pct == null
+        }
+        assertTrue(unknown is UpdateState.Downloading && unknown.pct == null)
+        val half = awaitState(controller) {
+            it is UpdateState.Downloading && it.pct == 50
+        }
+        assertTrue(half is UpdateState.Downloading && half.pct == 50)
         awaitState(controller) { it is UpdateState.Failed }
-        watcher.cancel()
-        assertTrue("expected a null (unknown) progress report", seen.contains(null))
-        assertTrue("expected the 50% report", seen.contains(50))
     }
 }
