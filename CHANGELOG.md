@@ -12,6 +12,7 @@
 - Security: an update whose checksum is missing or cannot be fetched is now refused instead of being installed unverified; a failed verification deletes the download and says why
 - A second call triggered while one is already ringing or in progress no longer leaves an orphaned looping ringtone: it settles as Missed and leaves the active call untouched
 - The mute button in the app's call screen now actually silences the answer audio (before, it only changed the icon)
+- Speakerphone now uses the modern audio-routing API on Android 12+ and is always reset when a call ends, so the route never leaks into the next call
 
 ## العربية
 ### تم الإصلاح
@@ -23,6 +24,7 @@
 - أمان: التحديث الذي تتعذر بصمته أو يستحيل جلبها أصبح يُرفض الآن بدل تثبيته دون تحقق؛ وفشل التحقق يحذف التنزيل ويوضح السبب
 - مكالمة ثانية تُستدعى أثناء رنين أو سير مكالمة أخرى لم تعد تترك نغمة رنين يتيمة تدور بلا نهاية: تُسوّى كـ«فائتة» وتترك المكالمة الجارية دون مساس
 - زر كتم الصوت في شاشة مكالمة التطبيق أصبح يُسكت صوت الرد فعليًا (قبل ذلك كان يغيّر الأيقونة فقط)
+- مكبر الصوت أصبح يستخدم واجهة توجيه الصوت الحديثة على Android 12+ ويُعاد ضبطه دائمًا عند انتهاء المكالمة فلا يتسرب التوجيه للمكالمة التالية
 
 ## [1.2] - 2026-10-22
 

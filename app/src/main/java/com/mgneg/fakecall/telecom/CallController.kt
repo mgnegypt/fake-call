@@ -204,6 +204,7 @@ class CallController(private val context: Context) {
         if (s.path != CallPath.APP_SCREEN) return
         ringTimeoutJob?.cancel(); ringTimeoutJob = null
         ringtonePlayer?.stop(); ringtonePlayer = null
+        applySpeakerRoute(false)
         IncomingCallNotifier.dismiss(context)
         _state.value = CallState.Idle
         finishHistory(s.historyId, CallStatus.DECLINED, 0)
@@ -214,6 +215,7 @@ class CallController(private val context: Context) {
         val s = _state.value as? CallState.InCall ?: return
         if (s.path != CallPath.APP_SCREEN) return
         audioPlayer.stop()
+        applySpeakerRoute(false)
         _state.value = CallState.Idle
         val duration = ((System.currentTimeMillis() - s.startedAt) / 1000).toInt()
         finishHistory(s.historyId, CallStatus.COMPLETED, duration)
@@ -227,12 +229,34 @@ class CallController(private val context: Context) {
         audioPlayer.setMuted(muted)
     }
 
-    @Suppress("DEPRECATION")
     fun setSpeaker(speaker: Boolean) {
         val s = _state.value as? CallState.InCall ?: return
         _state.value = s.copy(speaker = speaker)
-        val am = context.getSystemService(android.media.AudioManager::class.java)
-        am?.isSpeakerphoneOn = speaker
+        applySpeakerRoute(speaker)
+    }
+
+    /**
+     * Route call audio to (or away from) the loudspeaker. On API 31+ the
+     * deprecated isSpeakerphoneOn is replaced by the communication-device
+     * API; turning off clears the device so the system picks the default
+     * route again. Also used to reset the route when a call ends, so the
+     * speaker choice never leaks into the next call or other apps.
+     */
+    private fun applySpeakerRoute(speaker: Boolean) {
+        val am = context.getSystemService(android.media.AudioManager::class.java) ?: return
+        if (android.os.Build.VERSION.SDK_INT >= 31) {
+            if (speaker) {
+                val device = am.availableCommunicationDevices.firstOrNull {
+                    it.type == android.media.AudioDeviceInfo.TYPE_BUILTIN_SPEAKER
+                }
+                if (device != null) am.setCommunicationDevice(device)
+            } else {
+                am.clearCommunicationDevice()
+            }
+        } else {
+            @Suppress("DEPRECATION")
+            am.isSpeakerphoneOn = speaker
+        }
     }
 
     /** Events reported back by the Telecom connection (system UI path). */

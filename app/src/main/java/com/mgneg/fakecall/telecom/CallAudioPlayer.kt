@@ -48,6 +48,13 @@ class CallAudioPlayer(private val context: Context) {
         val am = context.getSystemService(AudioManager::class.java) ?: return
         focusRequest?.let { am.abandonAudioFocusRequest(it) }
         focusRequest = null
+        // Reset the audio route so a speaker choice never leaks past the call.
+        if (android.os.Build.VERSION.SDK_INT >= 31) {
+            am.clearCommunicationDevice()
+        } else {
+            @Suppress("DEPRECATION")
+            am.isSpeakerphoneOn = false
+        }
         if (am.mode == AudioManager.MODE_IN_COMMUNICATION) am.mode = AudioManager.MODE_NORMAL
     }
 }
