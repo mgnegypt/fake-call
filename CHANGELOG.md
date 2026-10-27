@@ -7,6 +7,7 @@
 - Theme is now a three-way choice (Follow system / Light / Dark) in Settings — before, once you picked light or dark there was no way back to following the system
 
 ### Fixed
+- The update no longer freezes the UI: fetching the checksum, verifying it and writing the install session all run off the main thread, and each phase is labelled in the sheet (fetching / verifying / installing).
 - Update progress is smooth and honest: the bar animates between percents, and when the server does not report the APK size the sheet shows an indeterminate bar instead of sitting at 0%.
 - The update sheet no longer jumps while updating: it opens fully expanded with a fixed-height status area, cannot be swiped away mid-download (a Cancel button replaces Dismiss while busy), and scrolls on small screens or large fonts.
 - The update download/verify/install flow moved out of the update sheet into an app-level controller: closing the sheet no longer cancels a download, and the install-permission/download state survives the sheet being dismissed and reopened.
@@ -33,6 +34,7 @@
 - المظهر أصبح اختيارًا ثلاثيًا (حسب النظام / فاتح / داكن) في الإعدادات — قبل ذلك، متى اخترت الفاتح أو الداكن لم تكن هناك طريقة للعودة إلى إعداد النظام
 
 ### تم الإصلاح
+- التحديث لم يعد يجمّد الواجهة: جلب بصمة التحقق والتحقق منها وكتابة جلسة التثبيت كلها تجري خارج الخيط الرئيسي، وكل مرحلة موسومة في الشاشة (جلب / تحقق / تثبيت).
 - تقدم التحديث أصبح سلسًا وصادقًا: الشريط يتحرك بسلاسة بين النسب، وعندما لا يعلن الخادم حجم الـAPK تعرض الشاشة شريطًا غير محدد بدل الوقوف عند 0%.
 - شاشة التحديث لم تعد تقفز أثناء التحديث: تُفتح ممتدة بالكامل مع منطقة حالة ثابتة الارتفاع، ولا يمكن إغلاقها بالسحب أثناء التنزيل (يحل زر «إلغاء» محل «إغلاق» أثناء الانشغال)، وتتمرر على الشاشات الصغيرة أو الخطوط الكبيرة.
 - انتقلت عملية التحديث (تنزيل وتحقق وتثبيت) من شاشة التحديث إلى متحكم على مستوى التطبيق: إغلاق الشاشة لم يعد يلغي التنزيل، وحالة التحديث تبقى بعد إغلاق الشاشة وإعادة فتحها

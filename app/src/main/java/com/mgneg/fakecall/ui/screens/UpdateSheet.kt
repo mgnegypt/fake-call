@@ -171,14 +171,32 @@ fun UpdateSheet(info: UpdateInfo, onDismiss: () -> Unit) {
                                 )
                             }
                         }
-                        is UpdateState.CheckingChecksum, is UpdateState.Verifying -> {
+                        is UpdateState.CheckingChecksum -> {
                             LinearProgressIndicator(
                                 color = Color.White,
                                 trackColor = Color.White.copy(alpha = 0.22f),
                                 modifier = Modifier.fillMaxWidth()
                             )
                             Text(
-                                stringResource(R.string.update_verifying),
+                                stringResource(R.string.update_checking_checksum),
+                                fontSize = 13.sp,
+                                color = Color.White.copy(alpha = 0.85f)
+                            )
+                        }
+                        is UpdateState.Verifying, is UpdateState.Installing -> {
+                            LinearProgressIndicator(
+                                color = Color.White,
+                                trackColor = Color.White.copy(alpha = 0.22f),
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                            Text(
+                                stringResource(
+                                    if (s is UpdateState.Installing) {
+                                        R.string.update_installing
+                                    } else {
+                                        R.string.update_verifying
+                                    }
+                                ),
                                 fontSize = 13.sp,
                                 color = Color.White.copy(alpha = 0.85f)
                             )

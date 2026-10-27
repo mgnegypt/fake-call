@@ -1,6 +1,8 @@
 package com.mgneg.fakecall.update
 
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -73,16 +75,23 @@ class UpdateController(
             return
         }
         currentFile = file
-        _state.value = UpdateState.Verifying
+        // Visible phases, all heavy work off the main thread (U4): the
+        // checksum fetch can take up to 15 s, the verify reads the whole
+        // APK, and the install copies + fsyncs it.
+        _state.value = UpdateState.CheckingChecksum
         val expected = downloader.fetchExpectedSha(info)
-        if (!UpdateGate.shouldInstall(expected, file)) {
+        _state.value = UpdateState.Verifying
+        val verified = withContext(Dispatchers.IO) {
+            UpdateGate.shouldInstall(expected, file)
+        }
+        if (!verified) {
             file.delete()
             currentFile = null
             _state.value = UpdateState.Failed(UpdateFailReason.CHECKSUM)
             return
         }
         _state.value = UpdateState.Installing
-        install(file)
+        withContext(Dispatchers.IO) { install(file) }
         currentFile = null
         _state.value = UpdateState.Idle
     }

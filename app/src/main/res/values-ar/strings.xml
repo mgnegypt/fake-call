@@ -105,7 +105,9 @@
     <string name="update_open_github">الفتح على GitHub</string>
     <string name="update_downloading">جارٍ التنزيل… %1$d%%</string>
     <string name="update_downloading_unknown">جارٍ التنزيل…</string>
+    <string name="update_checking_checksum">جارٍ جلب بصمة التحقق…</string>
     <string name="update_verifying">جارٍ التحقق من البصمة…</string>
+    <string name="update_installing">جارٍ التثبيت…</string>
     <string name="update_failed">فشل التحديث. يمكنك تنزيله من GitHub بدلًا من ذلك.</string>
     <string name="update_verify_failed">تعذّر التحقق من التنزيل، لذا لم يتم التثبيت. يمكنك تنزيله من GitHub بدلًا من ذلك.</string>
     <string name="update_install_permission">لتثبيت التحديثات داخل التطبيق، اسمح بالتثبيت من هذا المصدر في إعدادات النظام.</string>
