@@ -211,6 +211,9 @@ class UpdateControllerTest {
             it is UpdateState.Downloading && it.pct == 50
         }
         assertTrue(half is UpdateState.Downloading && half.pct == 50)
-        awaitState(controller) { it is UpdateState.Failed }
+        // NB: the test method must return Unit — ending on a value-
+        // returning expression makes JUnit reject the whole class.
+        val end = awaitState(controller) { it is UpdateState.Failed }
+        assertTrue(end is UpdateState.Failed)
     }
 }
