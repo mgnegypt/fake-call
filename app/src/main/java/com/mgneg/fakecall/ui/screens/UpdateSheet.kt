@@ -13,6 +13,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -138,32 +141,48 @@ fun UpdateSheet(info: UpdateInfo, onDismiss: () -> Unit) {
                         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     when (val s = state) {
                         is UpdateState.Downloading -> {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(10.dp)
-                                    .clip(RoundedCornerShape(5.dp))
-                                    .background(Color.White.copy(alpha = 0.22f))
-                            ) {
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth((s.pct ?: 0) / 100f)
-                                        .height(10.dp)
-                                        .clip(RoundedCornerShape(5.dp))
-                                        .background(Color.White)
+                            if (s.pct != null) {
+                                val animated by animateFloatAsState(
+                                    targetValue = s.pct / 100f,
+                                    animationSpec = tween(200),
+                                    label = "downloadProgress"
+                                )
+                                LinearProgressIndicator(
+                                    progress = { animated },
+                                    color = Color.White,
+                                    trackColor = Color.White.copy(alpha = 0.22f),
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                                Text(
+                                    stringResource(R.string.update_downloading, s.pct),
+                                    fontSize = 13.sp,
+                                    color = Color.White.copy(alpha = 0.85f)
+                                )
+                            } else {
+                                LinearProgressIndicator(
+                                    color = Color.White,
+                                    trackColor = Color.White.copy(alpha = 0.22f),
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                                Text(
+                                    stringResource(R.string.update_downloading_unknown),
+                                    fontSize = 13.sp,
+                                    color = Color.White.copy(alpha = 0.85f)
                                 )
                             }
+                        }
+                        is UpdateState.CheckingChecksum, is UpdateState.Verifying -> {
+                            LinearProgressIndicator(
+                                color = Color.White,
+                                trackColor = Color.White.copy(alpha = 0.22f),
+                                modifier = Modifier.fillMaxWidth()
+                            )
                             Text(
-                                stringResource(R.string.update_downloading, s.pct ?: 0),
+                                stringResource(R.string.update_verifying),
                                 fontSize = 13.sp,
                                 color = Color.White.copy(alpha = 0.85f)
                             )
                         }
-                        is UpdateState.CheckingChecksum, is UpdateState.Verifying -> Text(
-                            stringResource(R.string.update_verifying),
-                            fontSize = 13.sp,
-                            color = Color.White.copy(alpha = 0.85f)
-                        )
                         is UpdateState.Failed -> Text(
                             stringResource(
                                 if (s.reason == UpdateFailReason.CHECKSUM) {

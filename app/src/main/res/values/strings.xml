@@ -113,6 +113,7 @@
     <string name="update_download_install">Download and install</string>
     <string name="update_open_github">Open on GitHub</string>
     <string name="update_downloading">Downloading… %1$d%%</string>
+    <string name="update_downloading_unknown">Downloading…</string>
     <string name="update_verifying">Verifying checksum…</string>
     <string name="update_failed">Update failed. You can download it from GitHub instead.</string>
     <string name="update_verify_failed">Could not verify the download, so it was not installed. You can download it from GitHub instead.</string>
