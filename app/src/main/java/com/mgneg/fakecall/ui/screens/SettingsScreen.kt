@@ -86,6 +86,9 @@ fun SettingsScreen(onShowUpdate: () -> Unit, onOpenLogs: () -> Unit) {
 
     var checking by remember { mutableStateOf(false) }
     var checkMessage by remember { mutableStateOf<String?>(null) }
+    // Resolved in composition (the version name is a build constant) so
+    // the check-updates handler never reads resources via LocalContext.
+    val upToDateMsg = stringResource(R.string.settings_up_to_date, BuildConfig.VERSION_NAME)
 
     Column(
         modifier = Modifier
@@ -267,9 +270,7 @@ fun SettingsScreen(onShowUpdate: () -> Unit, onOpenLogs: () -> Unit) {
                             if (info != null) {
                                 onShowUpdate()
                             } else {
-                                checkMessage = context.getString(
-                                    R.string.settings_up_to_date, BuildConfig.VERSION_NAME
-                                )
+                                checkMessage = upToDateMsg
                             }
                         }
                     },

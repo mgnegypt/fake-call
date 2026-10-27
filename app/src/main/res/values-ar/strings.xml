@@ -195,6 +195,7 @@
     <string name="permissions_all_granted">كل الأذونات مفعّلة</string>
     <string name="permissions_all_granted_sub">كل شيء جاهز — المكالمات سترن في وقتها.</string>
     <plurals name="permissions_need_enabling">
+        <item quantity="zero">لا إذن يحتاج تفعيل</item>
         <item quantity="one">إذن واحد يحتاج تفعيل</item>
         <item quantity="two">إذنان يحتاجان تفعيل</item>
         <item quantity="few">%1$d أذونات تحتاج تفعيل</item>

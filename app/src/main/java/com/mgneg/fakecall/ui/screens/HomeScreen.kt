@@ -223,13 +223,15 @@ fun HomeScreen(
     // its own searchable list; picking an entry fills the same name
     // and number fields as manual typing.
     var showContacts by remember { mutableStateOf(false) }
+    val contactsDeniedMsg = stringResource(R.string.contacts_permission_denied)
+    val presetLimitMsg = stringResource(R.string.preset_limit_reached)
     val contactsPermissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { granted ->
         if (granted) {
             showContacts = true
         } else {
-            scope.launch { snackbar.showSnackbar(context.getString(R.string.contacts_permission_denied)) }
+            scope.launch { snackbar.showSnackbar(contactsDeniedMsg) }
         }
     }
 
@@ -261,16 +263,26 @@ fun HomeScreen(
     val effectiveDelay = if (delayIndex in DELAY_OPTIONS.indices) DELAY_OPTIONS[delayIndex]
         else customDelay.toIntOrNull() ?: 0
 
+    // The "scheduled" snackbar text is resolved in composition (the
+    // confirmation needs a plural for the chosen delay); startCall only
+    // records which delay to announce.
+    var scheduledNoticeSec by remember { mutableStateOf<Int?>(null) }
+    val scheduledNoticeText = scheduledNoticeSec?.let {
+        stringResource(
+            R.string.scheduled_confirmation,
+            pluralStringResource(R.plurals.delay_seconds, it, it)
+        )
+    }
+    LaunchedEffect(scheduledNoticeText) {
+        if (scheduledNoticeText != null) {
+            snackbar.showSnackbar(scheduledNoticeText)
+            scheduledNoticeSec = null
+        }
+    }
+
     fun startCall(delaySec: Int) {
         vm.trigger(name, number, audioPath, delaySec) {
-            if (delaySec > 0) scope.launch {
-                snackbar.showSnackbar(
-                    context.getString(
-                        R.string.scheduled_confirmation,
-                        context.resources.getQuantityString(R.plurals.delay_seconds, delaySec, delaySec)
-                    )
-                )
-            }
+            if (delaySec > 0) scheduledNoticeSec = delaySec
         }
     }
 
@@ -733,7 +745,7 @@ fun HomeScreen(
                     showPresetDialog = false
                     vm.savePreset(presetName.ifBlank { name }, name, number, audioPath, effectiveDelay) { ok ->
                         if (!ok) scope.launch {
-                            snackbar.showSnackbar(context.getString(R.string.preset_limit_reached))
+                            snackbar.showSnackbar(presetLimitMsg)
                         }
                     }
                 }) { Text(stringResource(R.string.action_save)) }

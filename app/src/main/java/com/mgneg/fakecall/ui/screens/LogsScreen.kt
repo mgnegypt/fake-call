@@ -57,14 +57,18 @@ fun LogsScreen(onBack: () -> Unit) {
     val attempt by app.settings.lastCallAttempt
         .collectAsState(initial = CallAttemptDiagnostics())
     val latestAttempt by rememberUpdatedState(attempt)
+    // Read in composition so the export callback below never resolves
+    // resources through a stale LocalContext.
+    val exportAppName = stringResource(R.string.app_name)
+    val exportNoneNote = stringResource(R.string.diag_none)
 
     val exportLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.CreateDocument("text/plain")
     ) { uri ->
         if (uri != null) {
             val text = latestAttempt.toLogText(
-                appName = context.getString(R.string.app_name),
-                noAttemptNote = context.getString(R.string.diag_none)
+                appName = exportAppName,
+                noAttemptNote = exportNoneNote
             )
             scope.launch {
                 runCatching {

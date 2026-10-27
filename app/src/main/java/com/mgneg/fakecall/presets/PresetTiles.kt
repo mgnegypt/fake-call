@@ -1,5 +1,6 @@
 package com.mgneg.fakecall.presets
 
+import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.content.Intent
 import android.os.Build
@@ -41,6 +42,9 @@ abstract class BasePresetTile : TileService() {
         super.onStopListening()
     }
 
+    // The Intent overload is used only below API 34, where it is the
+    // correct (non-deprecated) form; 34+ uses the PendingIntent overload.
+    @SuppressLint("StartActivityAndCollapseDeprecated")
     override fun onClick() {
         super.onClick()
         val intent = Intent(this, PresetTriggerActivity::class.java)

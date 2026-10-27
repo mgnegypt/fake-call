@@ -1,5 +1,6 @@
 package com.mgneg.fakecall.telecom
 
+import android.annotation.SuppressLint
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -42,6 +43,13 @@ object TelecomAccounts {
         runCatching { tm.registerPhoneAccount(account) }
     }
 
+    // callCapablePhoneAccounts is permission-gated by the platform
+    // (READ_PHONE_STATE), which the app deliberately does not declare:
+    // this probe is best-effort diagnostics only — without the permission
+    // it throws, runCatching turns that into null, and the caller falls
+    // back to the getPhoneAccount probe. Call placement itself never
+    // needed the permission.
+    @SuppressLint("MissingPermission")
     fun isEnabled(context: Context): Boolean {
         val tm = context.getSystemService(TelecomManager::class.java) ?: return false
         val ours = handle(context)

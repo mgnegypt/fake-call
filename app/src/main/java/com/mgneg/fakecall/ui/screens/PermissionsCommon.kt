@@ -44,8 +44,10 @@ data class PermissionEntry(
  * and Home readiness cards used.
  *
  * READ_PHONE_STATE is deliberately NOT part of the set (removed in 1.3):
- * registering and querying our own phone account and placing calls on it
- * never required it — nothing in the app calls an API that does.
+ * registering our own phone account and placing calls on it never
+ * required it. One diagnostics-only probe (callCapablePhoneAccounts) is
+ * permission-gated by the platform; it is called best-effort without the
+ * permission and simply reports "unavailable" (see TelecomAccounts).
  */
 @Composable
 fun rememberPermissionEntries(app: FakeCallApp): List<PermissionEntry> {

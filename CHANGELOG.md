@@ -20,6 +20,7 @@
 - Picked answer audio now shows the file's real name, and replaced or removed audio copies are cleaned up instead of leaking in private storage (copies a preset or scheduled call still uses are kept)
 - Automation triggers are now off by default: the Tasker/MacroDroid/ADB broadcast is ignored until you turn on "Allow automation triggers" in Settings, and the preset trigger screen is no longer visible to other apps
 - Android backup is disabled for the app (call history contains phone numbers and is never backed up), and the database no longer wipes itself on schema changes — future versions must migrate it properly
+- Lint is clean: the telecom diagnostics probes are explicitly marked best-effort (they run without READ_PHONE_STATE by design), screen snackbar/log strings are resolved in composition, and the Arabic permissions plural gained its missing "zero" form
 - Release safety: the release workflow now refuses a tag that does not match the app version, requires every release to raise the version code, and runs the unit tests and lint before building
 - Removed the READ_PHONE_STATE permission: registering and using the app's own call account never required it, so it is gone from the manifest and from the permissions checklist
 - Internals: history status changes now follow one tested rule set (a settled call can never be rewritten), and docs/TESTING.md records the release verification checklist

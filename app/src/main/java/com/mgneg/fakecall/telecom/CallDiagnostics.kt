@@ -1,5 +1,6 @@
 package com.mgneg.fakecall.telecom
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.telecom.PhoneAccount
 import android.telecom.PhoneAccountHandle
@@ -77,6 +78,9 @@ data class CallAttemptDiagnostics(
  */
 object RegistrarSnapshot {
 
+    // See TelecomAccounts.isEnabled: the callCapablePhoneAccounts probe
+    // is best-effort diagnostics and intentionally permission-free.
+    @SuppressLint("MissingPermission")
     fun capture(context: Context): List<String> {
         val tm = context.getSystemService(TelecomManager::class.java)
             ?: return listOf("registrar: TelecomManager unavailable")
