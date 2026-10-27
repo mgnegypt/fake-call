@@ -22,6 +22,7 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -82,6 +83,20 @@ fun UpdateSheet(info: UpdateInfo, onDismiss: () -> Unit) {
     )
     val lang = LanguageManager.effectiveLanguage(context)
     val notes = remember(info) { ReleaseParser.notesFor(info.notesBody, lang) }
+    // The install-permission hint used to be read once per composition,
+    // so granting the permission in Settings never cleared it (U8):
+    // refresh on every resume, and continue a download that was waiting
+    // on the grant.
+    var canInstall by remember { mutableStateOf(Permissions.canInstallUnknownApps(context)) }
+    var pendingStart by remember { mutableStateOf(false) }
+    LifecycleResumeEffect(Unit) {
+        canInstall = Permissions.canInstallUnknownApps(context)
+        if (canInstall && pendingStart) {
+            pendingStart = false
+            controller.start(info)
+        }
+        onPauseOrDispose { }
+    }
 
     ModalBottomSheet(
         onDismissRequest = { if (!busy) onDismiss() },
@@ -232,7 +247,7 @@ fun UpdateSheet(info: UpdateInfo, onDismiss: () -> Unit) {
                     )
                 }
             }
-            if (!Permissions.canInstallUnknownApps(context)) {
+            if (!canInstall) {
                 Text(
                     stringResource(R.string.update_install_permission),
                     style = MaterialTheme.typography.bodySmall,
@@ -246,7 +261,8 @@ fun UpdateSheet(info: UpdateInfo, onDismiss: () -> Unit) {
                 GradientButton(
                     text = stringResource(R.string.update_download_install),
                     onClick = {
-                        if (!Permissions.canInstallUnknownApps(context)) {
+                        if (!canInstall) {
+                            pendingStart = true
                             context.startActivity(Permissions.installPermissionIntent(context))
                             return@GradientButton
                         }
