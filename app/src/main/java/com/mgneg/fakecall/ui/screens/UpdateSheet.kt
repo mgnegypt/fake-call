@@ -45,8 +45,8 @@ import com.mgneg.fakecall.ui.components.SoftChip
 import com.mgneg.fakecall.ui.components.burgundy
 import com.mgneg.fakecall.update.Installer
 import com.mgneg.fakecall.update.ReleaseParser
-import com.mgneg.fakecall.update.Sha256
 import com.mgneg.fakecall.update.UpdateDownloader
+import com.mgneg.fakecall.update.UpdateGate
 import com.mgneg.fakecall.update.UpdateInfo
 import com.mgneg.fakecall.util.Permissions
 import com.mgneg.fakecall.util.rememberLtr
@@ -56,7 +56,7 @@ private sealed interface DlState {
     data object Idle : DlState
     data class Downloading(val pct: Int) : DlState
     data object Verifying : DlState
-    data object Failed : DlState
+    data class Failed(val messageRes: Int = R.string.update_failed) : DlState
 }
 
 /**
@@ -147,7 +147,7 @@ fun UpdateSheet(info: UpdateInfo, onDismiss: () -> Unit) {
                             color = Color.White.copy(alpha = 0.85f)
                         )
                         is DlState.Failed -> Text(
-                            stringResource(R.string.update_failed),
+                            stringResource(s.messageRes),
                             fontSize = 13.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color.White
@@ -192,16 +192,18 @@ fun UpdateSheet(info: UpdateInfo, onDismiss: () -> Unit) {
                                 state = DlState.Downloading(pct)
                             }
                             if (file == null) {
-                                state = DlState.Failed
+                                state = DlState.Failed()
                                 return@launch
                             }
+                            // Verification fails CLOSED: no expected
+                            // checksum (missing/unreachable .sha256 asset)
+                            // means no install, ever.
+                            state = DlState.Verifying
                             val expected = downloader.fetchExpectedSha(info)
-                            if (expected != null) {
-                                state = DlState.Verifying
-                                if (!Sha256.verify(file, expected)) {
-                                    state = DlState.Failed
-                                    return@launch
-                                }
+                            if (!UpdateGate.shouldInstall(expected, file)) {
+                                file.delete()
+                                state = DlState.Failed(R.string.update_verify_failed)
+                                return@launch
                             }
                             Installer.install(context, file)
                             onDismiss()

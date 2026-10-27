@@ -9,6 +9,7 @@
 - Unanswered calls now end as Missed after 45 seconds of ringing in both call modes, instead of ringing forever; a call that already rang is never re-fired after a reboot, and long-past scheduled calls settle as Missed instead of ringing hours late
 - Scheduled calls now survive an app update: pending alarms are re-registered when the package is replaced, not only at boot
 - Scheduled calls can now be cancelled from History, and clearing history cancels their alarms too, so a deleted schedule never rings
+- Security: an update whose checksum is missing or cannot be fetched is now refused instead of being installed unverified; a failed verification deletes the download and says why
 
 ## العربية
 ### تم الإصلاح
@@ -17,6 +18,7 @@
 - المكالمات التي لا يُردّ عليها تنتهي الآن كـ«فائتة» بعد 45 ثانية من الرنين في كلا وضعي الاتصال بدل الرنين بلا نهاية؛ والمكالمة التي رنّت لا تُعاد أبدًا بعد إعادة التشغيل، والمكالمات المجدولة التي فات وقتها منذ زمن تُسوّى كـ«فائتة» بدل أن ترن متأخرة بساعات
 - المكالمات المجدولة أصبحت تنجو من تحديث التطبيق: تُعاد تسجيل المنبهات المعلقة عند استبدال الحزمة، وليس عند الإقلاع فقط
 - أصبح بالإمكان إلغاء المكالمة المجدولة من شاشة السجل، ومسح السجل يلغي منبهاتها أيضًا فلا ترن مكالمة محذوفة أبدًا
+- أمان: التحديث الذي تتعذر بصمته أو يستحيل جلبها أصبح يُرفض الآن بدل تثبيته دون تحقق؛ وفشل التحقق يحذف التنزيل ويوضح السبب
 
 ## [1.2] - 2026-10-22
 

@@ -105,6 +105,7 @@
     <string name="update_downloading">جارٍ التنزيل… %1$d%%</string>
     <string name="update_verifying">جارٍ التحقق من البصمة…</string>
     <string name="update_failed">فشل التحديث. يمكنك تنزيله من GitHub بدلًا من ذلك.</string>
+    <string name="update_verify_failed">تعذّر التحقق من التنزيل، لذا لم يتم التثبيت. يمكنك تنزيله من GitHub بدلًا من ذلك.</string>
     <string name="update_install_permission">لتثبيت التحديثات داخل التطبيق، اسمح بالتثبيت من هذا المصدر في إعدادات النظام.</string>
     <string name="whats_new_title">ما الجديد في v%1$s</string>
 
