@@ -19,6 +19,7 @@
 - Answer audio now loads without blocking the call screen, and a broken audio file logs its failure instead of answering with silence
 - Picked answer audio now shows the file's real name, and replaced or removed audio copies are cleaned up instead of leaking in private storage (copies a preset or scheduled call still uses are kept)
 - Automation triggers are now off by default: the Tasker/MacroDroid/ADB broadcast is ignored until you turn on "Allow automation triggers" in Settings, and the preset trigger screen is no longer visible to other apps
+- Android backup is disabled for the app (call history contains phone numbers and is never backed up), and the database no longer wipes itself on schema changes — future versions must migrate it properly
 
 ## العربية
 ### تم التغيير
@@ -37,6 +38,7 @@
 - صوت الرد أصبح يُحمّل دون تعطيل شاشة المكالمة، وملف الصوت التالف يُسجّل فشله بدل الرد بصمت
 - صوت الرد المختار أصبح يعرض اسم الملف الحقيقي، والنسخ المستبدلة أو المحذوفة تُنظّف بدل التسرب في التخزين الخاص (النسخ التي يستخدمها سيناريو أو مكالمة مجدولة تبقى)
 - مشغلات الأتمتة أصبحت مغلقة افتراضيًا: بث Tasker وMacroDroid وADB يُتجاهل حتى تفعّل «السماح بمشغلات الأتمتة» في الإعدادات، وشاشة تشغيل السيناريوهات لم تعد ظاهرة للتطبيقات الأخرى
+- النسخ الاحتياطي من Android أصبح معطّلًا للتطبيق (سجل المكالمات يحتوي أرقام هواتف ولا يُنسخ أبدًا)، وقاعدة البيانات لم تعد تمسح نفسها عند تغيّر مخططها — الإصدارات القادمة يجب أن ترحّلها ترحيلًا صحيحًا
 
 ## [1.2] - 2026-10-22
 

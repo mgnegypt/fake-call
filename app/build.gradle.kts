@@ -5,6 +5,13 @@ plugins {
     alias(libs.plugins.ksp)
 }
 
+ksp {
+    // Room schema export (AppDatabase exportSchema = true): the schema
+    // JSON for each DB version is written here and committed, so future
+    // versions can ship real Migrations against it.
+    arg("room.schemaLocation", "$projectDir/schemas")
+}
+
 android {
     namespace = "com.mgneg.fakecall"
     compileSdk {
