@@ -203,8 +203,16 @@ fun HomeScreen(
                     true
                 }.getOrDefault(false)
                 if (ok) {
+                    val previous = audioPath
                     audioPath = file.absolutePath
-                    audioName = uri.lastPathSegment?.substringAfterLast('/') ?: file.name
+                    audioName = com.mgneg.fakecall.util.AudioFiles.displayName(context, uri)
+                        ?: uri.lastPathSegment?.substringAfterLast('/')
+                        ?: file.name
+                    // The replaced copy is deleted unless a preset or a
+                    // scheduled call still points at it.
+                    if (previous != null && previous != file.absolutePath) {
+                        com.mgneg.fakecall.util.AudioFiles.deleteIfUnreferenced(context, previous)
+                    }
                 }
             }
         }
@@ -525,7 +533,16 @@ fun HomeScreen(
                 trailing = if (audioPath != null) {
                     {
                         IconButton(
-                            onClick = { audioPath = null; audioName = null },
+                            onClick = {
+                                val removed = audioPath
+                                audioPath = null; audioName = null
+                                if (removed != null) {
+                                    scope.launch(kotlinx.coroutines.Dispatchers.IO) {
+                                        com.mgneg.fakecall.util.AudioFiles
+                                            .deleteIfUnreferenced(context, removed)
+                                    }
+                                }
+                            },
                             modifier = Modifier.size(28.dp)
                         ) {
                             Icon(

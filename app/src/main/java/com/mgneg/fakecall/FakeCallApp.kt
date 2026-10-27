@@ -55,6 +55,10 @@ class FakeCallApp : Application() {
             // A fresh process has no live call: any row still RINGING
             // belonged to a call that died with the previous process.
             callRepository.sweepStaleRinging()
+            // Drop answer-audio copies nothing references anymore.
+            runCatching {
+                com.mgneg.fakecall.util.AudioFiles.cleanupUnreferenced(this@FakeCallApp)
+            }
             initialized = true
         }
         UpdateWorker.schedulePeriodic(this)

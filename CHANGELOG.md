@@ -17,6 +17,7 @@
 - The mute button in the app's call screen now actually silences the answer audio (before, it only changed the icon)
 - Speakerphone now uses the modern audio-routing API on Android 12+ and is always reset when a call ends, so the route never leaks into the next call
 - Answer audio now loads without blocking the call screen, and a broken audio file logs its failure instead of answering with silence
+- Picked answer audio now shows the file's real name, and replaced or removed audio copies are cleaned up instead of leaking in private storage (copies a preset or scheduled call still uses are kept)
 
 ## العربية
 ### تم التغيير
@@ -33,6 +34,7 @@
 - زر كتم الصوت في شاشة مكالمة التطبيق أصبح يُسكت صوت الرد فعليًا (قبل ذلك كان يغيّر الأيقونة فقط)
 - مكبر الصوت أصبح يستخدم واجهة توجيه الصوت الحديثة على Android 12+ ويُعاد ضبطه دائمًا عند انتهاء المكالمة فلا يتسرب التوجيه للمكالمة التالية
 - صوت الرد أصبح يُحمّل دون تعطيل شاشة المكالمة، وملف الصوت التالف يُسجّل فشله بدل الرد بصمت
+- صوت الرد المختار أصبح يعرض اسم الملف الحقيقي، والنسخ المستبدلة أو المحذوفة تُنظّف بدل التسرب في التخزين الخاص (النسخ التي يستخدمها سيناريو أو مكالمة مجدولة تبقى)
 
 ## [1.2] - 2026-10-22
 
