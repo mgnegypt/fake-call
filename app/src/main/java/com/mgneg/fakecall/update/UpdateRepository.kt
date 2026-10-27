@@ -26,6 +26,18 @@ class UpdateRepository(
     private val _available = MutableStateFlow<UpdateInfo?>(null)
     val available: StateFlow<UpdateInfo?> = _available.asStateFlow()
 
+    /**
+     * The update flow controller (addendum U1): owned here so a download
+     * keeps running on the app scope even when the sheet is closed.
+     */
+    val controller: UpdateController by lazy {
+        UpdateController(
+            scope = app.appScope,
+            downloader = UpdateDownloader(context),
+            install = { file -> Installer.install(context, file) }
+        )
+    }
+
     init {
         app.appScope.launch {
             settings.updateCache.collect { cache ->

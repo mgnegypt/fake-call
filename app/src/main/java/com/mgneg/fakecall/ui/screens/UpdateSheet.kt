@@ -20,8 +20,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -43,21 +44,13 @@ import com.mgneg.fakecall.ui.components.HeroCard
 import com.mgneg.fakecall.ui.components.SoftCard
 import com.mgneg.fakecall.ui.components.SoftChip
 import com.mgneg.fakecall.ui.components.burgundy
-import com.mgneg.fakecall.update.Installer
 import com.mgneg.fakecall.update.ReleaseParser
-import com.mgneg.fakecall.update.UpdateDownloader
-import com.mgneg.fakecall.update.UpdateGate
+import com.mgneg.fakecall.FakeCallApp
+import com.mgneg.fakecall.update.UpdateFailReason
 import com.mgneg.fakecall.update.UpdateInfo
+import com.mgneg.fakecall.update.UpdateState
 import com.mgneg.fakecall.util.Permissions
 import com.mgneg.fakecall.util.rememberLtr
-import kotlinx.coroutines.launch
-
-private sealed interface DlState {
-    data object Idle : DlState
-    data class Downloading(val pct: Int) : DlState
-    data object Verifying : DlState
-    data class Failed(val messageRes: Int = R.string.update_failed) : DlState
-}
 
 /**
  * Update sheet, restyled to the design's Update board but still a
@@ -69,11 +62,18 @@ private sealed interface DlState {
 @Composable
 fun UpdateSheet(info: UpdateInfo, onDismiss: () -> Unit) {
     val context = LocalContext.current
-    val scope = rememberCoroutineScope()
+    val app = context.applicationContext as FakeCallApp
     val b = burgundy()
-    var state by remember { mutableStateOf<DlState>(DlState.Idle) }
+    // The flow lives in the controller now (addendum U1): this sheet
+    // only observes it, so closing the sheet never kills a download.
+    val controller = app.updateRepository.controller
+    val state by controller.state.collectAsState()
     val lang = LanguageManager.effectiveLanguage(context)
     val notes = remember(info) { ReleaseParser.notesFor(info.notesBody, lang) }
+
+    LaunchedEffect(state) {
+        if (state is UpdateState.Installing) onDismiss()
+    }
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -119,7 +119,7 @@ fun UpdateSheet(info: UpdateInfo, onDismiss: () -> Unit) {
                         color = Color.White.copy(alpha = 0.8f)
                     )
                     when (val s = state) {
-                        is DlState.Downloading -> {
+                        is UpdateState.Downloading -> {
                             Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -129,25 +129,31 @@ fun UpdateSheet(info: UpdateInfo, onDismiss: () -> Unit) {
                             ) {
                                 Box(
                                     modifier = Modifier
-                                        .fillMaxWidth(s.pct / 100f)
+                                        .fillMaxWidth((s.pct ?: 0) / 100f)
                                         .height(10.dp)
                                         .clip(RoundedCornerShape(5.dp))
                                         .background(Color.White)
                                 )
                             }
                             Text(
-                                stringResource(R.string.update_downloading, s.pct),
+                                stringResource(R.string.update_downloading, s.pct ?: 0),
                                 fontSize = 13.sp,
                                 color = Color.White.copy(alpha = 0.85f)
                             )
                         }
-                        is DlState.Verifying -> Text(
+                        is UpdateState.CheckingChecksum, is UpdateState.Verifying -> Text(
                             stringResource(R.string.update_verifying),
                             fontSize = 13.sp,
                             color = Color.White.copy(alpha = 0.85f)
                         )
-                        is DlState.Failed -> Text(
-                            stringResource(s.messageRes),
+                        is UpdateState.Failed -> Text(
+                            stringResource(
+                                if (s.reason == UpdateFailReason.CHECKSUM) {
+                                    R.string.update_verify_failed
+                                } else {
+                                    R.string.update_failed
+                                }
+                            ),
                             fontSize = 13.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color.White
@@ -185,34 +191,12 @@ fun UpdateSheet(info: UpdateInfo, onDismiss: () -> Unit) {
                             context.startActivity(Permissions.installPermissionIntent(context))
                             return@GradientButton
                         }
-                        val downloader = UpdateDownloader(context)
-                        scope.launch {
-                            state = DlState.Downloading(0)
-                            val file = downloader.downloadApk(info) { pct ->
-                                state = DlState.Downloading(pct)
-                            }
-                            if (file == null) {
-                                state = DlState.Failed()
-                                return@launch
-                            }
-                            // Verification fails CLOSED: no expected
-                            // checksum (missing/unreachable .sha256 asset)
-                            // means no install, ever.
-                            state = DlState.Verifying
-                            val expected = downloader.fetchExpectedSha(info)
-                            if (!UpdateGate.shouldInstall(expected, file)) {
-                                file.delete()
-                                state = DlState.Failed(R.string.update_verify_failed)
-                                return@launch
-                            }
-                            Installer.install(context, file)
-                            onDismiss()
-                        }
+                        controller.start(info)
                     },
                     modifier = Modifier.weight(1f),
                     height = 56,
                     textSize = 17,
-                    enabled = state is DlState.Idle || state is DlState.Failed
+                    enabled = state is UpdateState.Idle || state is UpdateState.Failed
                 )
                 SoftChip(
                     text = stringResource(R.string.update_open_github),
