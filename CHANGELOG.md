@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [1.3] - 2026-10-28
+
 ## English
 ### Changed
 - Theme is now a three-way choice (Follow system / Light / Dark) in Settings — before, once you picked light or dark there was no way back to following the system
