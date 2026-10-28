@@ -45,7 +45,8 @@ fun PermissionsScreen(onBack: () -> Unit) {
     val app = context.applicationContext as FakeCallApp
     val b = burgundy()
     val entries = rememberPermissionEntries(app)
-    val missing = entries.count { !it.granted }
+    val missing = entries.count { !it.granted && !it.unknown }
+    val hasUnknown = entries.any { it.unknown }
 
     Column(
         modifier = Modifier
@@ -66,7 +67,7 @@ fun PermissionsScreen(onBack: () -> Unit) {
                 horizontalArrangement = Arrangement.spacedBy(14.dp)
             ) {
                 Icon(
-                    if (missing > 0) Icons.Filled.WarningAmber else Icons.Filled.Check,
+                    if (missing > 0 || hasUnknown) Icons.Filled.WarningAmber else Icons.Filled.Check,
                     contentDescription = null,
                     tint = Color.White,
                     modifier = Modifier.size(36.dp)
@@ -75,6 +76,8 @@ fun PermissionsScreen(onBack: () -> Unit) {
                     Text(
                         if (missing > 0) {
                             pluralStringResource(R.plurals.permissions_need_enabling, missing, missing)
+                        } else if (hasUnknown) {
+                            stringResource(R.string.perm_account_unknown)
                         } else {
                             stringResource(R.string.permissions_all_granted)
                         },
@@ -84,7 +87,7 @@ fun PermissionsScreen(onBack: () -> Unit) {
                     )
                     Text(
                         stringResource(
-                            if (missing > 0) R.string.permissions_hero_sub
+                            if (missing > 0 || hasUnknown) R.string.permissions_hero_sub
                             else R.string.permissions_all_granted_sub
                         ),
                         color = Color.White.copy(alpha = 0.85f),
@@ -132,6 +135,26 @@ fun PermissionsScreen(onBack: () -> Unit) {
                                 fontWeight = FontWeight.Bold,
                                 modifier = Modifier.padding(start = 4.dp)
                             )
+                        }
+                    } else if (entry.unknown) {
+                        Column(
+                            horizontalAlignment = Alignment.End,
+                            verticalArrangement = Arrangement.spacedBy(6.dp)
+                        ) {
+                            Text(
+                                stringResource(R.string.perm_account_unknown),
+                                color = b.muted,
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(top = 4.dp)
+                            )
+                            GradientButton(
+                                text = stringResource(R.string.action_try_call),
+                                onClick = { entry.onTryCall?.invoke() }
+                            )
+                            androidx.compose.material3.TextButton(onClick = entry.onEnable) {
+                                Text(stringResource(R.string.perm_open_settings))
+                            }
                         }
                     } else {
                         GradientButton(

@@ -208,6 +208,9 @@
         <item quantity="one">%1$d permission needs enabling</item>
         <item quantity="other">%1$d permissions need enabling</item>
     </plurals>
+    <string name="perm_account_unknown">Not verified yet</string>
+    <string name="action_try_call">Try a call</string>
+    <string name="perm_open_settings">Open settings</string>
     <string name="perm_reason_account">So calls ring in the phone app.</string>
     <string name="perm_reason_exact">So scheduled calls ring exactly on time.</string>
     <string name="perm_reason_notifications">So the call can appear full-screen while the device is locked.</string>

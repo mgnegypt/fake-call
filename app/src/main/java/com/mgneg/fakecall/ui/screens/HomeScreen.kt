@@ -294,7 +294,7 @@ fun HomeScreen(
     }
 
     val permissionEntries = rememberPermissionEntries(app)
-    val missingPermissions = permissionEntries.count { !it.granted }
+    val missingPermissions = permissionEntries.count { !it.granted && !it.unknown }
 
     Column(
         modifier = Modifier

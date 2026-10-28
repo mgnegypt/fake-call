@@ -208,6 +208,9 @@
         <item quantity="many">%1$d إذنًا يحتاج تفعيل</item>
         <item quantity="other">%1$d إذن يحتاج تفعيل</item>
     </plurals>
+    <string name="perm_account_unknown">لم يتم التحقق بعد</string>
+    <string name="action_try_call">جرّب مكالمة</string>
+    <string name="perm_open_settings">فتح الإعدادات</string>
     <string name="perm_reason_account">لترن المكالمات في تطبيق الهاتف.</string>
     <string name="perm_reason_exact">لترن المكالمات المجدولة في وقتها.</string>
     <string name="perm_reason_notifications">لتظهر المكالمة بملء الشاشة أثناء قفل الجهاز.</string>

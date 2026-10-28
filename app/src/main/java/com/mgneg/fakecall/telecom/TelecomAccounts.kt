@@ -71,6 +71,30 @@ object TelecomAccounts {
             .getOrDefault(false)
     }
 
+    /**
+     * The honest tri-state verdict used by the Permissions UI. Runs the
+     * same probes as [isEnabled] but keeps "could not read" distinct from
+     * "disabled", and folds in stored connection [evidence] per
+     * [AccountEnablementRules]. [isEnabled] stays for diagnostics, where
+     * a plain observed boolean is what the log format records.
+     */
+    fun enablement(context: Context, evidence: Boolean): AccountEnablement {
+        val tm = context.getSystemService(TelecomManager::class.java)
+            ?: return if (evidence) AccountEnablement.ENABLED else AccountEnablement.UNKNOWN
+        val ours = handle(context)
+        @Suppress("MissingPermission")
+        val capable = runCatching { tm.callCapablePhoneAccounts }.getOrNull()
+        val capableContains = capable?.any {
+            it.componentName == ours.componentName && it.id == ours.id
+        }
+        val direct = if (capable == null) {
+            runCatching { tm.getPhoneAccount(ours) }.getOrNull()?.isEnabled
+        } else {
+            null
+        }
+        return AccountEnablementRules.decide(capableContains, direct, evidence)
+    }
+
     fun accountSettingsIntent(): Intent = Intent(TelecomManager.ACTION_CHANGE_PHONE_ACCOUNTS)
 
     /**

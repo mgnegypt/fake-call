@@ -29,6 +29,7 @@ class SettingsStore(private val context: Context) {
         val DEFAULT_NUMBER = stringPreferencesKey("default_number")
         val UPDATE_NOTIFICATIONS = booleanPreferencesKey("update_notifications")
         val AUTOMATION_ENABLED = booleanPreferencesKey("automation_enabled")
+        val TELECOM_EVIDENCE = booleanPreferencesKey("telecom_evidence")
         val LAST_CHECK = longPreferencesKey("update_last_check")
         val ETAG = stringPreferencesKey("update_etag")
         val LATEST_VERSION = stringPreferencesKey("update_latest_version")
@@ -60,6 +61,15 @@ class SettingsStore(private val context: Context) {
     val defaultNumber: Flow<String> = context.dataStore.data.map { it[Keys.DEFAULT_NUMBER] ?: "" }
     val updateNotifications: Flow<Boolean> =
         context.dataStore.data.map { it[Keys.UPDATE_NOTIFICATIONS] ?: false }
+
+    /**
+     * Connection evidence: true after FakeConnectionService actually
+     * created an incoming connection (proof the system routed a call to
+     * our account); cleared when a later telecom placement fails. Only a
+     * fallback signal for account enablement — see AccountEnablementRules.
+     */
+    val telecomEvidence: Flow<Boolean> =
+        context.dataStore.data.map { it[Keys.TELECOM_EVIDENCE] ?: false }
 
     /** External automation triggers are OFF until the owner opts in. */
     val automationEnabled: Flow<Boolean> =
@@ -129,6 +139,7 @@ class SettingsStore(private val context: Context) {
     suspend fun setDefaultNumber(v: String) = edit { it[Keys.DEFAULT_NUMBER] = v }
     suspend fun setUpdateNotifications(v: Boolean) = edit { it[Keys.UPDATE_NOTIFICATIONS] = v }
     suspend fun setAutomationEnabled(v: Boolean) = edit { it[Keys.AUTOMATION_ENABLED] = v }
+    suspend fun setTelecomEvidence(v: Boolean) = edit { it[Keys.TELECOM_EVIDENCE] = v }
     suspend fun setLastSeenVersion(v: String) = edit { it[Keys.LAST_SEEN_VERSION] = v }
     suspend fun setIntroShown(v: Boolean) = edit { it[Keys.INTRO_SHOWN] = v }
     suspend fun setRingtoneUri(v: String?) = edit { p ->

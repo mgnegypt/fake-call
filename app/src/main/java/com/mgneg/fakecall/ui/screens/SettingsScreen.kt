@@ -377,6 +377,17 @@ private fun PermissionCheckRow(entry: PermissionEntry) {
                     modifier = Modifier.padding(start = 4.dp)
                 )
             }
+        } else if (entry.unknown) {
+            Text(
+                stringResource(R.string.perm_account_unknown),
+                color = b.muted,
+                fontSize = 13.sp,
+                fontWeight = FontWeight.Bold
+            )
+            GradientButton(
+                text = stringResource(R.string.action_try_call),
+                onClick = { entry.onTryCall?.invoke() }
+            )
         } else {
             GradientButton(
                 text = stringResource(R.string.action_enable),

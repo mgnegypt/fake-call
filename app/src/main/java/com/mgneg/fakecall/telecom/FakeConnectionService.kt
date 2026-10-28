@@ -6,6 +6,7 @@ import android.telecom.ConnectionService
 import android.telecom.PhoneAccountHandle
 import android.telecom.TelecomManager
 import com.mgneg.fakecall.FakeCallApp
+import kotlinx.coroutines.launch
 
 class FakeConnectionService : ConnectionService() {
 
@@ -21,6 +22,13 @@ class FakeConnectionService : ConnectionService() {
         val audioUri = extras?.getString(TelecomAccounts.EXTRA_AUDIO_URI)
         val name = extras?.getString(TelecomAccounts.EXTRA_CALLER_NAME).orEmpty()
         val number = request.address?.schemeSpecificPart.orEmpty()
+        // Connection evidence (owner condition, 2026-10-28): the system
+        // only delivers an incoming connection to an ENABLED account, so
+        // reaching this callback is hard proof of enablement — unlike a
+        // bare "placement returned", which some stacks report loosely.
+        (applicationContext as? FakeCallApp)?.let { app ->
+            app.appScope.launch { runCatching { app.settings.setTelecomEvidence(true) } }
+        }
         return FakeConnection(applicationContext, name, number, audioUri, historyId)
     }
 
@@ -28,7 +36,11 @@ class FakeConnectionService : ConnectionService() {
         connectionManagerPhoneAccount: PhoneAccountHandle,
         request: ConnectionRequest
     ) {
-        (applicationContext as? FakeCallApp)?.callController
-            ?.onTelecomStateChanged(CallState.Idle)
+        // A system call failed to materialise: stored evidence no longer
+        // reflects reality, so it is cleared (owner condition 2).
+        (applicationContext as? FakeCallApp)?.let { app ->
+            app.appScope.launch { runCatching { app.settings.setTelecomEvidence(false) } }
+            app.callController?.onTelecomStateChanged(CallState.Idle)
+        }
     }
 }

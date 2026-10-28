@@ -1,6 +1,7 @@
 package com.mgneg.fakecall.telecom
 
 import android.annotation.SuppressLint
+import android.content.pm.PackageManager
 import android.content.Context
 import android.telecom.PhoneAccount
 import android.telecom.PhoneAccountHandle
@@ -93,9 +94,35 @@ object RegistrarSnapshot {
             lines += "ourAccount: found enabled=${ours.isEnabled} " +
                 "capabilities=${capabilitiesText(ours)}"
         }
-        val capable = runCatching { tm.callCapablePhoneAccounts }.getOrNull()
+        // READ_PHONE_STATE state, so a log reader can tell "permission
+        // not declared" (the app never asks for it since 1.3) from
+        // "declared but denied", plus the probe's exception type when
+        // the call-capable list could not be read.
+        val pm = context.packageManager
+        val rpsDeclared = runCatching {
+            @Suppress("DEPRECATION")
+            pm.getPackageInfo(context.packageName, PackageManager.GET_PERMISSIONS)
+                .requestedPermissions
+                ?.contains(android.Manifest.permission.READ_PHONE_STATE) == true
+        }.getOrDefault(false)
+        val rpsGranted = pm.checkPermission(
+            android.Manifest.permission.READ_PHONE_STATE, context.packageName
+        ) == PackageManager.PERMISSION_GRANTED
+        lines += "phoneStatePermission: " + when {
+            !rpsDeclared -> "not declared"
+            rpsGranted -> "granted"
+            else -> "denied"
+        }
+        var capableError: Throwable? = null
+        val capable = try {
+            tm.callCapablePhoneAccounts
+        } catch (t: Throwable) {
+            capableError = t
+            null
+        }
         if (capable == null) {
             lines += "callCapable: unavailable"
+            capableError?.let { lines += "callCapableError: ${it.javaClass.simpleName}" }
         } else {
             lines += "callCapable: ${capable.size}"
             capable.forEach { handle ->

@@ -7,6 +7,7 @@
 - Theme is now a three-way choice (Follow system / Light / Dark) in Settings — before, once you picked light or dark there was no way back to following the system
 
 ### Fixed
+- The Permissions screen no longer claims the phone account is not enabled when the platform cannot verify it: the account state is now tri-state (enabled / disabled / not verified), a real system connection counts as enablement evidence, a later failed system call clears that evidence, and the diagnostics log records the READ_PHONE_STATE state and the probe's exception type.
 - The update flow is covered by unit tests for its state machine: happy path, missing/mismatched checksum, double-start, cancel, install failure and unknown-size progress.
 - Downloaded update files clean up after themselves: the cached APK is deleted once the install session takes it, and stale downloads or partial files from older versions are cleared on app start.
 - The update sheet fits narrow screens and large fonts: the new version stands on its own line (smaller when long), the current version sits beneath it, and the download button takes the full width with GitHub/Dismiss on their own row.
@@ -41,6 +42,7 @@
 - المظهر أصبح اختيارًا ثلاثيًا (حسب النظام / فاتح / داكن) في الإعدادات — قبل ذلك، متى اخترت الفاتح أو الداكن لم تكن هناك طريقة للعودة إلى إعداد النظام
 
 ### تم الإصلاح
+- شاشة الأذونات لم تعد تدّعي أن حساب الاتصال غير مفعّل بينما النظام عاجز عن التحقق منه: صارت حالة الحساب ثلاثية (مفعّل / معطّل / لم يتم التحقق)، ويُعدّ اتصال نظام حقيقي دليل تفعيل، وفشل مكالمة نظام لاحقة يمسح هذا الدليل، وسجل التشخيص يوثّق حالة إذن READ_PHONE_STATE ونوع استثناء المسبار.
 - عملية التحديث أصبحت مغطاة باختبارات وحدة لآلة حالاتها: المسار الناجح، البصمة المفقودة/غير المطابقة، البدء المزدوج، الإلغاء، فشل التثبيت، والتقدم عند حجم مجهول.
 - ملفات التحديث المنزّلة تنظف وراءها: يُحذف الـAPK من الكاش بمجرد أن تتسلمه جلسة التثبيت، والتنزيلات القديمة أو الملفات الناقصة من إصدارات أقدم تُمسح عند بدء التطبيق.
 - شاشة التحديث تناسب الشاشات الضيقة والخطوط الكبيرة: الإصدار الجديد على سطر مستقل (أصغر عندما يطول)، والإصدار الحالي تحته، وزر التنزيل بعرض الشاشة كاملًا مع GitHub و«إغلاق» على سطر خاص بهما.

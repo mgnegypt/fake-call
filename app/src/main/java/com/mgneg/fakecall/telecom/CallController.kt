@@ -179,6 +179,12 @@ class CallController(private val context: Context) {
                         placeError
                     )
                     _state.value = CallState.Idle
+                    // A system call just failed: any stored connection
+                    // evidence is stale and must not keep claiming the
+                    // account is enabled (owner condition 2).
+                    app.appScope.launch {
+                        runCatching { app.settings.setTelecomEvidence(false) }
+                    }
                     IncomingCallNotifier.showTelecomUnavailable(context)
                     if (historyId > 0) finishHistory(historyId, CallStatus.FAILED, 0)
                 }
